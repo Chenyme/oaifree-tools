@@ -1,8 +1,12 @@
-# Hello，各位。
+# oaifree-tools
+
+[![下载 Download](https://img.shields.io/github/downloads/Chenyme/oaifree-tools/total.svg?style=flat-square)](https://github.com/Chenyme/oaifree-tools/releases)
+![Docker Pulls](https://img.shields.io/docker/pulls/chenyme/oaifree-tool)
+
 
 这是一个小白写的服务，如有不对之处还请指教。
 
-现已发布：[Demo](http://47.236.123.254:8501/)
+演示站：[Demo](http://47.236.123.254:8501/)
 
 管理密码：neo_niubi
 
