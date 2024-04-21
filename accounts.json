@@ -1,0 +1,7 @@
+{
+  "groupA": {
+    "Account": "xxx@xxx.com",
+    "access_token": "ey",
+    "refresh_token": "ee"
+  }
+}
