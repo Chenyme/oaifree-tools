@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
-COPY setting.toml config.json accounts.json tool.py /app/
+COPY setting.toml config.json accounts.json invite.json tool.py /app/
 RUN pip install --no-cache-dir streamlit pandas openpyxl
 
 CMD ["streamlit", "run", "/app/tool.py"]
