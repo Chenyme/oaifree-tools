@@ -7,6 +7,7 @@
 这是一个小白写的服务，如有不对之处还请指教。
 
 演示站：[Demo](http://47.236.123.254:8501/)
+（请不要修改演示站的superkey，谢谢❤️）
 
 管理密码：neo_niubi
 
@@ -16,10 +17,16 @@
 ## 项目功能
 > - 支持无域名部署（用始皇的网页）
 > - 支持账户密码登录
+> - 支持注册码注册
 > - 支持Oauth直接跳转
 > - 支持用户管理，token管理
 > - 支持用户自己刷新token，无需自己维护
 
+## 最近更新
+> - 支持修改标题
+> - 支持管理用户功能
+> - 支持注册码注册
+> - 修复了一些已知问题
 
 ## 效果图：登录界面
 
@@ -81,6 +88,14 @@
 
 ![9](https://github.com/Chenyme/oaifree-tools/blob/main/public/9.png)
 
+### 用户邀请
+1. 开启注册功能，设置注册码
+
+![11](https://github.com/Chenyme/oaifree-tools/blob/main/public/11.png)
+  
+2. 注册
+
+![12](https://github.com/Chenyme/oaifree-tools/blob/main/public/12.png)
 
 ## 鸣谢
 
