@@ -36,8 +36,8 @@
 ### 如何安装
 
 - 首先你需要一台VPS，准备好docker。
-- 然后在服务器中输入```docker pull chenyme/oaifree-tool:v1```等待镜像拉取。
-- 拉取完后```docker run -d -p 8501:8501 chenyme/oaifree-tool:v1```（记得打开服务器的8501端口）。
+- 然后在服务器中输入```docker pull chenyme/oaifree-tool:v2```等待镜像拉取。
+- 拉取完后```docker run -d -p 8501:8501 chenyme/oaifree-tool:v2```（记得打开服务器的8501端口）。
 - 最后在网页中输入`服务器IP:8501`就能访问啦。
 - 看到和上面的效果图一样的界面就是成功了
 
