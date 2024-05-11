@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
-COPY setting.toml config.json accounts.json invite.json tool.py /app/
-RUN pip install --no-cache-dir streamlit pandas openpyxl
+COPY setting.toml config.json accounts.json invite.json login.py style.css /app/
+RUN pip install --no-cache-dir streamlit pandas openpyxl streamlit-on-Hover-tabs
 
-CMD ["streamlit", "run", "/app/tool.py"]
+CMD ["streamlit", "run", "/app/login.py"]

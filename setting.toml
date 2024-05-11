@@ -3,4 +3,4 @@ title = "OpenAI，Not CloseAI"
 yourdomain = "new.oaifree.com"
 superkey = "neo_niubi"
 user_refresh = true
-user_signup = false
+user_signup = true
