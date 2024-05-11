@@ -26,9 +26,20 @@
 > - 新ui
 > - 修复了一些已知问题
 
-## 效果图：登录界面
 
-![1](https://github.com/Chenyme/oaifree-tools/blob/main/public/1.png)
+## 效果图
+
+### 主界面
+
+![2](https://github.com/Chenyme/oaifree-tools/blob/main/public/v31.png)
+
+### 管理界面
+
+![2](https://github.com/Chenyme/oaifree-tools/blob/main/public/v33.png)
+
+### 用户界面
+
+![2](https://github.com/Chenyme/oaifree-tools/blob/main/public/v32.png)
 
 
 ### 如何安装
