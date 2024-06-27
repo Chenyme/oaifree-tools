@@ -20,8 +20,8 @@
 ## 部署项目
 #### Docker
 ```
-docker pull chenyme/oaifree-tool:v4
-docker run -d -p 8501:8501 chenyme/oaifree-tool:v4
+docker pull chenyme/oait:v1.0
+docker run -d -p 8501:8501 chenyme/oait:v1.0
 ```
 
 默认管理账号：**admin**，管理密码：**12345678**
