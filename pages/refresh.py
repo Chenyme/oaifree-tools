@@ -5,13 +5,12 @@ import logging
 import streamlit as st
 from utils import get_accesstoken, get_sharetoken, login
 
+
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     handlers=[logging.FileHandler("app.log", encoding='utf-8'),
                               logging.StreamHandler()])
-
 logger = logging.getLogger()
-
 png_logger = logging.getLogger("PIL.PngImagePlugin")
 png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
@@ -26,6 +25,23 @@ with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
     accounts = json.load(file)
 with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
     web_setting = toml.load(file)
+
+
+def authenticate(username, password):
+    account = config.get(username)
+    return account and account['password'] == password
+
+
+def login(username, password):
+    if username == web_setting['web']['super_user'] and password == web_setting['web']['super_key']:
+        return 3, None, 'admin'
+    elif username not in config:
+        return 0, None, None
+    elif authenticate(username, password):
+        account = config[username]
+        return 2, account['token'], account['group']
+    else:
+        return 1, None, None
 
 
 st.set_page_config(layout="wide", page_title=web_setting["web"]["title"], page_icon="LOGO.png")

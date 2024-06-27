@@ -10,34 +10,33 @@ import streamlit as st
 import streamlit_antd_components as sac
 from utils import get_accesstoken, get_sharetoken, df_to_json1, df_to_json2, df_to_json3
 
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    handlers=[logging.FileHandler("app.log", encoding='utf-8'),
+                              logging.StreamHandler()])
+logger = logging.getLogger()
+png_logger = logging.getLogger("PIL.PngImagePlugin")
+png_logger.setLevel(logging.WARNING)
+urllib3_logger = logging.getLogger("urllib3.connectionpool")
+urllib3_logger.setLevel(logging.WARNING)
+
+current_path = os.path.abspath('.')
+with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
+    invite_config = json.load(file)
+with open(current_path + '/config.json', 'r', encoding='utf-8') as file:
+    config = json.load(file)
+with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
+    accounts = json.load(file)
+with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
+    web_setting = toml.load(file)
+
+st.set_page_config(layout="wide", page_title=web_setting["web"]["title"], page_icon="LOGO.png")
+
 if "role" not in st.session_state:
     st.session_state.role = None
 
 if st.session_state.role == "admin":
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s',
-                        handlers=[logging.FileHandler("app.log", encoding='utf-8'),
-                                  logging.StreamHandler()])
-
-    logger = logging.getLogger()
-
-    png_logger = logging.getLogger("PIL.PngImagePlugin")
-    png_logger.setLevel(logging.WARNING)
-    urllib3_logger = logging.getLogger("urllib3.connectionpool")
-    urllib3_logger.setLevel(logging.WARNING)
-
-    current_path = os.path.abspath('.')
-    with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
-        invite_config = json.load(file)
-    with open(current_path + '/config.json', 'r', encoding='utf-8') as file:
-        config = json.load(file)
-    with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
-        accounts = json.load(file)
-    with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
-        web_setting = toml.load(file)
-
-    st.set_page_config(layout="wide", page_title=web_setting["web"]["title"], page_icon="LOGO.png")
-
     st.markdown("""
         <style>
         .stButton>button {
@@ -321,9 +320,7 @@ if st.session_state.role == "admin":
                                 json_file.write(accounts_json)
                             logger.info(f"【AC刷新】 管理员刷新{ac_group}的Access_token成功！")
                             st.toast("刷新成功！", icon=':material/check_circle:')
-                            msg = st.toast("即将刷新页面...3s", icon=':material/check_circle:')
-                            time.sleep(1)
-                            msg.toast("即将刷新页面...2s", icon=':material/check_circle:')
+                            msg = st.toast("即将刷新页面...2s", icon=':material/check_circle:')
                             time.sleep(1)
                             msg.toast("即将刷新页面...1s", icon=':material/check_circle:')
                             time.sleep(1)
@@ -344,11 +341,14 @@ if st.session_state.role == "admin":
             st.write('')
             st.write("**用户列表**")
             sac.alert(label="`site_limit` 表示限制的网站名称，为空则无限制；`expires_in` 表示过期的秒数，为 0 则永不过期；`gpt35_limit` 表示gpt-3.5可使用的次数，为 -1 则无限制；`gpt4_limit` 表示gpt-4可使用的次数，为 -1 则无限制；`show_conversations` 表示是否会话无需隔离，为 false 则隔离。", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
-            fields = ['username'] + list(next(iter(config.values())).keys())
-            rows = [[user] + list(account.values()) for user, account in config.items()]
-            df2 = pd.DataFrame(rows, columns=fields)
-            edited_df2 = st.data_editor(df2, hide_index=True, use_container_width=True,
-                                        disabled=["group", "site_limit", "expires_in", "gpt35_limit", "gpt4_limit", "show_conversations"], num_rows="dynamic")
+            try:
+                fields = ['username'] + list(next(iter(config.values())).keys())
+                rows = [[user] + list(account.values()) for user, account in config.items()]
+                df2 = pd.DataFrame(rows, columns=fields)
+                edited_df2 = st.data_editor(df2, hide_index=True, use_container_width=True,
+                                            disabled=["group", "site_limit", "expires_in", "gpt35_limit", "gpt4_limit", "show_conversations"], num_rows="dynamic")
+            except:
+                sac.alert(label="无数据！用户列表为空！请在下方的注册模块注册新用户！", color="error", variant='quote',size="md", radius="lg", icon=True, closable=True)
             st.write('')
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
@@ -413,9 +413,7 @@ if st.session_state.role == "admin":
                         with open(json_filename, 'w', encoding='utf-8') as json_file:
                             json_file.write(config_json)
                         st.toast("注册成功！", icon=':material/check_circle:')
-                        msg = st.toast("即将刷新页面...3s", icon=':material/check_circle:')
-                        time.sleep(1)
-                        msg.toast("即将刷新页面...2s", icon=':material/check_circle:')
+                        msg = st.toast("即将刷新页面...2s", icon=':material/check_circle:')
                         time.sleep(1)
                         msg.toast("即将刷新页面...1s", icon=':material/check_circle:')
                         time.sleep(1)
@@ -487,5 +485,8 @@ if st.session_state.role == "admin":
     col1, col2, col3 = st.columns([0.4, 0.2, 0.4])
     with col2:
         st.image("LOGO.png", width=200, caption="一键管理Oaifree服务，简单上手", use_column_width=True)
+
 else:
+    st.title("")
+    st.title("")
     sac.alert("非法访问！", "你无权进入该页面！", color="error", size="md", radius="lg", icon=True, closable=True)

@@ -12,7 +12,6 @@ logging.basicConfig(level=logging.INFO,  # 日志设置
                     handlers=[logging.FileHandler("app.log", encoding='utf-8'),
                               logging.StreamHandler()])
 logger = logging.getLogger()
-
 png_logger = logging.getLogger("PIL.PngImagePlugin")
 png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
@@ -71,6 +70,23 @@ def select():
                 json_file.write(config_json)
             logger.info(f"【用户注册】 新用户注册 {new_name}，token:{new_token_key}，group:{user_new_group}！")
             st.success("成功", icon=":material/check_circle")
+
+
+def authenticate(username, password):
+    account = config.get(username)
+    return account and account['password'] == password
+
+
+def login(username, password):
+    if username == web_setting['web']['super_user'] and password == web_setting['web']['super_key']:
+        return 3, None, 'admin'
+    elif username not in config:
+        return 0, None, None
+    elif authenticate(username, password):
+        account = config[username]
+        return 2, account['token'], account['group']
+    else:
+        return 1, None, None
 
 
 # 应用页面样式
