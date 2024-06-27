@@ -452,10 +452,11 @@ if st.session_state.role == "admin":
             with open('app.log', 'r', encoding='utf-8') as file:
                 logs = file.read()
             pattern = re.compile(
-                r'(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2},\d{3} - root - INFO - 【(用户登录|管理登录)】 (?:用户：|管理员：)(\w+) 登录成功！'
+                r'(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2},\d{3} - INFO - 【(用户登录|管理登录)】 (?:用户：|管理员：)(\w+) 登录成功！'
             )
 
             matches = pattern.findall(logs)
+            print(logs)
             st.write('**登录总览**')
             if matches:
                 data = pd.DataFrame(matches, columns=['日期', 'login_type', 'user'])
