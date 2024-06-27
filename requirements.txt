@@ -1,0 +1,4 @@
+streamlit
+streamlit_antd_components
+openpyxl
+pandas
