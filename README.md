@@ -17,11 +17,17 @@
 > - 支持手动/自动刷新AccessToken无需定时维护
 
 ## 项目部署
-
-#### Docker
+#### docker
 ```shell
 docker pull chenyme/oait:v1.01
 docker run -d -p 8501:8501 chenyme/oait:v1.01
+```
+
+#### docker（Github）
+如果你访问docker镜像较慢，可以使用Github的仓库
+```shell
+docker pull ghcr.io/chenyme/oait:latest
+docker run -d -p 8501:8501 ghcr.io/chenyme/oait:latest
 ```
 
 #### Git
@@ -31,9 +37,10 @@ docker build -t chenyme/oait:v1.01 .
 docker run -d -p 8501:8501 chenyme/oait:v1.01
 ```
 
-#### Python调试
-```
+#### Python
+```shell
 git clone https://github.com/Chenyme/oaifree-tools
+cd oaifree-tools
 streamlit run home.py
 ```
 
@@ -44,6 +51,8 @@ streamlit run home.py
 默认管理账号：`admin`
 
 管理密码：`12345678`
+
+默认邀请码有三个，您可以选择删除其中的两个
 
 <table>
   <tr>
