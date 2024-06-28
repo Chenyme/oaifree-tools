@@ -3,20 +3,18 @@ import toml
 import os
 import logging
 import streamlit as st
-from utils import get_accesstoken, get_sharetoken, login
+from utils import get_accesstoken, get_sharetoken
 
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler("app.log", encoding='utf-8'),
-                              logging.StreamHandler()])
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler("app.log", encoding='utf-8'), logging.StreamHandler()])
 logger = logging.getLogger()
 png_logger = logging.getLogger("PIL.PngImagePlugin")
 png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
-current_path = os.path.abspath('.')
+
+current_path = os.path.abspath('.') + '/config'
 with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
     invite_config = json.load(file)
 with open(current_path + '/config.json', 'r', encoding='utf-8') as file:
@@ -72,6 +70,7 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
+
 st.title("")
 st.write("")
 st.write("")
@@ -110,11 +109,12 @@ with col2:
                             name, user_share_token = get_sharetoken(user_account, user_ac_tk)
                             if user_share_token == token_result:
                                 accounts[group_result]["access_token"] = user_ac_tk
-                                acoounts_json = json.dumps(accounts, indent=2)
+                                accounts_json = json.dumps(accounts, indent=2)
                                 json_filename = 'accounts.json'
-                                with open(json_filename, 'w', encoding='utf-8') as json_file:
-                                    json_file.write(acoounts_json)
+                                with open(current_path + json_filename, 'w', encoding='utf-8') as json_file:
+                                    json_file.write(accounts_json)
                                 st.toast("刷新成功!", icon=':material/check_circle')
+                                logger.info(f"<用户> 【AC刷新】 用户 {user_account} 主动刷新Access_token成功！")
                             else:
                                 st.toast("刷新失败，请联系管理员!", icon=':material/error:')
                     else:

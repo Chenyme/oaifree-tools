@@ -1,0 +1,35 @@
+{
+  "login_test1": {
+    "password": "test1",
+    "token": "fk-",
+    "group": "groupA",
+    "type": "Plus",
+    "site_limit": "",
+    "expires_in": "0",
+    "gpt35_limit": "-1",
+    "gpt4_limit": "-1",
+    "show_conversations": "false"
+  },
+  "login_test2": {
+    "password": "test2",
+    "token": "fk-",
+    "group": "groupA",
+    "type": "Plus",
+    "site_limit": "",
+    "expires_in": "0",
+    "gpt35_limit": "-1",
+    "gpt4_limit": "-1",
+    "show_conversations": "false"
+  },
+  "login_test3": {
+    "password": "test3",
+    "token": "fk-",
+    "group": "groupA",
+    "type": "Plus",
+    "site_limit": "",
+    "expires_in": "0",
+    "gpt35_limit": "-1",
+    "gpt4_limit": "-1",
+    "show_conversations": "false"
+  }
+}

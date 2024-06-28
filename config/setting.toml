@@ -1,0 +1,23 @@
+[web]
+title = "OpenAI, Not CloseAI"
+subtitle = "真诚、友善、团结、专业"
+domain = "new.oaifree.com"
+notice_enable = true
+notice_title = "**欢迎来到本镜像站**"
+notice_subtitle = "本服务基于@Neo的oaifree服务，由@Chenyme制作登录管理界面，如果觉得好用麻烦给个Star叭！  "
+notice_size = "md"
+notice_radius = "md"
+notice_style = "outline"
+notice_color = "dark"
+notice_banner = true
+super_user = "admin"
+super_key = "12345678"
+user_refresh = false
+refresh_all = true
+site_limit = ""
+expires_in = 0
+gpt35_limit = -1
+gpt4_limit = -1
+show_conversations = "false"
+share = false
+share_notice = "**请自觉遵守道德规范，文明使用，禁止输入色情、暴力、恐怖等违法内容，一经发现，立即封禁！**"

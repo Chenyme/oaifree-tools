@@ -4,20 +4,17 @@ import logging
 import json
 import streamlit as st
 import streamlit_antd_components as sac
-from utils import login, get_sharetoken, get_accesstoken, get_login_url
+from utils import get_sharetoken, get_accesstoken, get_login_url
 
 
-logging.basicConfig(level=logging.INFO,  # 日志设置
-                    format='%(asctime)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler("app.log", encoding='utf-8'),
-                              logging.StreamHandler()])
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler("app.log", encoding='utf-8'), logging.StreamHandler()])
 logger = logging.getLogger()
 png_logger = logging.getLogger("PIL.PngImagePlugin")
 png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
-current_path = os.path.abspath('.')  # 读取配置文件
+current_path = os.path.abspath('.') + '/config'
 with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
     invite_config = json.load(file)
 with open(current_path + '/config.json', 'r', encoding='utf-8') as file:
@@ -26,6 +23,8 @@ with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
     accounts = json.load(file)
 with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
     web_setting = toml.load(file)
+with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
+    share_data = json.load(file)
 
 st.set_page_config(layout="wide", page_title=web_setting["web"]["title"], page_icon="LOGO.png")
 
@@ -33,12 +32,14 @@ if "role" not in st.session_state:
     st.session_state.role = None
 
 
-@st.experimental_dialog("欢迎成为我们的新伙伴！")  # 注册模块
+@st.experimental_dialog("成为我们的新伙伴！")  # 注册模块
 def select():
+    st.write("")
     st.write("")
     user_new_acc = st.text_input("**账户：**")
     user_new_pass = st.text_input("**密码：**")
     user_new_invite = st.text_input("**注册邀请码：**")
+    st.write("")
     st.write("")
     if st.button("**加入**", use_container_width=True, type="primary"):
         st.write("")
@@ -60,16 +61,24 @@ def select():
                 new_name: {
                     'password': user_new_pass,
                     'token': new_token_key,
-                    'group': user_new_group
+                    'group': user_new_group,
+                    'type': group_data['account_type'],
+                    'site_limit': web_setting["web"]["site_limit"],
+                    'expires_in': web_setting["web"]["expires_in"],
+                    'gpt35_limit': web_setting["web"]["gpt35_limit"],
+                    'gpt4_limit': web_setting["web"]["gpt4_limit"],
+                    'show_conversations': web_setting["web"]["show_conversations"]
                 }
             }
             config.update(json_data)
 
             config_json = json.dumps(config, indent=2, ensure_ascii=False)
-            with open('config.json', 'w', encoding='utf-8') as json_file:
+            with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
                 json_file.write(config_json)
-            logger.info(f"【用户注册】 新用户注册 {new_name}，token:{new_token_key}，group:{user_new_group}！")
-            st.success("成功", icon=":material/check_circle")
+            logger.info(f"<用户> 【用户注册】 新用户注册成功！name：{new_name}，token:{new_token_key}，group:{user_new_group}，注册邀请码：{user_new_invite}")
+            st.success("注册成功，3s后自动刷新界面！", icon=":material/check_circle")
+            st.rerun()
+    st.write("")
 
 
 def authenticate(username, password):
@@ -128,8 +137,8 @@ with col4:
     col1, col2, col3 = st.columns([0.01, 0.69, 0.3])
     with col2:
         if web_setting["web"]["notice_enable"]:
-            sac.alert(label=web_setting["web"]["notice_title"], description=web_setting["web"]["notice_subtitle"], color="dark",
-                    variant=web_setting["web"]["notice_style"], banner=web_setting["web"]["notice_banner"], size="md", radius="md", icon=True, closable=True)
+            sac.alert(label=web_setting["web"]["notice_title"], description=web_setting["web"]["notice_subtitle"], color=web_setting["web"]["notice_color"],
+                      variant=web_setting["web"]["notice_style"], banner=web_setting["web"]["notice_banner"], size=web_setting["web"]["notice_size"], radius=web_setting["web"]["notice_radius"], icon=True, closable=True)
 with col5:
     st.write("")
     st.write("")
@@ -151,14 +160,14 @@ with col5:
             if web_setting["web"]["refresh_all"]:
                 user_ac_tk = get_accesstoken(accounts[group_result]["refresh_token"])
                 if user_ac_tk is None or user_ac_tk == "":
-                    logger.info(f"【AC刷新】 用户登录刷新时，{group_result}的Access_token获取失败！")
+                    logger.info(f"<用户> 【AC刷新】 用户登录时，{group_result} 的Access_token刷新失败！")
                 else:
                     accounts[group_result]["access_token"] = user_ac_tk
                     accounts_json = json.dumps(accounts, indent=2)
                     json_filename = 'accounts.json'
-                    with open(json_filename, 'w', encoding='utf-8') as json_file:
+                    with open(current_path + json_filename, 'w', encoding='utf-8') as json_file:
                         json_file.write(accounts_json)
-                    logger.info(f"【AC刷新】 用户登录时 {group_result}的Access_token成功！")
+                    logger.info(f"<用户> 【AC刷新】 用户登录时 {group_result} 的Access_token刷新成功！")
         elif login_result == 3:
             st.session_state.role = "admin"
             logger.info(f"【管理登录】 管理员：{account} 登录成功！")
@@ -171,7 +180,10 @@ with col5:
         st.link_button("**点我验证**", url, use_container_width=True, type="primary")
     except:
         pass
+    st.write("")
     st.page_link("pages/refresh.py", label=":red[无法登录？]", icon=":material/login:", use_container_width=True)
+
+    st.page_link("pages/share.py", label="Share共享站", icon=":material/login:", use_container_width=True)
 
     footer = """
         <style>

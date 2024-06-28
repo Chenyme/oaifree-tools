@@ -1,34 +1,5 @@
-import os
 import json
-import toml
 import requests
-
-current_path = os.path.abspath('.')
-with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
-    invite_config = json.load(file)
-with open(current_path + '/config.json', 'r', encoding='utf-8') as file:
-    config = json.load(file)
-with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
-    accounts = json.load(file)
-with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
-    web_setting = toml.load(file)
-
-
-def authenticate(username, password):
-    account = config.get(username)
-    return account and account['password'] == password
-
-
-def login(username, password):
-    if username == web_setting['web']['super_user'] and password == web_setting['web']['super_key']:
-        return 3, None, 'admin'
-    elif username not in config:
-        return 0, None, None
-    elif authenticate(username, password):
-        account = config[username]
-        return 2, account['token'], account['group']
-    else:
-        return 1, None, None
 
 
 def get_accesstoken(refresh_token):
@@ -78,10 +49,11 @@ def get_login_url(yourdomain, sharetoken):
 
 def df_to_json1(df):
     json_data = df.to_dict('records')
-    json_data = {str(record['groups']): {
-        'Account': record['Account'],
-        'access_token': record['access_token'],
-        'refresh_token': record['refresh_token']
+    json_data = {str(record['用户组']): {
+        'account_type': record['订阅类型'],
+        'account': record['账户邮箱'],
+        'access_token': record['AC_Token'],
+        'refresh_token': record['RF_Token']
     } for record in json_data}
     return json.dumps(json_data, indent=2)
 
@@ -92,6 +64,7 @@ def df_to_json2(df):
         'password': record['password'],
         'token': record['token'],
         'group': record['group'],
+        'type': record['type'],
         'site_limit': record['site_limit'],
         'expires_in': record['expires_in'],
         'gpt35_limit': record['gpt35_limit'],
