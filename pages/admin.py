@@ -12,10 +12,9 @@ import streamlit as st
 import streamlit_antd_components as sac
 from utils import get_accesstoken, get_sharetoken, df_to_json1, df_to_json2, df_to_json3
 
-
-
 # 运行日志
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler("app.log", encoding='utf-8'), logging.StreamHandler()])
+current_path = os.path.abspath('.') + '/config/'
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler(current_path + "/app.log", encoding='utf-8'), logging.StreamHandler()])
 logger = logging.getLogger()
 png_logger = logging.getLogger("PIL.PngImagePlugin")
 png_logger.setLevel(logging.WARNING)
@@ -23,7 +22,6 @@ urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
 # 读取配置文件
-current_path = os.path.abspath('.') + '/config/'
 with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
     invite_config = json.load(file)
 with open(current_path + '/config.json', 'r', encoding='utf-8') as file:
@@ -196,7 +194,7 @@ if st.session_state.role == "admin":
         st.write("")
         st.write("**请选择需要导出的配置文件**")
         st.write("")
-        files = st.multiselect("选择的文件", ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json"], ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json"], label_visibility="collapsed")
+        files = st.multiselect("选择的文件", ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json", "app.log"], ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json", "app.log"], label_visibility="collapsed")
         st.write("")
         if st.button("**导出数据**", use_container_width=True):
             st.write("")
@@ -235,7 +233,7 @@ if st.session_state.role == "admin":
         uploaded_file = st.file_uploader("上传配置文件", type=['zip'], label_visibility="collapsed")
         st.write("")
         st.write("")
-        required_files = ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json"]
+        required_files = ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json", "app.log"]
         if st.button("**上传并配置**", use_container_width=True, type="primary"):
             if uploaded_file is not None:
                 if uploaded_file.name.endswith('.zip'):
@@ -278,7 +276,7 @@ if st.session_state.role == "admin":
             st.write("**站点信息**")
 
             user_names = config.keys()
-            size_bytes1 = os.path.getsize("app.log")
+            size_bytes1 = os.path.getsize(current_path + "app.log")
             size_bytes2 = 0
             for file in os.listdir("config"):
                 size_bytes2 += os.path.getsize("config/" + file)
@@ -306,7 +304,7 @@ if st.session_state.role == "admin":
             col1, col2, col3, col4, col5 = st.columns(5)
             col1.metric("用户总数", len(user_names), len(user_names)-3)
             col2.metric("号池总数", len(accounts.keys()), len(accounts.keys())-1)
-            col3.metric("服务次数", st.session_state.count_people, st.session_state.count_people)
+            col3.metric("服务累计", st.session_state.count_people, st.session_state.count_people)
             col4.metric("日志信息", size1, size_bytes1-35)
             col5.metric("配置信息", size2, size_bytes2-2463)
 
@@ -318,24 +316,82 @@ if st.session_state.role == "admin":
                     upload()
 
             st.divider()
-            with open('app.log', 'r', encoding='utf-8') as file:
+            with open(current_path + 'app.log', 'r', encoding='utf-8') as file:
                 lines = file.readlines()
-            with open('app.log', 'r', encoding='utf-8') as file:
+            with open(current_path + 'app.log', 'r', encoding='utf-8') as file:
                 logs = file.read()
             pattern = re.compile(
-                r'(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2},\d{3} - INFO - 【(用户登录|管理登录)】 (?:用户：|管理员：)(\w+) 登录成功！'
+                r'(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2},\d{3} - INFO - 【用户登录】 用户：(\w+) 登录成功！'
             )
-            matches = pattern.findall(logs)
+
+            pattern_share = re.compile(r'(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2},\d{3} - INFO - 【Share登录】 共享账户：(\w+) 被登录！')
+
+            matches_user = pattern.findall(logs)
+            matches_share = pattern_share.findall(logs)
+
             st.write('**服务总览**')
-            if matches:
-                st.session_state.count_people = len(matches)
-                data = pd.DataFrame(matches, columns=['日期', 'login_type', 'user'])
-                summary = data.groupby(['日期', 'user']).size().reset_index(name='登录总计')
-                pivot_table = summary.pivot(index='日期', columns='user', values='登录总计').fillna(0)
-                st.write("")
-                st.bar_chart(pivot_table)
-            else:
-                sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
+
+            plot_choose = sac.segmented(
+                items=[
+                    sac.SegmentedItem(label='登录统计柱状图', icon='bar-chart-line'),
+                    sac.SegmentedItem(label='登录统计折线图', icon='graph-up'),
+                    sac.SegmentedItem(label='用户站服务统计', icon='person-video3'),
+                    sac.SegmentedItem(label='共享站服务统计', icon='share'),
+                ], color='dark', use_container_width=True
+            )
+
+            if plot_choose == '登录统计柱状图':
+                if matches_user or matches_share:
+                    matches = matches_user + matches_share
+                    st.session_state.count_people = len(matches)
+                    data = pd.DataFrame(matches, columns=['日期', 'user'])
+                    summary = data.groupby(['日期', 'user']).size().reset_index(name='登录总计')
+                    pivot_table = summary.pivot(index='日期', columns='user', values='登录总计').fillna(0)
+                    st.write("")
+                    st.bar_chart(pivot_table)
+                else:
+                    sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
+                    col1, col2, col3 = st.columns([0.46, 0.08, 0.46])
+                    with col2:
+                        st.image("LOGO.png", caption="图表", width=200, use_column_width=True)
+            if plot_choose == '登录统计折线图':
+                if matches_user or matches_share:
+                    matches = matches_user + matches_share
+                    df = pd.DataFrame(matches, columns=['date', 'user'])
+                    user_login_counts = df.groupby(['date', 'user']).size().unstack(fill_value=0).reset_index()
+                    user_login_counts['total_logins'] = user_login_counts.select_dtypes(include=['number']).sum(axis=1)
+                    st.line_chart(data=user_login_counts.set_index('date'), use_container_width=True)
+                else:
+                    sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
+                    col1, col2, col3 = st.columns([0.46, 0.08, 0.46])
+                    with col2:
+                        st.image("LOGO.png", caption="图表", width=200, use_column_width=True)
+
+            if plot_choose == '用户站服务统计':
+                if matches_user:
+                    data = pd.DataFrame(matches_user, columns=['日期', 'user'])
+                    summary = data.groupby(['日期', 'user']).size().reset_index(name='登录总计')
+                    pivot_table = summary.pivot(index='日期', columns='user', values='登录总计').fillna(0)
+                    st.write("")
+                    st.bar_chart(pivot_table)
+                else:
+                    sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md",radius="lg", icon=True, closable=True)
+                    col1, col2, col3 = st.columns([0.46, 0.08, 0.46])
+                    with col2:
+                        st.image("LOGO.png", caption="图表", width=200, use_column_width=True)
+
+            if plot_choose == '共享站服务统计':
+                if matches_share:
+                    data = pd.DataFrame(matches_share, columns=['日期', 'user'])
+                    summary = data.groupby(['日期', 'user']).size().reset_index(name='登录总计')
+                    pivot_table = summary.pivot(index='日期', columns='user', values='登录总计').fillna(0)
+                    st.write("")
+                    st.bar_chart(pivot_table)
+                else:
+                    sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
+                    col1, col2, col3 = st.columns([0.46, 0.08, 0.46])
+                    with col2:
+                        st.image("LOGO.png",caption="图表", width=200, use_column_width=True)
 
             st.divider()
             st.write("**运行日志**")
@@ -348,7 +404,7 @@ if st.session_state.role == "admin":
                 st.write("")
                 if st.button("**清理日志**", use_container_width=True):
                     log_content = "【OaiT服务已成功开启！】\n"
-                    with open("app.log", "w", encoding="utf-8") as log_file:
+                    with open(current_path + "app.log", "w", encoding="utf-8") as log_file:
                         log_file.write(log_content)
                     st.rerun()
                 st.write("")
@@ -656,7 +712,6 @@ if st.session_state.role == "admin":
             st.divider()
             st.write("**友情链接**")
             sac.buttons([sac.ButtonsItem("GitHub", href="https://github.com/Chenyme", color="dark"), sac.ButtonsItem("Linux.do", href="https://linux.do", color="dark"), sac.ButtonsItem("zhile.io", href="https://zhile.io/", color="dark"), sac.ButtonsItem("Streamlit", href="https://streamlit.io", color="dark"), sac.ButtonsItem("我的其他项目", href="https://github.com/Chenyme/Chenyme-AAVT", color="dark")], use_container_width=True, color="dark", index=None, variant="filled")
-
 
     col1, col2, col3 = st.columns([0.4, 0.2, 0.4])
     with col2:

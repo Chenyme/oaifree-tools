@@ -1,12 +1,19 @@
 import os
 import json
 import toml
+import logging
 import streamlit as st
 import streamlit_antd_components as sac
 from utils import get_login_url
 
+current_path = os.path.abspath('.') + '/config/'
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler(current_path + "app.log", encoding='utf-8'), logging.StreamHandler()])
+logger = logging.getLogger()
+png_logger = logging.getLogger("PIL.PngImagePlugin")
+png_logger.setLevel(logging.WARNING)
+urllib3_logger = logging.getLogger("urllib3.connectionpool")
+urllib3_logger.setLevel(logging.WARNING)
 
-current_path = os.path.abspath('.') + '/config'
 with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
     web_setting = toml.load(file)
 with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
@@ -67,17 +74,17 @@ if web_setting["web"]["share"]:
                         if share_data[key]['gpt4_limit'] == "-1":
                             st.write("GPT4 次数：**无限制**")
                         else:
-                            st.write("GPT4 次数：**次数限制 - " + share_data[key]['gpt4_limit'] + "**")
+                            st.write("GPT4 次数：**次数限制 - " + str(share_data[key]['gpt4_limit']) + "**")
 
                     if share_data[key]['gpt35_limit'] == "-1":
                         st.write("GPT3.5 次数：**无限制**")
                     else:
-                        st.write("GPT3.5 次数：**次数限制 - " + share_data[key]['gpt35_limit'] + "**")
+                        st.write("GPT3.5 次数：**次数限制 - " + str(share_data[key]['gpt35_limit']) + "**")
 
                     if share_data[key]['expires_in'] == "0":
                         st.write("账户到期时间：**永不过期**")
                     else:
-                        st.write("账户到期时间：**" + share_data[key]['expires_in'] + "**")
+                        st.write("账户到期时间：**" + str(share_data[key]['expires_in']) + "**")
                     st.write("")
         if i % 2 == 0:
             with col2:
@@ -92,17 +99,17 @@ if web_setting["web"]["share"]:
                         if share_data[key]['gpt4_limit'] == "-1":
                             st.write("GPT4 次数：**无限制**")
                         else:
-                            st.write("GPT4 次数：**次数限制 - " + share_data[key]['gpt4_limit'] + "**")
+                            st.write("GPT4 次数：**次数限制 - " + str(share_data[key]['gpt4_limit']) + "**")
 
                     if share_data[key]['gpt35_limit'] == "-1":
                         st.write("GPT3.5 次数：**无限制**")
                     else:
-                        st.write("GPT3.5 次数：**次数限制 - " + share_data[key]['gpt35_limit'] + "**")
+                        st.write("GPT3.5 次数：**次数限制 - " + str(share_data[key]['gpt35_limit']) + "**")
 
                     if share_data[key]['expires_in'] == "0":
                         st.write("账户到期时间：**永不过期**")
                     else:
-                        st.write("账户到期时间：**" + share_data[key]['expires_in'] + "**")
+                        st.write("账户到期时间：**" + str(share_data[key]['expires_in']) + "**")
                     st.write("")
         i += 1
 
@@ -112,6 +119,7 @@ if web_setting["web"]["share"]:
     key = st.selectbox("**选择要登录的Share账户**", list(share_data.keys()), index=0)
     st.write("")
     if st.button("登录", use_container_width=True, key="login1"):
+        logger.info(f"【Share登录】 共享账户：{key} 被登录！")
         domain = web_setting["web"]["domain"]
         share_url = get_login_url(domain, share_data[key]['token'])
         st.link_button("**点我验证**", share_url, use_container_width=True, type="primary")

@@ -5,16 +5,14 @@ import logging
 import streamlit as st
 from utils import get_accesstoken, get_sharetoken
 
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler("app.log", encoding='utf-8'), logging.StreamHandler()])
+current_path = os.path.abspath('.') + '/config/'
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler(current_path + "app.log", encoding='utf-8'), logging.StreamHandler()])
 logger = logging.getLogger()
 png_logger = logging.getLogger("PIL.PngImagePlugin")
 png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
-
-current_path = os.path.abspath('.') + '/config'
 with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
     invite_config = json.load(file)
 with open(current_path + '/config.json', 'r', encoding='utf-8') as file:
