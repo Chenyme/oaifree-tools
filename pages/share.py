@@ -71,17 +71,17 @@ if web_setting["web"]["share"]:
                     elif share_data[key]['type'] == "Plus":
                         sac.tags([sac.Tag("GPT-3.5", color="green"), sac.Tag("GPT-4", color="blue"), sac.Tag("GPT-4o", color="red")], size="md", key=i)
                         st.write("账户昵称：**" + key + "**")
-                        if share_data[key]['gpt4_limit'] == "-1":
+                        if str(share_data[key]['gpt4_limit']) == "-1":
                             st.write("GPT4 次数：**无限制**")
                         else:
-                            st.write("GPT4 次数：**次数限制 - " + str(share_data[key]['gpt4_limit']) + "**")
+                            st.write("GPT4 次数：**限制 - " + str(share_data[key]['gpt4_limit']) + "次**")
 
-                    if share_data[key]['gpt35_limit'] == "-1":
+                    if str(share_data[key]['gpt35_limit']) == "-1":
                         st.write("GPT3.5 次数：**无限制**")
                     else:
-                        st.write("GPT3.5 次数：**次数限制 - " + str(share_data[key]['gpt35_limit']) + "**")
+                        st.write("GPT3.5 次数：**限制 - " + str(share_data[key]['gpt35_limit']) + "次**")
 
-                    if share_data[key]['expires_in'] == "0":
+                    if str(share_data[key]['expires_in']) == "0":
                         st.write("账户到期时间：**永不过期**")
                     else:
                         st.write("账户到期时间：**" + str(share_data[key]['expires_in']) + "**")
@@ -96,17 +96,17 @@ if web_setting["web"]["share"]:
                     elif share_data[key]['type'] == "Plus":
                         sac.tags([sac.Tag("GPT-3.5", color="green"), sac.Tag("GPT-4", color="blue"), sac.Tag("GPT-4o", color="red")], size="md", key=i)
                         st.write("账户昵称：**" + key + "**")
-                        if share_data[key]['gpt4_limit'] == "-1":
+                        if str(share_data[key]['gpt4_limit']) == "-1":
                             st.write("GPT4 次数：**无限制**")
                         else:
-                            st.write("GPT4 次数：**次数限制 - " + str(share_data[key]['gpt4_limit']) + "**")
+                            st.write("GPT4 次数：**限制 - " + str(share_data[key]['gpt4_limit']) + " 次**")
 
-                    if share_data[key]['gpt35_limit'] == "-1":
+                    if str(share_data[key]['gpt35_limit']) == "-1":
                         st.write("GPT3.5 次数：**无限制**")
                     else:
-                        st.write("GPT3.5 次数：**次数限制 - " + str(share_data[key]['gpt35_limit']) + "**")
+                        st.write("GPT3.5 次数：**限制 - " + str(share_data[key]['gpt35_limit']) + " 次**")
 
-                    if share_data[key]['expires_in'] == "0":
+                    if str(share_data[key]['expires_in']) == "0":
                         st.write("账户到期时间：**永不过期**")
                     else:
                         st.write("账户到期时间：**" + str(share_data[key]['expires_in']) + "**")
