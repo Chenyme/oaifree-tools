@@ -19,8 +19,8 @@
 ## 项目部署
 #### docker
 ```shell
-docker pull chenyme/oait:v1.01
-docker run -d -p 8501:8501 chenyme/oait:v1.01
+docker pull chenyme/oait:v1.1.0
+docker run -d -p 8501:8501 chenyme/oait:v1.1.0
 ```
 
 #### docker（Github）
@@ -33,8 +33,8 @@ docker run -d -p 8501:8501 ghcr.io/chenyme/oait:latest
 #### Git
 ```shell
 git clone https://github.com/Chenyme/oaifree-tools
-docker build -t chenyme/oait:v1.01 .
-docker run -d -p 8501:8501 chenyme/oait:v1.01
+docker build -t chenyme/oait:v1.1.0 .
+docker run -d -p 8501:8501 chenyme/oait:v1.1.0
 ```
 
 #### Python
