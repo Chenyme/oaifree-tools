@@ -82,6 +82,7 @@ def df_to_json2(df):
     json_data = df.to_dict('records')
     json_data = {str(record['账户']): {
         'password': record['密码'],
+        'uid': record['UID'],
         'token': record['SA_Token'],
         'group': record['用户组'],
         'type': record['订阅类型'],
