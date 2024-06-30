@@ -330,7 +330,7 @@ if st.session_state.role == "admin":
     def new_invite():
         st.write("")
         it_group = st.selectbox("**选择用户组**", list(accounts.keys()), index=0)
-        note = st.text_input("**备注**", value=time.strftime('%Y-%m-%d %H:%M:%S'), help="备注信息，可为空")
+        note = st.text_input("**备注**", value="2024", help="备注信息，可为空")
         auto_it_gen = st.checkbox("**批量生成**")
         if auto_it_gen:
             num_it_gen = st.number_input("**生成数量**", value=5, min_value=1, max_value=100)
@@ -432,7 +432,7 @@ if st.session_state.role == "admin":
             gpt35_limit = st.number_input("**限制GPT-3.5**", value=-1, help="GPT-3.5对话限制，填 -1 则不限制", key="gpt35_limit_new")
             gpt4_limit = st.number_input("**限制GPT-4**", value=-1, help="GPT-4对话限制，填 -1 则不限制", key="gpt4_limit_new")
             show_conversations = st.selectbox("**会话无需隔离**", ['true', 'false'], index=1, help="false为隔离会话", key="show_conversations_new")
-        note = st.text_input("**备注**", value=time.strftime('%Y-%m-%d %H:%M:%S'), help="备注信息，可为空", key="note_new")
+        note = st.text_input("**备注**", value="2024", help="备注信息，可为空", key="note_new")
         auto_rf_gen = st.checkbox("**批量生成**")
         if auto_rf_gen:
             num_rf_gen = st.number_input("**生成数量**", value=5, min_value=1, max_value=100, key="num_rf_gen_new")
@@ -527,8 +527,8 @@ if st.session_state.role == "admin":
             col1.metric("用户总数", len(user_names), len(user_names)-3)
             col2.metric("号池总数", len(accounts.keys()), len(accounts.keys())-1)
             col3.metric("服务累计", st.session_state.count_people, st.session_state.count_people)
-            col4.metric("日志信息", size1, size_bytes1-35)
-            col5.metric("配置信息", size2, size_bytes2-2463)
+            col4.metric("日志信息", size1, size_bytes1-36)
+            col5.metric("配置信息", size2, size_bytes2-3755)
 
             with col1:
                 if st.button("**导出配置**", use_container_width=True):
