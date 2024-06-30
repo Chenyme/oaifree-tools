@@ -28,3 +28,31 @@ invite_link_enable = false
 invite_link = "https://"
 refresh_link_enable = false
 refresh_link = "https://"
+
+[excel]
+hide_index_account = true
+height_account = 248
+order_what_account = "用户组"
+order_row_account = "默认"
+order_account = [ "用户组", "订阅类型", "账户邮箱", "AC_Token", "RF_Token",]
+hide_index_invite = true
+height_invite = 248
+order_what_invite = "是否使用"
+order_row_invite = "默认"
+order_invite = [ "Invite_Token", "用户组", "备注", "是否使用",]
+hide_index_user = true
+height_user = 248
+order_what_user = "用户组"
+order_row_user = "默认"
+order_user = [ "账户", "密码", "UID", "SA_Token", "用户组", "订阅类型",]
+hide_index_refresh = true
+height_refresh = 248
+order_what_refresh = "用户组"
+order_row_refresh = "默认"
+order_refresh = [ "userRF_Token", "用户组", "限制网站", "过期秒数", "GPT3.5限制", "GPT4限制", "会话无需隔离", "备注", "是否使用",]
+
+[chart]
+start_date = 2024-07-01
+end_date = 2024-07-01
+height = 400
+horizontal = false

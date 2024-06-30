@@ -8,6 +8,7 @@ import secrets
 import logging
 import zipfile
 import requests
+from datetime import datetime
 from io import BytesIO
 import pandas as pd
 import streamlit as st
@@ -119,8 +120,8 @@ if st.session_state.role == "admin":
         with col2:
             st.image("LOGO.png", width=200, caption="安全保护", use_column_width=True)
         st.write("")
-        super_user = st.text_input("**新的昵称**", value=web_setting["web"]["super_user"])
-        super_key = st.text_input("**新的密钥**", value=web_setting["web"]["super_key"])
+        super_user = st.text_input("**新的昵称**", placeholder="请输入您的新昵称！")
+        super_key = st.text_input("**新的密钥**", type="password", placeholder="请输入您的新密钥！")
         st.write("")
         sac.alert(label='**首次登入请修改super_key(管理员密钥)**', color="warning", size='md', radius='lg', icon=True,
                   closable=True)
@@ -196,12 +197,12 @@ if st.session_state.role == "admin":
     def new_account():
         col1, col2 = st.columns(2)
         with col1:
-            new_group = st.text_input("**新的用户组昵称***", value="")
+            new_group = st.text_input("**新的用户组昵称***", value="", help="所有模块串联的唯一标识，不可为空", placeholder="唯一标识，不可为空")
         with col2:
             new_account_type = st.selectbox("**订阅套餐***", ["Free", "Plus"], index=1, help="订阅套餐情况，不可为空")
-        new_account = st.text_input("**账户邮箱**", value="", help="账户邮箱，用于标识备注，可为空")
-        new_access_token = st.text_input("**AC_Token***", help="AC_Token，登录的必要Token，不可为空")
-        new_refresh_token = st.text_input("**RF_Token**", help="RF_Token，用于AC刷新的Token，可为空，为空则刷新功能不可用")
+        new_account = st.text_input("**账户邮箱**", value="", help="账户邮箱，用于标识备注，可为空", placeholder="账户邮箱，用于备注，可为空")
+        new_access_token = st.text_input("**AC_Token***", help="AC_Token，登录刷新必要的Token，不可为空", placeholder="AC_Token，登录刷新必要的Token，不可为空")
+        new_refresh_token = st.text_input("**RF_Token**", help="RF_Token，用于AC刷新的Token，可为空，为空则刷新功能不可用", placeholder="RF_Token，用于AC刷新的Token，若无可为空")
         st.write("")
         if st.button("**保存新账户**", use_container_width=True, type="primary"):
             if new_group in accounts.keys():
@@ -271,12 +272,10 @@ if st.session_state.role == "admin":
 
     @st.experimental_dialog("站点迁移-配置导入")
     def upload():
-        st.write("")
+        sac.alert(label="**仅支持V1.1.3版本后的配置文件**", description="V1.1.2版本及更低，请删除zip中以下文件：**`setting.toml` 、`invite.json` 、`config.json` 、`refresh.json`** ", banner=True, color="info", variant='filled', size="md", radius="lg", icon=True, closable=True)
+
         st.write("**请上传配置文件**")
-        sac.alert(label="**仅支持V1.1.2版本后的配置文件**", description=" 若为V1.1.1及更低版本，请删除config.zip中的不兼容配置：`setting.toml`、`invite.json`、`config.json` ！ ", banner=True, color="info", variant='filled', size="lg", radius="lg", icon=True, closable=True)
-        st.write("")
         uploaded_file = st.file_uploader("上传配置文件", type=['zip'], label_visibility="collapsed")
-        st.write("")
         st.write("")
         required_files = ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json", "app.log", "refresh.json", "domain.json"]
         if st.button("**上传并配置**", use_container_width=True, type="primary"):
@@ -308,11 +307,11 @@ if st.session_state.role == "admin":
 
     @st.experimental_dialog("配置新用户权限")
     def invite():
-        site_limit = st.text_input("限制网站（为空不限制）", value="", help="限制的网站, 为空则不限制")
-        expires_in = st.number_input("有效期（秒）", value=0, help="token有效期（单位为秒），填 0 则永久有效")
-        gpt35_limit = st.number_input("限制GPT-3.5", value=-1, help="GPT-3.5对话限制，填 -1 则不限制")
-        gpt4_limit = st.number_input("限制GPT-4", value=-1, help="GPT-4对话限制，填 -1 则不限制")
-        show_conversations = st.selectbox("会话无需隔离", ['true', 'false'], index=1, help="false为隔离会话")
+        site_limit = st.text_input("限制网站", value=web_setting["web"]["site_limit"], help="限制的网站, 为空则不限制", placeholder="限制使用的网站, 为空则不限制")
+        expires_in = st.number_input("有效期（秒）", value=web_setting["web"]["expires_in"], min_value=0, max_value=864000, step=86400, help="token有效期（单位为秒），填 0 则永久有效")
+        gpt35_limit = st.number_input("限制GPT-3.5", value=web_setting["web"]["gpt35_limit"], min_value=-1, max_value=1000000, step=5, help="GPT-3.5对话限制，填 -1 则不限制")
+        gpt4_limit = st.number_input("限制GPT-4", value=web_setting["web"]["gpt4_limit"], min_value=-1, max_value=1000000, step=5, help="GPT-4对话限制，填 -1 则不限制")
+        show_conversations = st.selectbox("会话无需隔离", ['true', 'false'], index=['true', 'false'].index(web_setting["web"]["show_conversations"]), help="false为隔离会话")
         st.write("")
         if st.button("**保存默认配置**", use_container_width=True, type="primary"):
             web_setting["web"]["site_limit"] = site_limit
@@ -323,21 +322,22 @@ if st.session_state.role == "admin":
             with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
                 toml.dump(web_setting, f)
             logger.info(f"<管理员> 【邀请码设置】 更新了邀请码的默认设置！")
-            sac.alert(label="保存成功！", color="success", variant='quote', size="md", radius="lg", icon=True, closable=True)
+            st.write("")
+            sac.alert(label="保存成功！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
         st.write("")
 
     @st.experimental_dialog("生成邀请令牌")
     def new_invite():
         st.write("")
         it_group = st.selectbox("**选择用户组**", list(accounts.keys()), index=0)
-        note = st.text_input("**备注**", value="2024", help="备注信息，可为空")
+        note = st.text_input("**备注**", placeholder="2024/06/30 00:00:00", help="备注信息，可为空")
         auto_it_gen = st.checkbox("**批量生成**")
         if auto_it_gen:
-            num_it_gen = st.number_input("**生成数量**", value=5, min_value=1, max_value=100)
+            num_it_gen = st.number_input("**生成数量**", value=5, min_value=1, max_value=100, step=5)
             len_it_gen = st.number_input("**邀请令牌长度**", value=16, min_value=16, max_value=32)
 
         else:
-            it_token = st.text_input("**邀请令牌**", value="it-")
+            it_token = st.text_input("**邀请令牌**", placeholder="it-xxxxxxxxxxxxxxxx")
 
         st.write("")
         if st.button("**生成邀请令牌**", use_container_width=True, key="new_invite"):
@@ -348,7 +348,21 @@ if st.session_state.role == "admin":
                         "note": note,
                         "used": False
                     }
+                with open(current_path + "invite.json", "w", encoding="utf-8") as f:
+                    json.dump(invite_config, f, indent=2)
                 logger.info(f"<管理员> 【邀请令牌】 生成了{num_it_gen}个新的邀请令牌！")
+                st.write("")
+                sac.alert(label="**生成成功！**", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
+                time.sleep(0.5)
+                sac.alert(label="**即将自动刷新！**", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
+                time.sleep(1.5)
+                st.rerun()
+            elif it_token is None or it_token == "":
+                st.write("")
+                sac.alert(label="**邀请令牌不能为空，请重新填写！**", color="error", variant='filled', size="md", radius="lg", icon=True, closable=True)
+            elif it_token in invite_config.keys():
+                st.write("")
+                sac.alert(label="**此邀请令牌已存在，请重新填写！**", color="error", variant='filled', size="md", radius="lg", icon=True, closable=True)
             else:
                 invite_config[it_token] = {
                     "group": it_group,
@@ -356,14 +370,15 @@ if st.session_state.role == "admin":
                     "used": False
                 }
                 logger.info(f"<管理员> 【邀请令牌】 生成了新的邀请令牌：{it_token}！")
-            with open(current_path + "invite.json", "w", encoding="utf-8") as f:
-                json.dump(invite_config, f, indent=2)
-
-            sac.alert(label="生成成功！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
-            time.sleep(0.5)
-            sac.alert(label="即将自动刷新！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
-            time.sleep(1.5)
-            st.rerun()
+                with open(current_path + "invite.json", "w", encoding="utf-8") as f:
+                    json.dump(invite_config, f, indent=2)
+                logger.info(f"<管理员> 【邀请令牌】 生成了{num_it_gen}个新的邀请令牌！")
+                st.write("")
+                sac.alert(label="**生成成功！**", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
+                time.sleep(0.5)
+                sac.alert(label="**即将自动刷新！**", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
+                time.sleep(1.5)
+                st.rerun()
         st.write("")
 
     @st.experimental_dialog("状态刷新")
@@ -426,19 +441,19 @@ if st.session_state.role == "admin":
         col1, col2 = st.columns(2)
         with col1:
             rf_group = st.selectbox("**组别**", accounts.keys(), key="rf_group_new")
-            site_limit = st.text_input("**限制网站（为空不限制）**", value="", help="限制的网站, 为空则不限制", key="site_limit_new")
+            site_limit = st.text_input("**限制网站（为空不限制）**", value="", help="限制的网站, 为空则不限制", key="site_limit_new", placeholder="限制网站, 为空则不限制")
             expires_in = st.number_input("**有效期（秒**）", value=0, help="token有效期（单位为秒），填 0 则永久有效", key="expires_in_new")
         with col2:
             gpt35_limit = st.number_input("**限制GPT-3.5**", value=-1, help="GPT-3.5对话限制，填 -1 则不限制", key="gpt35_limit_new")
             gpt4_limit = st.number_input("**限制GPT-4**", value=-1, help="GPT-4对话限制，填 -1 则不限制", key="gpt4_limit_new")
             show_conversations = st.selectbox("**会话无需隔离**", ['true', 'false'], index=1, help="false为隔离会话", key="show_conversations_new")
-        note = st.text_input("**备注**", value="2024", help="备注信息，可为空", key="note_new")
+        note = st.text_input("**备注**", value="2024", help="备注信息，可为空", key="note_new", placeholder="2024/06/30 00:00:00")
         auto_rf_gen = st.checkbox("**批量生成**")
         if auto_rf_gen:
-            num_rf_gen = st.number_input("**生成数量**", value=5, min_value=1, max_value=100, key="num_rf_gen_new")
+            num_rf_gen = st.number_input("**生成数量**", value=5, min_value=1, max_value=100, step=5, key="num_rf_gen_new")
             len_rf_gen = st.number_input("**刷新令牌长度**", value=16, min_value=16, max_value=32, key="len_rf_gen_new")
         else:
-            rf_token = st.text_input("**刷新令牌**", value="rf-", key="rf_token_new")
+            rf_token = st.text_input("**刷新令牌**", key="rf_token_new", placeholder="rf-xxxxxxxxxxxxxxxx")
 
         st.write("")
         if st.button("**生成刷新令牌**", use_container_width=True, key="new_refresh"):
@@ -455,6 +470,19 @@ if st.session_state.role == "admin":
                         "used": False
                     }
                 logger.info(f"<管理员> 【刷新令牌】 生成了{num_rf_gen}个新的刷新令牌！")
+                with open(current_path + "refresh.json", "w", encoding="utf-8") as f:
+                    json.dump(refresh_data, f, indent=2)
+                sac.alert(label="生成成功！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
+                time.sleep(0.5)
+                sac.alert(label="即将自动刷新！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
+                time.sleep(1.5)
+                st.rerun()
+            elif rf_token is None or rf_token == "":
+                st.write("")
+                sac.alert(label="**刷新令牌不能为空，请重新填写！**", color="error", variant='filled', size="md", radius="lg", icon=True, closable=True)
+            elif rf_token in refresh_data.keys():
+                st.write("")
+                sac.alert(label="**此刷新令牌已存在，请重新填写！**", color="error", variant='filled', size="md", radius="lg", icon=True, closable=True)
             else:
                 refresh_data[rf_token] = {
                     "group": rf_group,
@@ -467,14 +495,13 @@ if st.session_state.role == "admin":
                     "used": False
                 }
                 logger.info(f"<管理员> 【刷新令牌】 生成了新的刷新令牌：{rf_token}！")
-
-            with open(current_path + "refresh.json", "w", encoding="utf-8") as f:
-                json.dump(refresh_data, f, indent=2)
-            sac.alert(label="生成成功！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
-            time.sleep(0.5)
-            sac.alert(label="即将自动刷新！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
-            time.sleep(1.5)
-            st.rerun()
+                with open(current_path + "refresh.json", "w", encoding="utf-8") as f:
+                    json.dump(refresh_data, f, indent=2)
+                sac.alert(label="生成成功！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
+                time.sleep(0.5)
+                sac.alert(label="即将自动刷新！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
+                time.sleep(1.5)
+                st.rerun()
         st.write("")
 
 
@@ -530,6 +557,7 @@ if st.session_state.role == "admin":
             col4.metric("日志信息", size1, size_bytes1-36)
             col5.metric("配置信息", size2, size_bytes2-3755)
 
+            col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
                 if st.button("**导出配置**", use_container_width=True):
                     download()
@@ -542,92 +570,150 @@ if st.session_state.role == "admin":
                 lines = file.readlines()
             with open(current_path + 'app.log', 'r', encoding='utf-8') as file:
                 logs = file.read()
-            pattern = re.compile(r'(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2},\d{3} - INFO - 【用户登录】 用户：(\w+) 登录成功！')
-            pattern_share = re.compile(r'(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2},\d{3} - INFO - 【Share登录】 共享账户：(\w+) 被登录！')
-            pattern_sign = re.compile(r'(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2},\d{3} - INFO - 【用户注册】 新用户：(\w+) 注册成功！')
 
-            matches_user = pattern.findall(logs)
+            pattern_user = re.compile(
+                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【用户登录】 用户：(\w+) 登录成功！')
+            pattern_share = re.compile(
+                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【Share登录】 共享账户：(\w+) 被登录！')
+            pattern_sign = re.compile(
+                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【用户注册】 新用户：(\w+) 注册成功！')
+
+            matches_user = pattern_user.findall(logs)
             matches_share = pattern_share.findall(logs)
             matches_sign = pattern_sign.findall(logs)
 
+            # 合并所有日期
+            all_dates = [datetime.strptime(date, '%Y-%m-%d %H').date() for date, _ in
+                         matches_user + matches_share + matches_sign]
+            min_date = min(all_dates) if all_dates else datetime.today().date()
+            max_date = max(all_dates) if all_dates else datetime.today().date()
             st.write('**服务总览**')
-            plot_choose = sac.segmented(
-                items=[
-                    sac.SegmentedItem(label='登录统计柱状图', icon='bar-chart-line'),
-                    sac.SegmentedItem(label='登录统计折线图', icon='graph-up'),
-                    sac.SegmentedItem(label='用户服务统计图', icon='person-video3'),
-                    sac.SegmentedItem(label='共享服务统计图', icon='share'),
-                    sac.SegmentedItem(label='注册人数统计图', icon='door-open'),
-                ], color='dark', use_container_width=True
-            )
+            with st.expander("**图表工具**", expanded=False, icon=":material/square_foot:"):
+                plot_choose = sac.segmented(
+                    items=[
+                        sac.SegmentedItem(label='登录统计柱状图', icon='bar-chart-line'),
+                        sac.SegmentedItem(label='登录统计折线图', icon='graph-up'),
+                        sac.SegmentedItem(label='用户服务统计图', icon='person-video3'),
+                        sac.SegmentedItem(label='共享服务统计图', icon='share'),
+                        sac.SegmentedItem(label='注册人数统计图', icon='door-open'),
+                        sac.SegmentedItem(label='时段人数统计图', icon='radio_button_checked'),
+                    ], color='dark', use_container_width=True
+                )
+                col1, col2, col3, col4, col5 = st.columns(5)
+                with col1:
+                    start_date = st.date_input("**开始日期**", value=min_date, min_value=min_date, max_value=max_date)
+                with col2:
+                    end_date = st.date_input("**结束日期**", value=max_date, min_value=min_date, max_value=max_date)
+                with col3:
+                    height = st.number_input('**图表高度**', min_value=100, max_value=1000, value=400, step=50)
+                with col4:
+                    horizontal = st.selectbox('**水平显示**', [True, False], index=0)
+                with col5:
+                    st.write("")
+                    if st.button("**保存设置**", use_container_width=True):
+                        web_setting["chart"]["start_date"] = start_date
+                        web_setting["chart"]["end_date"] = end_date
+                        web_setting["chart"]["height"] = height
+                        web_setting["chart"]["horizontal"] = horizontal
+                        with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
+                            toml.dump(web_setting, f)
+                        st.toast("保存成功！", icon=":material/check_circle:")
+
+            data_user = pd.DataFrame(matches_user, columns=['日期时间', 'user'])
+            data_share = pd.DataFrame(matches_share, columns=['日期时间', 'user'])
+            data_sign = pd.DataFrame(matches_sign, columns=['日期时间', 'user'])
+
+            data_user['日期'] = pd.to_datetime(data_user['日期时间']).dt.date
+            data_share['日期'] = pd.to_datetime(data_share['日期时间']).dt.date
+            data_sign['日期'] = pd.to_datetime(data_sign['日期时间']).dt.date
+
+            filtered_user = data_user[(data_user['日期'] >= start_date) & (data_user['日期'] <= end_date)]
+            filtered_share = data_share[(data_share['日期'] >= start_date) & (data_share['日期'] <= end_date)]
+            filtered_sign = data_sign[(data_sign['日期'] >= start_date) & (data_sign['日期'] <= end_date)]
 
             if plot_choose == '登录统计柱状图':
-                if matches_user or matches_share:
-                    matches = matches_user + matches_share
+                if not filtered_user.empty or not filtered_share.empty:
+                    matches = pd.concat([filtered_user, filtered_share])
                     st.session_state.count_people = len(matches)
-                    data = pd.DataFrame(matches, columns=['日期', 'user'])
-                    summary = data.groupby(['日期', 'user']).size().reset_index(name='登录总计')
+                    matches['日期'] = matches['日期'].astype(str)
+                    summary = matches.groupby(['日期', 'user']).size().reset_index(name='登录总计')
                     pivot_table = summary.pivot(index='日期', columns='user', values='登录总计').fillna(0)
                     st.write("")
-                    st.bar_chart(pivot_table)
+                    st.bar_chart(pivot_table, height=height, use_container_width=True, horizontal=horizontal)
                 else:
-                    sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
-                    col1, col2, col3 = st.columns([0.46, 0.08, 0.46])
-                    with col2:
-                        st.image("LOGO.png", caption="图表", width=200, use_column_width=True)
+                    sac.alert("**暂无此项统计数据，快去使用吧！**", color="warning", variant="quote", size="md", radius="md", icon=True, closable=True, key="alert_1")
 
             if plot_choose == '登录统计折线图':
-                if matches_user or matches_share:
-                    matches = matches_user + matches_share
-                    df = pd.DataFrame(matches, columns=['date', 'user'])
-                    user_login_counts = df.groupby(['date', 'user']).size().unstack(fill_value=0).reset_index()
-                    user_login_counts['total_logins'] = user_login_counts.select_dtypes(include=['number']).sum(axis=1)
-                    st.line_chart(data=user_login_counts.set_index('date'), use_container_width=True)
+                if not filtered_user.empty or not filtered_share.empty:
+                    matches = pd.concat([filtered_user, filtered_share])
+                    matches['日期'] = matches['日期'].astype(str)
+                    user_login_counts = matches.groupby(['日期', 'user']).size().unstack(fill_value=0).reset_index()
+                    user_login_counts['总登录数'] = user_login_counts.select_dtypes(include=['number']).sum(axis=1)
+                    st.line_chart(data=user_login_counts.set_index('日期'), use_container_width=True, height=height)
                 else:
-                    sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
-                    col1, col2, col3 = st.columns([0.46, 0.08, 0.46])
-                    with col2:
-                        st.image("LOGO.png", caption="图表", width=200, use_column_width=True)
+                    sac.alert("**暂无此项统计数据，快去使用吧！**", color="warning", variant="quote", size="md", radius="md", icon=True, closable=True, key="alert_2")
 
             if plot_choose == '用户服务统计图':
-                if matches_user:
-                    data = pd.DataFrame(matches_user, columns=['日期', 'user'])
-                    summary = data.groupby(['日期', 'user']).size().reset_index(name='登录总计')
+                if not filtered_user.empty:
+                    filtered_user['日期'] = filtered_user['日期'].astype(str)
+                    summary = filtered_user.groupby(['日期', 'user']).size().reset_index(name='登录总计')
                     pivot_table = summary.pivot(index='日期', columns='user', values='登录总计').fillna(0)
                     st.write("")
-                    st.bar_chart(pivot_table)
+                    st.bar_chart(pivot_table, height=height, use_container_width=True, horizontal=horizontal)
                 else:
-                    sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md",radius="lg", icon=True, closable=True)
-                    col1, col2, col3 = st.columns([0.46, 0.08, 0.46])
-                    with col2:
-                        st.image("LOGO.png", caption="图表", width=200, use_column_width=True)
+                    sac.alert("**暂无此项统计数据，快去使用吧！**", color="warning", variant="quote", size="md", radius="md", icon=True, closable=True, key="alert_3")
 
             if plot_choose == '共享服务统计图':
-                if matches_share:
-                    data = pd.DataFrame(matches_share, columns=['日期', 'user'])
-                    summary = data.groupby(['日期', 'user']).size().reset_index(name='登录总计')
+                if not filtered_share.empty:
+                    filtered_share['日期'] = filtered_share['日期'].astype(str)
+                    summary = filtered_share.groupby(['日期', 'user']).size().reset_index(name='登录总计')
                     pivot_table = summary.pivot(index='日期', columns='user', values='登录总计').fillna(0)
                     st.write("")
-                    st.bar_chart(pivot_table)
+                    st.bar_chart(pivot_table, height=height, use_container_width=True, horizontal=horizontal)
                 else:
-                    sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
-                    col1, col2, col3 = st.columns([0.46, 0.08, 0.46])
-                    with col2:
-                        st.image("LOGO.png",caption="图表", width=200, use_column_width=True)
+                    sac.alert("**暂无此项统计数据，快去使用吧！**", color="warning", variant="quote", size="md", radius="md", icon=True, closable=True, key="alert_4")
 
             if plot_choose == '注册人数统计图':
-                print(matches_sign)
-                if matches_sign:
-                    data = pd.DataFrame(matches_sign, columns=['日期', 'user'])
-                    summary = data.groupby(['日期', 'user']).size().reset_index(name='注册总计')
+                if not filtered_sign.empty:
+                    filtered_sign['日期'] = filtered_sign['日期'].astype(str)
+                    summary = filtered_sign.groupby(['日期', 'user']).size().reset_index(name='注册总计')
                     pivot_table = summary.pivot(index='日期', columns='user', values='注册总计').fillna(0)
                     st.write("")
-                    st.bar_chart(pivot_table)
+                    st.bar_chart(pivot_table, height=height, use_container_width=True, horizontal=horizontal)
                 else:
-                    sac.alert(label="暂无服务记录，快去使用吧！", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
-                    col1, col2, col3 = st.columns([0.46, 0.08, 0.46])
-                    with col2:
-                        st.image("LOGO.png", caption="图表", width=200, use_column_width=True)
+                    sac.alert("**暂无此项统计数据，快去使用吧！**", color="warning", variant="quote", size="md", radius="md", icon=True, closable=True, key="alert_5")
+
+            if plot_choose == '时段人数统计图':
+                if not filtered_user.empty:
+                    data = filtered_user.copy()
+                    data['小时'] = pd.to_datetime(data['日期时间']).dt.hour
+                    data['时段'] = data['小时'].apply(lambda hour: (
+                        '00:00-04:00' if 0 <= hour < 4 else
+                        '04:00-08:00' if 4 <= hour < 8 else
+                        '08:00-12:00' if 8 <= hour < 12 else
+                        '12:00-16:00' if 12 <= hour < 16 else
+                        '16:00-20:00' if 16 <= hour < 20 else
+                        '20:00-24:00'
+                    ))
+                    summary = data.groupby(['日期', '时段']).size().reset_index(name='登录总计')
+                    summary['日期'] = pd.to_datetime(summary['日期']).dt.date
+
+                    import altair as alt
+
+                    chart = alt.Chart(summary).mark_bar().encode(
+                        x=alt.X('日期:T', title='日期', timeUnit='yearmonthdate'),
+                        y=alt.Y('时段:N', title='时段'),
+                        color='登录总计:Q',
+                        tooltip=['日期', '时段', '登录总计']
+                    ).properties(
+                        height=height,
+                        width=800
+                    ).configure_axis(
+                        labelAngle=15
+                    )
+                    st.altair_chart(chart, use_container_width=True)
+                else:
+                    sac.alert("**暂无此项统计数据，快去使用吧！**", color="warning", variant="quote", size="md", radius="md", icon=True, closable=True, key="alert_6")
 
             st.divider()
             st.write("**运行日志**")
@@ -662,7 +748,7 @@ if st.session_state.role == "admin":
             st.write("")
             col6, col7, col8, col9, col10 = st.columns(5)
             with col6:
-                if st.button(" **保存设置**", use_container_width=True):
+                if st.button("**保存修改**", use_container_width=True, key="save_setting_web"):
                     web_setting["web"]["title"] = title
                     web_setting["web"]["subtitle"] = subtitle
                     web_setting["web"]["super_user"] = super_user
@@ -801,12 +887,40 @@ if st.session_state.role == "admin":
                     for groups, datas in accounts.items()]
             st.write("**号池列表**")
             sac.alert(label="**`用户组` 是每个账号的唯一标识，`不允许名称相同！`**", description="用户组是各个模块相互联系的重要关键字，命名后请谨慎修改！", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
-            df1 = pd.DataFrame(rows, columns=['用户组', '订阅类型', '账户邮箱', 'AC_Token', 'RF_Token'])
-            edited_df1 = st.data_editor(df1, hide_index=True, use_container_width=True, num_rows="dynamic", height=248, column_config={"订阅类型": st.column_config.SelectboxColumn(options=["Free", "Plus"])})
+
+            fields = ['用户组', '订阅类型', '账户邮箱', 'AC_Token', 'RF_Token']
+            df1 = pd.DataFrame(rows, columns=fields)
+            with st.expander("**表格工具**", expanded=False, icon=":material/construction:"):
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    hide_index = st.selectbox("**隐藏索引**", [True, False], index=[True, False].index(web_setting["excel"]["hide_index_account"]), key="hide_index_account")
+                with col2:
+                    height = st.number_input("**表格高度**", value=web_setting["excel"]["height_account"], min_value=100, max_value=1000, step=100, key="height_account")
+                with col3:
+                    order_what = st.selectbox("**排序列名**", fields, index=fields.index(web_setting["excel"]["order_what_account"]), key="order_what_account")
+                with col4:
+                    order_row = st.selectbox("**排序方式**", ["默认", "升序", "降序"], index=["默认", "升序", "降序"].index(web_setting["excel"]["order_row_account"]), key="order_row_account")
+
+                order = st.multiselect("**数据显示**", fields, web_setting["excel"]["order_account"], key="order_account")
+
+                if order_row == "升序":
+                    df1 = df1.sort_values(by=order_what, ascending=True)
+                elif order_row == "降序":
+                    df1 = df1.sort_values(by=order_what, ascending=False)
+
+            edited_df1 = st.data_editor(df1, hide_index=hide_index, use_container_width=True, num_rows="dynamic", height=height, column_config={"订阅类型": st.column_config.SelectboxColumn(options=["Free", "Plus"])}, column_order=order)
 
             col6, col7, col8, col9, col10 = st.columns(5)
             with col6:
                 if st.button("**保存修改**", use_container_width=True):
+                    web_setting["excel"]["hide_index_account"] = hide_index
+                    web_setting["excel"]["height_account"] = height
+                    web_setting["excel"]["order_what_account"] = order_what
+                    web_setting["excel"]["order_row_account"] = order_row
+                    web_setting["excel"]["order_account"] = order
+
+                    with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
+                        toml.dump(web_setting, f)
                     json_data1 = df_to_json1(edited_df1)
                     json_filename = 'accounts.json'
                     with open(current_path + json_filename, 'w', encoding='utf-8') as json_file:
@@ -826,13 +940,25 @@ if st.session_state.role == "admin":
             invite_link_enable = st.checkbox("**显示发卡链接**", value=web_setting["web"]["invite_link_enable"], key="invite_link_enable")
             invite_link = st.text_input("**发卡链接(完整网址)**", value=web_setting["web"]["invite_link"], key="invite_link")
             st.write("")
-            rows = [[IV_Token, invite_config[IV_Token]["group"], invite_config[IV_Token]["note"], invite_config[IV_Token]["used"]] for IV_Token, Group in invite_config.items()]
-            df3 = pd.DataFrame(rows, columns=['Invite_Token', '用户组', '备注', '是否使用'])
 
+            fields = ['Invite_Token', '用户组', '备注', '是否使用']
+            rows = [[IV_Token, invite_config[IV_Token]["group"], invite_config[IV_Token]["note"], invite_config[IV_Token]["used"]] for IV_Token, Group in invite_config.items()]
+            df3 = pd.DataFrame(rows, columns=fields)
             with st.expander("**表格工具**", expanded=False, icon=":material/construction:"):
-                col1, col2, col3, col4, col5 = st.columns(5)
+                col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    hide_index = st.selectbox("**隐藏索引**", [True, False], index=0, key="hide_index_invite")
+                    hide_index = st.selectbox("**隐藏索引**", [True, False], index=[True, False].index(web_setting["excel"]["hide_index_invite"]), key="hide_index_invite")
+                with col2:
+                    height = st.number_input("**表格高度**", value=web_setting["excel"]["height_invite"], min_value=100, max_value=1000, step=100, key="height_invite")
+                with col3:
+                    order_what = st.selectbox("**排序列名**", fields, index=fields.index(web_setting["excel"]["order_what_invite"]), key="order_what")
+                with col4:
+                    order_row = st.selectbox("**排序方式**", ["默认", "升序", "降序"], index=["默认", "升序", "降序"].index(web_setting["excel"]["order_row_invite"]), key="order_row")
+
+                col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
+                with col1:
+                    order = st.multiselect("**数据显示**", fields, web_setting["excel"]["order_invite"], key="order", label_visibility="collapsed")
+                with col2:
                     if st.button("删除已用令牌", use_container_width=True, key="delete_invite"):
                         for i in list(invite_config.keys()):
                             if invite_config[i]["used"]:
@@ -842,8 +968,7 @@ if st.session_state.role == "admin":
                         st.toast("删除成功!", icon=':material/check_circle:')
                         logger.info(f"<管理员> 【邀请令牌】 删除了已使用的邀请令牌！")
                         st.rerun()
-                with col2:
-                    height = st.number_input("**表格高度**", value=248, min_value=100, max_value=1000, step=100, key="height_invite")
+                with col3:
                     if st.button("删除所有令牌", use_container_width=True, key="delete_all_invite"):
                         invite_config.clear()
                         with open(current_path + "invite.json", "w", encoding="utf-8") as f:
@@ -851,12 +976,6 @@ if st.session_state.role == "admin":
                         st.toast("删除成功!", icon=':material/check_circle:')
                         logger.info(f"<管理员> 【邀请令牌】 删除了所有的邀请令牌！")
                         st.rerun()
-                with col3:
-                    order_what = st.selectbox("**排序列名**", ["Invite_Token", "用户组", "备注", "是否使用"], index=3, key="order_what")
-                with col4:
-                    order_row = st.selectbox("**排序方式**", ["默认", "升序", "降序"], index=0, key="order_row")
-                with col5:
-                    order = st.multiselect("**数据显示**", ["Invite_Token", "用户组", "备注", "是否使用"], key="order")
 
                 if order_row == "升序":
                     df3 = df3.sort_values(by=order_what, ascending=True)
@@ -869,6 +988,11 @@ if st.session_state.role == "admin":
             col6, col7 = st.columns([0.99999, 0.00001])
             with col1:
                 if st.button("**保存修改**", use_container_width=True, key="save_invite"):
+                    web_setting["excel"]["hide_index_invite"] = hide_index
+                    web_setting["excel"]["height_invite"] = height
+                    web_setting["excel"]["order_what_invite"] = order_what
+                    web_setting["excel"]["order_row_invite"] = order_row
+                    web_setting["excel"]["order_invite"] = order
                     web_setting["web"]["invite_link_enable"] = invite_link_enable
                     web_setting["web"]["invite_link"] = invite_link
                     with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
@@ -939,15 +1063,40 @@ if st.session_state.role == "admin":
             st.write("**用户列表**")
             sac.alert(label="**所有表格均支持 `搜索`、`下载`、`新建`、`删除`、`修改`、`排序` ，但请务必在修改后进行保存！**", color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
 
-            fields = ['账户', '密码', 'SA_Token', '用户组', '订阅类型', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离']
+            fields = ['账户', '密码', 'UID', 'SA_Token', '用户组', '订阅类型', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离']
             rows = [[user] + list(account.values()) for user, account in config.items()]
             df2 = pd.DataFrame(rows, columns=fields)
-            edited_df2 = st.data_editor(df2, hide_index=True, use_container_width=True, height=248, disabled=['用户组', '订阅类型', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离'], num_rows="dynamic")
+            with st.expander("**表格工具**", expanded=False, icon=":material/construction:"):
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    hide_index = st.selectbox("**隐藏索引**", [True, False], index=[True, False].index(web_setting["excel"]["hide_index_user"]), key="hide_index_user")
+                with col2:
+                    height = st.number_input("**表格高度**", value=web_setting["excel"]["height_user"], min_value=100, max_value=1000, step=100, key="height_user")
+                with col3:
+                    order_what = st.selectbox("**排序列名**", fields, index=fields.index(web_setting["excel"]["order_what_user"]), key="order_what_user")
+                with col4:
+                    order_row = st.selectbox("**排序方式**", ["默认", "升序", "降序"], index=["默认", "升序", "降序"].index(web_setting["excel"]["order_row_user"]), key="order_row_user")
+
+                order = st.multiselect("**数据显示**", fields, web_setting["excel"]["order_user"], key="order_user")
+
+                if order_row == "升序":
+                    df2 = df2.sort_values(by=order_what, ascending=True)
+                elif order_row == "降序":
+                    df2 = df2.sort_values(by=order_what, ascending=False)
+
+            edited_df2 = st.data_editor(df2, column_order=order, hide_index=hide_index, use_container_width=True, height=height, disabled=['用户组', 'UID', '订阅类型', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离'], num_rows="dynamic")
 
             st.write('')
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
                 if st.button("**保存修改** ", use_container_width=True, key="save_user"):
+                    web_setting["excel"]["hide_index_user"] = hide_index
+                    web_setting["excel"]["height_user"] = height
+                    web_setting["excel"]["order_what_user"] = order_what
+                    web_setting["excel"]["order_row_user"] = order_row
+                    web_setting["excel"]["order_user"] = order
+                    with open(current_path + 'setting.toml', 'w', encoding='utf-8') as f:
+                        toml.dump(web_setting, f)
                     json_data2 = df_to_json2(edited_df2)
                     with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
                         json_file.write(json_data2)
@@ -976,9 +1125,20 @@ if st.session_state.role == "admin":
             rows = [[rf_token] + list(datas.values()) for rf_token, datas in refresh_data.items()]
             df4 = pd.DataFrame(rows, columns=fields)
             with st.expander("**表格工具**", expanded=False, icon=":material/construction:"):
-                col1, col2, col3, col4, col5 = st.columns(5)
+                col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    hide_index = st.selectbox("**隐藏索引**", [True, False], index=0, key="hide_index_refresh")
+                    hide_index = st.selectbox("**隐藏索引**", [True, False], index=[True, False].index(web_setting["excel"]["hide_index_refresh"]), key="hide_index_refresh")
+                with col2:
+                    height = st.number_input("**表格高度**", value=web_setting["excel"]["height_refresh"], min_value=100, max_value=1000, step=100, key="height_refresh")
+                with col3:
+                    order_what = st.selectbox("**排序列名**", fields, index=fields.index(web_setting["excel"]["order_what_refresh"]), key="order_what_refresh")
+                with col4:
+                    order_row = st.selectbox("**排序方式**", ["默认", "升序", "降序"], index=["默认", "升序", "降序"].index(web_setting["excel"]["order_row_refresh"]), key="order_row_refresh")
+
+                col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
+                with col1:
+                    order = st.multiselect("**数据显示**", fields, web_setting["excel"]["order_refresh"], key="order_refresh", label_visibility="collapsed")
+                with col2:
                     if st.button("删除已用令牌", use_container_width=True, key="delete_refresh"):
                         for i in list(refresh_data.keys()):
                             if refresh_data[i]["used"]:
@@ -988,8 +1148,7 @@ if st.session_state.role == "admin":
                         st.toast("删除成功!", icon=':material/check_circle:')
                         logger.info(f"<管理员> 【刷新令牌】 删除了已使用的刷新令牌！")
                         st.rerun()
-                with col2:
-                    height = st.number_input("**表格高度**", value=248, min_value=100, max_value=1000, step=100, key="height_refresh")
+                with col3:
                     if st.button("删除所有令牌", use_container_width=True, key="delete_all_refresh"):
                         refresh_data.clear()
                         with open(current_path + "refresh.json", "w", encoding="utf-8") as f:
@@ -997,12 +1156,6 @@ if st.session_state.role == "admin":
                         st.toast("删除成功!", icon=':material/check_circle:')
                         logger.info(f"<管理员> 【刷新令牌】 删除了所有的刷新令牌！")
                         st.rerun()
-                with col3:
-                    order_what = st.selectbox("**排序列名**", ['userRF_Token', '用户组', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离', '备注', '是否使用'], index=8, key="order_what")
-                with col4:
-                    order_row = st.selectbox("**排序方式**", ["默认", "升序", "降序"], index=0, key="order_row_refresh")
-                with col5:
-                    order = st.multiselect("**数据显示**", ['userRF_Token', '用户组', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离', '备注', '是否使用'], ['userRF_Token', '用户组', '过期秒数', 'GPT3.5限制', 'GPT4限制', '备注', '是否使用'], key="order_refresh")
 
                 if order_row == "升序":
                     df4 = df4.sort_values(by=order_what, ascending=True)
@@ -1033,15 +1186,16 @@ if st.session_state.role == "admin":
             sac.alert(label="**说明：`限制网站`为 空 则无限制；`过期秒数` 为 0 则永不过期；`GPT3.5限制` 为 -1 则无限制；`GPT4限制` 为 -1 则无限制；`会话无需隔离` 为 true 则不隔离会话**",color="warning", variant='quote', size="md", radius="lg", icon=True, closable=True)
             col1, col2 = st.columns(2)
             with col1:
-                user_new_acc = st.text_input("**账户**")
-                user_new_pass = st.text_input("**密码**")
+                user_new_acc = st.text_input("**账户**", key="user_new_acc_admin", placeholder="user_name")
+                user_new_pass = st.text_input("**密码**", key="user_new_pass_admin", type="password", placeholder="user_password")
                 user_new_group = st.selectbox("**组别**", accounts.keys())
                 show_conversations = st.selectbox("**会话无需隔离**", ['true', 'false'], index=1, help="false为隔离会话")
             with col2:
-                site_limit = st.text_input("**限制网站（为空不限制）**", value="", help="限制的网站, 为空则不限制")
+                site_limit = st.text_input("**限制网站（为空不限制）**", value="", help="限制的网站, 为空则不限制", placeholder="site1,site2")
                 expires_in = st.number_input("**有效期（秒**）", value=0, help="token有效期（单位为秒），填 0 则永久有效")
                 gpt35_limit = st.number_input("**限制GPT-3.5**", value=-1, help="GPT-3.5对话限制，填 -1 则不限制")
                 gpt4_limit = st.number_input("**限制GPT-4**", value=-1, help="GPT-4对话限制，填 -1 则不限制")
+            uid = st.text_input("**UID(32位)**", value="UID-" + secrets.token_urlsafe(32), help="用户的UID，为空则自动生成，用于用户修改密码", disabled=True)
             st.write('')
             col1, col2, col3, col4, col5 = st.columns(5)
             col6, col7 = st.columns([0.99999, 0.00001])
@@ -1064,6 +1218,7 @@ if st.session_state.role == "admin":
                         json_data = {
                             new_name: {
                                 'password': user_new_pass,
+                                'uid': uid,
                                 'token': new_token_key,
                                 'group': user_new_group,
                                 'type': group_data['account_type'],
@@ -1083,7 +1238,7 @@ if st.session_state.role == "admin":
                         st.toast("注册成功！", icon=':material/check_circle:')
                         st.toast("即将刷新页面...1s", icon=':material/check_circle:')
                         time.sleep(1)
-                        logger.info(f"<管理员> 【用户注册】 新用户注册成功！name：{new_name}，token:{new_token_key}，group:{user_new_group}")
+                        logger.info(f"<管理员> 【用户注册】 新用户注册成功！uid：{uid}，name：{new_name}，token:{new_token_key}，group:{user_new_group}")
                         st.rerun()
 
                 st.write("")
@@ -1130,7 +1285,7 @@ if st.session_state.role == "admin":
 
             st.divider()
             st.write("**关于**")
-            st.write("版本：OaiT V1.1.2")
+            st.write("版本：OaiT V1.1.3")
             st.write("作者：@Chenyme")
             st.write("鸣谢：@Neo")
             st.write("GitHub：https://github.com/Chenyme/oaifree-tools")
@@ -1153,17 +1308,16 @@ if st.session_state.role == "admin":
 else:
     col1, col2, col3 = st.columns(3)
     with col2:
-        sac.alert("**非法访问！**", "**警告：你无权进入该页面！**", color="error", size="lg", radius="lg", icon=True, variant="filled", closable=True)
+        sac.alert("**非法访问！**", "**警告：你无权进入该页面！**", color="error", size="lg", radius="lg", icon=True,
+                  variant="filled", closable=True)
         with st.container(border=True):
-            col1, col2, col3 = st.columns([0.35, 0.3, 0.35])
+            col1, col2, col3 = st.columns([0.38, 0.24, 0.38])
             with col2:
                 st.image("LOGO.png", width=200, use_column_width=True)
             st.write("")
             admin = st.text_input("**管理账户：**")
-            st.write("")
             key = st.text_input("**管理密钥：**", type="password")
-            st.write("")
-            st.write("")
+            st.divider()
             if st.button("**验证身份**", use_container_width=True):
                 if admin == web_setting["web"]["super_user"] and key == web_setting["web"]["super_key"]:
                     st.session_state.role = "admin"
@@ -1171,8 +1325,7 @@ else:
                     st.write("")
                     st.switch_page("pages/admin.py")
                 else:
-                    sac.alert(label="身份验证失败！", color="error", variant='quote', size="lg", radius="lg", icon=True,
-                              closable=True)
-            st.write("")
-            st.write("")
+                    st.toast("**身份验证失败，如果您不是管理员请前往首页进行登录！**", icon=":material/error:")
+            if st.button("**返回首页**", use_container_width=True):
+                st.switch_page("home.py")
             st.write("")

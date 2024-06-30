@@ -111,31 +111,64 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("")
-st.write("")
+
 col1, col2, col3 = st.columns(3)
 with col2:
-    with st.container(border=True):
+    set_choose = sac.segmented(
+        items=[
+            sac.SegmentedItem(label='更改密码', icon='file-text'),
+            sac.SegmentedItem(label='账户续费', icon='tools'),
+        ], align='center', use_container_width=True, color='dark'
+    )
+    st.write("")
+    st.write("")
+    if set_choose == '更改密码':
+        st.write("### 更改密码")
+        st.write("")
+        st.write("")
+        user_account = st.text_input("**账户**", placeholder="您的账户", key="user_account")
+        user_password = st.text_input("**新密码**", type="password", placeholder="您的新密码", key="user_password")
+        uid = st.text_input("**UID**", placeholder="唯一标识UID", key="uid")
+
+        st.divider()
+        st.write("")
+
+        if st.button("**修改密码**", use_container_width=True):
+            if user_account != "" and user_password is not None:
+                if user_account in config.keys():
+                    if user_password != config[user_account]['password']:
+                        if config[user_account]['uid'] == uid:
+                            config[user_account]['password'] = user_password
+                            with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
+                                json.dump(config, file, indent=2)
+                            logger.info(f"【密码更改】 账户：{user_account} 密码更改成功！new_password:{user_password}")
+                            st.toast('**密码已成功更改！**', icon=':material/check_circle:')
+                        else:
+                            st.toast('**错误的UID，UID是您注册时和登陆时显示的令牌！**', icon=':material/error:')
+                    else:
+                        st.toast('**修改失败，新密码不能与旧密码相同！**', icon=':material/error:')
+                else:
+                    st.toast('**账户不存在，请检查您填写的账户名称是否正确！**', icon=':material/error:')
+            else:
+                st.toast('**账户不能为空，请填写您的账户！**', icon=':material/error:')
+    else:
         if not web_setting["web"]["user_refresh"]:
             col1, col2, col3 = st.columns([0.35, 0.3, 0.35])
             with col2:
                 st.image("LOGO.png", width=200, use_column_width=True)
             sac.alert("**诶呀！出错啦！**",description="**管理员暂未开放相关功能！**", color="error", variant="filled", size="lg", radius="lg", icon=True, closable=True)
-            st.write("")
-            if st.button("**返回首页**", use_container_width=True):
-                st.switch_page("home.py")
-            st.write("")
 
         else:
-            st.write("### 账户刷新")
+            st.write("### 账户续费")
             st.write("")
             st.write("")
 
-            user_account = st.text_input("**账户**")
-            user_password = st.text_input("**密码**", type="password")
-            refresh = st.text_input("**刷新令牌**")
+            user_account = st.text_input("**账户**", placeholder="您的账户")
+            user_password = st.text_input("**密码**", type="password", placeholder="您的密码")
+            refresh = st.text_input("**刷新令牌**", placeholder="您的刷新令牌，输入后请Enter确认！")
             login_result, token_result, group_result = login(user_account, user_password)
-            st.write("")
+
+            st.divider()
             st.write("")
             if st.button("**执行刷新**", use_container_width=True):
                 if user_account != "" and user_password != "":
@@ -167,31 +200,29 @@ with col2:
                                             with open(current_path + '/refresh.json', 'w', encoding='utf-8') as file:
                                                 json.dump(refresh_data, file, indent=2)
 
-                                            logger.info(f"【账户刷新】 账户：{user_account} 刷新成功！")
-                                            st.toast('刷新成功！', icon=':material/check:')
+                                            logger.info(f"【账户续费】 账户：{user_account} 续费成功！续费:{refresh_data[refresh]['expires_in']}秒！")
+                                            st.toast('续费成功！', icon=':material/check_circle:')
                                         else:
-                                            logger.error(f"【账户刷新】 账户：{user_account} 刷新失败！请检查AC_Token是否有效！")
-                                            sac.alert("刷新失败！请联系管理员！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                                            logger.error(f"【账户续费】 账户：{user_account} 续费失败！请检查AC_Token是否有效！")
+                                            st.toast('续费失败！请联系管理员更新相关Token！', icon=':material/error:')
                                     else:
-                                        logger.error(f"【账户刷新】 账户：{user_account} 刷新失败！请检查RF_Token是否有效！")
-                                        sac.alert("刷新失败！请联系管理员！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                                        logger.error(f"【账户续费】 账户：{user_account} 续费失败！请检查RF_Token是否有效！")
+                                        st.toast('续费失败！请联系管理员更新相关Token！', icon=':material/error:')
                                 else:
-                                    sac.alert("刷新令牌与账户不匹配！请联系管理员更换！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                                    st.toast('**验证失败，此刷新令牌与账户用户组不匹配！**', icon=':material/error:')
                             else:
-                                sac.alert("刷新令牌已被使用！请联系管理员更换！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                                st.toast('**验证失败，此刷新令牌已被使用！**', icon=':material/error:')
                         else:
-                            sac.alert("刷新令牌无效！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                            st.toast('**验证失败，此刷新令牌不存在！**', icon=':material/error:')
                     else:
-                        sac.alert("账户密码错误！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                        st.toast('**验证失败，账户密码错误！**', icon=':material/error:')
                 else:
-                    sac.alert("账户密码不能为空！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                    st.toast('**验证失败，账户密码不能为空！**', icon=':material/error:')
 
             if web_setting["web"]["refresh_link_enable"]:
-                st.link_button("**获取刷新令牌**", web_setting["web"]["refresh_link"], use_container_width=True)
-
-            st.write("")
-            if st.button("**返回首页**", use_container_width=True, key="rf_home"):
-                st.switch_page("home.py")
+                st.link_button("**获取令牌**", web_setting["web"]["refresh_link"], use_container_width=True)
+    if st.button("**返回首页**", use_container_width=True, key="rf_home"):
+        st.switch_page("home.py")
 col4, col5, col6 = st.columns([0.3, 0.23, 0.3])
 with col5:
     footer = """

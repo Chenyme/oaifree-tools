@@ -229,12 +229,12 @@ st.markdown("<div style='text-align:center;'><h1 style='text-align:center;'>" + 
 st.markdown("<div style='text-align:center;'><div>" + web_setting["web"]["subtitle"] + "</div></div>", unsafe_allow_html=True)
 
 st.title("")
-sac.alert(label=web_setting["web"]["share_notice"], color=web_setting["web"]["notice_color"],
-                      variant=web_setting["web"]["notice_style"], banner=web_setting["web"]["notice_banner"], size=web_setting["web"]["notice_size"], radius=web_setting["web"]["notice_radius"], icon=True, closable=True)
 
-st.divider()
+sac.alert(label=web_setting["web"]["share_notice"], color=web_setting["web"]["notice_color"], variant=web_setting["web"]["notice_style"], banner=web_setting["web"]["notice_banner"], size=web_setting["web"]["notice_size"], radius=web_setting["web"]["notice_radius"], icon=True, closable=True)
+
+
 if web_setting["web"]["share"]:
-
+    st.divider()
     st.write("")
     key = st.selectbox("**选择要登录的Share账户**", list(share_data.keys()), index=0)
     st.write("")
@@ -311,10 +311,13 @@ if web_setting["web"]["share"]:
 
 else:
     st.write("")
-    sac.alert(label="**无权限访问！**", description="**Share共享站管理员暂未开放！**", color="error", variant="filled", size="lg", radius="lg", icon=True, closable=False)
-    if st.button("**返回首页**", use_container_width=True):
-        st.switch_page("home.py")
-    st.write("")
+    col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+    with col2:
+        st.divider()
+        sac.alert(label="**无权限访问！**", description="**Share共享站管理员暂未开放！**", color="error", variant="filled", size="lg", radius="lg", icon=True, closable=False)
+        if st.button("**返回首页**", use_container_width=True):
+            st.switch_page("home.py")
+        st.write("")
 
 
 col4, col5, col6 = st.columns([0.2, 0.6, 0.2])

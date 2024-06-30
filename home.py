@@ -3,6 +3,7 @@ import toml
 import logging
 import json
 import streamlit as st
+import secrets
 import streamlit_antd_components as sac
 from utils import get_sharetoken, get_accesstoken, get_login_url, check_sharetoken
 
@@ -147,11 +148,15 @@ def check_login_status(token_result, user_name, group_result):
 def select():
     st.write("")
     st.write("")
-    user_new_acc = st.text_input("**账户：**")
-    user_new_pass = st.text_input("**密码：**", type="password")
-    user_new_invite = st.text_input("**邀请令牌：**")
+    user_new_acc = st.text_input("**账户：**", placeholder="您的账户")
+    user_new_pass = st.text_input("**密码：**", type="password", placeholder="您的密码")
+    user_new_invite = st.text_input("**邀请令牌：**", placeholder="您的邀请令牌，输入后请Enter确认！")
+    uid = "UID-" + secrets.token_urlsafe(32)
+    st.divider()
     st.write("")
-    st.write("")
+    if web_setting["web"]["invite_link_enable"]:
+        st.link_button("**获取令牌**", web_setting["web"]["invite_link"], use_container_width=True)
+
     if st.button("**加入我们**", use_container_width=True, type="primary"):
         st.write("")
         if user_new_acc == "":
@@ -174,6 +179,7 @@ def select():
                     new_name: {
                         'password': user_new_pass,
                         'token': new_token_key,
+                        'uid': uid,
                         'group': user_new_group,
                         'type': group_data['account_type'],
                         'site_limit': web_setting["web"]["site_limit"],
@@ -193,15 +199,18 @@ def select():
                 with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
                     json_file.write(config_json)
 
-                logger.info("name：{new_name}，token:{new_token_key}，group:{user_new_group}，注册邀请码：{user_new_invite}")
+                logger.info(f"name：{new_name}，token:{new_token_key}，group:{user_new_group}，注册邀请码：{user_new_invite}")
                 logger.info(f"【用户注册】 新用户：{new_name} 注册成功！")
-                sac.alert(label="**注册成功！请前往登录！**", color="success", variant="quote", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label="**恭喜，注册成功！**",
+                          description=f"您的专属 **UID** （可用于密码更改、用户登录）：**{uid}** ", color="success",
+                          variant="filled", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label=f"**请务必牢记并保存您的UID！**", color="success", banner=True, variant="filled",
+                          size="md", radius="md", icon=True, closable=True)
             else:
-                sac.alert(label="**注册失败，请联系管理员！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label="**注册失败，请联系管理员！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
         else:
             st.error("邀请令牌已被使用！请更换令牌", icon=":material/error:")
-    if web_setting["web"]["invite_link_enable"]:
-        st.link_button("**获取邀请令牌**", web_setting["web"]["invite_link"], use_container_width=True)
+
     st.write("")
 
 
@@ -324,8 +333,8 @@ with col5:
     st.write("")
     st.write("")
     st.write("")
-    account = st.text_input("**账户**")
-    password = st.text_input("**密码**", type="password")
+    account = st.text_input("**账户**", placeholder="account")
+    password = st.text_input("**密码**", type="password", placeholder="password")
     st.write("---")
     if st.button("**登录**", use_container_width=True):
         login_result, token_result, group_result = login(account, password)
@@ -351,8 +360,8 @@ with col5:
         pass
 
     st.write("")
-    st.page_link("pages/refresh.py", label=":red[无法登录？]", icon=":material/login:", use_container_width=True)
-    st.page_link("pages/share.py", label="Share共享站", icon=":material/login:", use_container_width=True)
+    st.page_link("pages/refresh.py", label=":red[**忘记密码？账户过期？**]", icon=":material/login:", use_container_width=True)
+    st.page_link("pages/share.py", label="**Share共享站**", icon=":material/login:", use_container_width=True)
 
     footer = """
         <style>

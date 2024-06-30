@@ -1,6 +1,7 @@
 {
   "login_test1": {
-    "password": "test1",
+    "password": "test11",
+    "uid": "UID-qS3HZlfbm-kQFmmEkOMaNrFJL2HkUivh_JwIX4d8-Xs",
     "token": "fk-",
     "group": "groupA",
     "type": "Plus",
@@ -12,6 +13,7 @@
   },
   "login_test2": {
     "password": "test2",
+    "uid": "UID-XeXraNYuLF6bcMgLpIwrJys8dWcxIVAJSXZt-Y2UFJc",
     "token": "fk-",
     "group": "groupA",
     "type": "Plus",
@@ -23,6 +25,7 @@
   },
   "login_test3": {
     "password": "test3",
+    "uid": "UID-cOdFpsBk-NnFPdNGxD1mvPqNAOAAdgY_06EIMp4JIrg",
     "token": "fk-",
     "group": "groupA",
     "type": "Plus",
