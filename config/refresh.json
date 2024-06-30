@@ -1,0 +1,29 @@
+{
+  "rf-pajINbace8A1WiEx-KSEYQ": {
+    "group": "groupA",
+    "site_limit": "",
+    "expires_in": 0,
+    "gpt35_limit": -1,
+    "gpt4_limit": -1,
+    "show_conversations": "false",
+    "used": false
+  },
+  "rf-AwYsR1b4NQv4YIbd2JZNtQ": {
+    "group": "groupA",
+    "site_limit": "",
+    "expires_in": 0,
+    "gpt35_limit": -1,
+    "gpt4_limit": -1,
+    "show_conversations": "false",
+    "used": false
+  },
+  "rf-3tXuKGDvviOvs8r6sWYtVw": {
+    "group": "groupA",
+    "site_limit": "",
+    "expires_in": 0,
+    "gpt35_limit": -1,
+    "gpt4_limit": -1,
+    "show_conversations": "false",
+    "used": false
+  }
+}

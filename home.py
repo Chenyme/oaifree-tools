@@ -4,7 +4,7 @@ import logging
 import json
 import streamlit as st
 import streamlit_antd_components as sac
-from utils import get_sharetoken, get_accesstoken, get_login_url
+from utils import get_sharetoken, get_accesstoken, get_login_url, check_sharetoken
 
 current_path = os.path.abspath('.') + '/config/'
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler(current_path + "app.log", encoding='utf-8'), logging.StreamHandler()])
@@ -24,11 +24,120 @@ with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
     web_setting = toml.load(file)
 with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
     share_data = json.load(file)
+with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:
+    domain_data = json.load(file)
 
 st.set_page_config(layout="wide", page_title=web_setting["web"]["title"], page_icon="LOGO.png")
 
 if "role" not in st.session_state:
     st.session_state.role = None
+
+st.markdown("""
+    <style>
+    .st-emotion-cache-consg2.e16zdaao0 {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 2.5em;
+        background-color: #333 !important;
+        color: #fff !important;
+        border: none;
+        border-radius: 10px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
+        text-decoration: none;
+        padding: 0 1em;
+    }
+    .st-emotion-cache-consg2.e16zdaao0:hover {
+        background-color: #444 !important;
+        color: #fff !important;
+        transform: scale(1.05);
+    }
+    .st-emotion-cache-consg2.e16zdaao0:active {
+        background-color: #222 !important;
+        color: #fff !important;
+        transform: scale(0.95);
+    }
+    .st-emotion-cache-187vdiz.e1nzilvr4 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+        background-color: transparent !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)  # 链接按钮样式
+
+
+def check_login_status(token_result, user_name, group_result):
+    error = False
+
+    # 判断SA_Token是否有效
+    if check_sharetoken(token_result):
+
+        token_result = token_result
+        logging.info(f"<用户> 【用户登录】 用户：{user_name} 登录成功！")
+    else:
+        if str(config[user_name]["expires_in"]) == "0":
+            logging.info(f"<用户> 【SA验证】 用户 {user_name} 的SA_Token已经失效！尝试刷新中...")
+            status.update(label="**账户SA状态已失效！尝试刷新中...**", state="running", expanded=False)
+            sa_status, name, token_result = get_sharetoken(
+                user_name,
+                accounts[group_result]["access_token"],
+                config[user_name]["site_limit"],
+                config[user_name]["expires_in"],
+                config[user_name]["gpt35_limit"],
+                config[user_name]["gpt4_limit"],
+                config[user_name]["show_conversations"]
+            )
+
+            # 判断AC_Token是否有效
+            if sa_status:
+                config[user_name]["token"] = token_result
+                config_json = json.dumps(config, indent=2)
+                with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
+                    json_file.write(config_json)
+                logging.info(f"<用户> 【SA刷新】 用户 {user_name} 的SA_Token刷新成功！")
+            else:
+                logging.info(f"<用户> 【AC刷新】 用户 {user_name} 的AC_Token已经失效！尝试刷新中...")
+                status.update(label="**账户AC状态已失效！尝试刷新中...**", state="running", expanded=False)
+                ac_status, user_ac_tk = get_accesstoken(accounts[group_result]["refresh_token"])
+
+                # 判断RF_Token是否有效
+                if ac_status:
+                    status.update(label="**已成功刷新！请耐心等待...**", state="running", expanded=False)
+                    sa_status, name, token_result = get_sharetoken(
+                        user_name,
+                        user_ac_tk,
+                        config[user_name]["site_limit"],
+                        config[user_name]["expires_in"],
+                        config[user_name]["gpt35_limit"],
+                        config[user_name]["gpt4_limit"],
+                        config[user_name]["show_conversations"]
+                    )
+
+                    config[user_name]["token"] = token_result
+                    config_json = json.dumps(config, indent=2)
+                    with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
+                        json_file.write(config_json)
+                    accounts[group_result]["access_token"] = user_ac_tk
+                    accounts_json = json.dumps(accounts, indent=2)
+                    with open(current_path + 'accounts.json', 'w', encoding='utf-8') as json_file:
+                        json_file.write(accounts_json)
+                    logging.info(f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新成功！")
+                else:
+                    error = "RF过期"
+                    logging.error(
+                        f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新失败！请检查RF_Token是否正确！")
+        else:
+            error = "过期"
+            logging.error(f"<用户> 【SA验证】 用户 {user_name} 的SA_Token已经过期！")
+
+    return error, token_result
 
 
 @st.experimental_dialog("成为我们的新伙伴！")  # 注册模块
@@ -36,11 +145,11 @@ def select():
     st.write("")
     st.write("")
     user_new_acc = st.text_input("**账户：**")
-    user_new_pass = st.text_input("**密码：**")
-    user_new_invite = st.text_input("**注册邀请码：**")
+    user_new_pass = st.text_input("**密码：**", type="password")
+    user_new_invite = st.text_input("**邀请令牌：**")
     st.write("")
     st.write("")
-    if st.button("**加入**", use_container_width=True, type="primary"):
+    if st.button("**加入我们**", use_container_width=True, type="primary"):
         st.write("")
         if user_new_acc == "":
             st.error("请填写您的账户!", icon=":material/error:")
@@ -51,33 +160,99 @@ def select():
         elif user_new_invite not in invite_config.keys():
             st.error("此注册邀请码无效，请重新输入！", icon=":material/error:")
         else:
-            user_new_group = invite_config[user_new_invite]
+            user_new_group = invite_config[user_new_invite]['group']
             group_data = accounts[user_new_group]
             acc = group_data['access_token']
-            new_name, new_token_key = get_sharetoken(user_new_acc, acc, web_setting["web"]["site_limit"], web_setting["web"]["expires_in"], web_setting["web"]["gpt35_limit "], web_setting["web"]["gpt4_limit "], web_setting["web"]["show_conversations"])
+            status, new_name, new_token_key = get_sharetoken(user_new_acc, acc, web_setting["web"]["site_limit"], web_setting["web"]["expires_in"], web_setting["web"]["gpt35_limit"], web_setting["web"]["gpt4_limit"], web_setting["web"]["show_conversations"])
 
-            json_data = {
-                new_name: {
-                    'password': user_new_pass,
-                    'token': new_token_key,
-                    'group': user_new_group,
-                    'type': group_data['account_type'],
-                    'site_limit': web_setting["web"]["site_limit"],
-                    'expires_in': web_setting["web"]["expires_in"],
-                    'gpt35_limit': web_setting["web"]["gpt35_limit"],
-                    'gpt4_limit': web_setting["web"]["gpt4_limit"],
-                    'show_conversations': web_setting["web"]["show_conversations"]
+            if status:
+
+                json_data = {
+                    new_name: {
+                        'password': user_new_pass,
+                        'token': new_token_key,
+                        'group': user_new_group,
+                        'type': group_data['account_type'],
+                        'site_limit': web_setting["web"]["site_limit"],
+                        'expires_in': web_setting["web"]["expires_in"],
+                        'gpt35_limit': web_setting["web"]["gpt35_limit"],
+                        'gpt4_limit': web_setting["web"]["gpt4_limit"],
+                        'show_conversations': web_setting["web"]["show_conversations"]
+                    }
                 }
-            }
-            config.update(json_data)
+                config.update(json_data)
+                config_json = json.dumps(config, indent=2)
 
-            config_json = json.dumps(config, indent=2, ensure_ascii=False)
-            with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
-                json_file.write(config_json)
-            logger.info(f"<用户> 【用户注册】 新用户注册成功！name：{new_name}，token:{new_token_key}，group:{user_new_group}，注册邀请码：{user_new_invite}")
-            st.success("注册成功，3s后自动刷新界面！", icon=":material/check_circle")
-            st.rerun()
+                del invite_config[user_new_invite]
+                with open(current_path + '/invite.json', 'w') as file:
+                    json.dump(invite_config, file, indent=2)
+
+                with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
+                    json_file.write(config_json)
+
+                logger.info("name：{new_name}，token:{new_token_key}，group:{user_new_group}，注册邀请码：{user_new_invite}")
+                logger.info(f"【用户注册】 新用户：{new_name} 注册成功！")
+                sac.alert(label="**注册成功！请前往登录！**", color="success", variant="quote", size="md", radius="md", icon=True, closable=True)
+            else:
+                sac.alert(label="**注册失败，请联系管理员！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+    if web_setting["web"]["invite_link_enable"]:
+        st.link_button("**获取邀请令牌**", web_setting["web"]["invite_link"], use_container_width=True)
     st.write("")
+
+
+@st.experimental_dialog("身份验证")  # 选择模块
+def choose(user_name, login_result, token_result, group_result):
+    st.write(f"## 欢迎您，{user_name}！")
+    st.write("")
+    st.write("")
+
+    if web_setting["web"]["choose_domain"] == "不允许":
+        with st.status("**正在验证您的身份...**") as status:
+            error, token_result = check_login_status(token_result, user_name, group_result)
+            if error == "RF过期":
+                status.update(label="**啊哦！出错了！**", state="error", expanded=True)
+                st.write("")
+                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+            elif error == "过期":
+                status.update(label="**啊哦！出错了！**", state="error", expanded=True)
+                st.write("")
+                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+            else:
+                status.update(label="**即将验证完毕...感谢您的等待！**", state="running", expanded=False)
+                domain = web_setting["web"]["domain"]
+
+                if domain_data[domain]['type'] == "Classic":  # 判断服务站类型
+                    url = "https://" + domain + "/auth/login_share?token=" + token_result
+                else:
+                    url = get_login_url(domain, token_result)
+
+                st.write("")
+                st.link_button("**开始使用**", url, use_container_width=True)
+                status.update(label="**验证成功!**", state="complete", expanded=True)
+
+    else:
+        with st.status("**正在验证您的身份...**") as status:
+            error, token_result = check_login_status(token_result, user_name, group_result)
+            if error == "RF过期":
+                status.update(label="**啊哦！出错了！**", state="error", expanded=True)
+                st.write("")
+                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+            elif error == "过期":
+                status.update(label="**啊哦！出错了！**", state="error", expanded=True)
+                st.write("")
+                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+            else:
+                status.update(label="**即将验证完毕...请稍后！**", state="running", expanded=False)
+                st.write("")
+                for domain in web_setting["web"]["user_domain"]:
+                    if domain_data[domain]['type'] == "Classic":  # 判断服务站类型
+                        url = "https://" + domain + "/auth/login_share?token=" + token_result
+                    else:
+                        url = get_login_url(domain, token_result)
+                    st.write("")
+                    name = domain_data[domain]['name']
+                    st.link_button(f"**{name}**", url, use_container_width=True)
+                status.update(label="**验证成功!**", state="complete", expanded=True)
 
 
 def authenticate(username, password):
@@ -152,36 +327,26 @@ with col5:
         elif login_result == 1:
             st.toast('**账户密码错误，请重新输入！**', icon=':material/error:')
         elif login_result == 2:
-            domain = web_setting["web"]["domain"]
-            url = get_login_url(domain, token_result)
+            st.session_state.role = "role"
             logger.info(f"【用户登录】 用户：{account} 登录成功！")
-            st.toast('获取登录信息成功!', icon=':material/check_circle:')
-            if web_setting["web"]["refresh_all"]:
-                user_ac_tk = get_accesstoken(accounts[group_result]["refresh_token"])
-                if user_ac_tk is None or user_ac_tk == "":
-                    logger.info(f"<用户> 【AC刷新】 用户登录时，{group_result} 的Access_token刷新失败！")
-                else:
-                    accounts[group_result]["access_token"] = user_ac_tk
-                    accounts_json = json.dumps(accounts, indent=2)
-                    json_filename = 'accounts.json'
-                    with open(current_path + json_filename, 'w', encoding='utf-8') as json_file:
-                        json_file.write(accounts_json)
-                    logger.info(f"<用户> 【AC刷新】 用户登录时 {group_result} 的Access_token刷新成功！")
+            st.toast('账户密码验证成功!', icon=':material/check_circle:')
         elif login_result == 3:
             st.session_state.role = "admin"
             logger.info(f"【管理登录】 管理员：{account} 登录成功！")
-            st.page_link("pages/admin.py", label="管理面板", icon=":material/admin_panel_settings:", use_container_width=True)
+            st.switch_page("pages/admin.py")
 
     if st.button("**注册**", use_container_width=True):
         select()
 
     try:
-        st.link_button("**点我验证**", url, use_container_width=True, type="primary")
+        if st.session_state.role == "role":
+            choose(account, login_result, token_result, group_result)
+            st.session_state.role = None
     except:
         pass
+
     st.write("")
     st.page_link("pages/refresh.py", label=":red[无法登录？]", icon=":material/login:", use_container_width=True)
-
     st.page_link("pages/share.py", label="Share共享站", icon=":material/login:", use_container_width=True)
 
     footer = """

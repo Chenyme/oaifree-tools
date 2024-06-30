@@ -1,5 +1,14 @@
 {
-  "INVITE_TOKEN_TEST_@asiofhnoaifboia": "groupA",
-  "INVITE_TOKEN_TEST_@asadgsgaergrer": "groupA",
-  "INVITE_TOKEN_TEST_@agdrgesrherssr": "groupA"
+  "it-839uOaGPMrnyff3jLiBpLQ": {
+    "group": "groupA",
+    "used": false
+  },
+  "it-egcAFXKulsnaMvq1Xxr_4w": {
+    "group": "groupA",
+    "used": false
+  },
+  "it-BsKXsBC9mWz5ODlIhT8ZJA": {
+    "group": "groupA",
+    "used": false
+  }
 }
