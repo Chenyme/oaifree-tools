@@ -22,8 +22,8 @@
 ## 项目部署
 #### docker
 ```shell
-docker pull chenyme/oait:v1.1.1
-docker run -d -p 8501:8501 chenyme/oait:v1.1.1
+docker pull chenyme/oait:v1.1.2
+docker run -d -p 8501:8501 chenyme/oait:v1.1.2
 
 # docker pull ghcr.io/chenyme/oait:latest
 # docker run -d -p 8501:8501 ghcr.io/chenyme/oait:latest
@@ -32,8 +32,8 @@ docker run -d -p 8501:8501 chenyme/oait:v1.1.1
 #### Git
 ```shell
 git clone https://github.com/Chenyme/oaifree-tools
-docker build -t chenyme/oait:v1.1.1 .
-docker run -d -p 8501:8501 chenyme/oait:v1.1.1
+docker build -t chenyme/oait:v1.1.2 .
+docker run -d -p 8501:8501 chenyme/oait:v1.1.2
 ```
 
 #### Python
@@ -47,8 +47,8 @@ streamlit run home.py
 在`项目运行`日志下导出所有配置文件
 
 ```shell
-docker pull chenyme/oait:v1.1.1
-docker run -d -p 8501:8501 chenyme/oait:v1.1.1
+docker pull chenyme/oait:v1.1.2
+docker run -d -p 8501:8501 chenyme/oait:v1.1.2
 
 # docker pull ghcr.io/chenyme/oait:latest
 # docker run -d -p 8501:8501 ghcr.io/chenyme/oait:latest
