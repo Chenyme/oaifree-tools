@@ -74,70 +74,73 @@ st.markdown("""
 
 
 def check_login_status(token_result, user_name, group_result):
-    error = False
-
+    error_status = False
     # 判断SA_Token是否有效
-    if check_sharetoken(token_result):
+    with st.status("**正在验证您的环境...**") as status:
 
-        token_result = token_result
-        logging.info(f"<用户> 【用户登录】 用户：{user_name} 登录成功！")
-    else:
-        if str(config[user_name]["expires_in"]) == "0":
-            logging.info(f"<用户> 【SA验证】 用户 {user_name} 的SA_Token已经失效！尝试刷新中...")
-            status.update(label="**账户SA状态已失效！尝试刷新中...**", state="running", expanded=False)
-            sa_status, name, token_result = get_sharetoken(
-                user_name,
-                accounts[group_result]["access_token"],
-                config[user_name]["site_limit"],
-                config[user_name]["expires_in"],
-                config[user_name]["gpt35_limit"],
-                config[user_name]["gpt4_limit"],
-                config[user_name]["show_conversations"]
-            )
+        if check_sharetoken(token_result):
+            st.session_state.role = None
+            token_result = token_result
+            logger.info(f"【用户登录】 用户：{user_name} 登录成功！")
+        else:
+            if str(config[user_name]["expires_in"]) == "0":
+                status.update(label="**SA状态已失效！尝试刷新中...**", state="running", expanded=True)
+                logging.info(f"<用户> 【SA验证】 用户 {user_name} 的SA_Token已经失效！尝试刷新中...")
+                sa_status, name, token_result = get_sharetoken(
+                    user_name,
+                    accounts[group_result]["access_token"],
+                    config[user_name]["site_limit"],
+                    config[user_name]["expires_in"],
+                    config[user_name]["gpt35_limit"],
+                    config[user_name]["gpt4_limit"],
+                    config[user_name]["show_conversations"]
+                )
 
-            # 判断AC_Token是否有效
-            if sa_status:
-                config[user_name]["token"] = token_result
-                config_json = json.dumps(config, indent=2)
-                with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
-                    json_file.write(config_json)
-                logging.info(f"<用户> 【SA刷新】 用户 {user_name} 的SA_Token刷新成功！")
-            else:
-                logging.info(f"<用户> 【AC刷新】 用户 {user_name} 的AC_Token已经失效！尝试刷新中...")
-                status.update(label="**账户AC状态已失效！尝试刷新中...**", state="running", expanded=False)
-                ac_status, user_ac_tk = get_accesstoken(accounts[group_result]["refresh_token"])
-
-                # 判断RF_Token是否有效
-                if ac_status:
-                    status.update(label="**已成功刷新！请耐心等待...**", state="running", expanded=False)
-                    sa_status, name, token_result = get_sharetoken(
-                        user_name,
-                        user_ac_tk,
-                        config[user_name]["site_limit"],
-                        config[user_name]["expires_in"],
-                        config[user_name]["gpt35_limit"],
-                        config[user_name]["gpt4_limit"],
-                        config[user_name]["show_conversations"]
-                    )
-
+                # 判断AC_Token是否有效
+                if sa_status:
                     config[user_name]["token"] = token_result
                     config_json = json.dumps(config, indent=2)
                     with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
                         json_file.write(config_json)
-                    accounts[group_result]["access_token"] = user_ac_tk
-                    accounts_json = json.dumps(accounts, indent=2)
-                    with open(current_path + 'accounts.json', 'w', encoding='utf-8') as json_file:
-                        json_file.write(accounts_json)
-                    logging.info(f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新成功！")
-                else:
-                    error = "RF过期"
-                    logging.error(
-                        f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新失败！请检查RF_Token是否正确！")
-        else:
-            error = "过期"
-            logging.error(f"<用户> 【SA验证】 用户 {user_name} 的SA_Token已经过期！")
+                    logging.info(f"<用户> 【SA刷新】 用户 {user_name} 的SA_Token刷新成功！")
 
-    return error, token_result
+                else:
+                    logging.info(f"<用户> 【AC刷新】 用户 {user_name} 的AC_Token已经失效！尝试刷新中...")
+                    status.update(label="**AC状态已失效！尝试刷新中...**", state="running", expanded=False)
+                    ac_status, user_ac_tk = get_accesstoken(accounts[group_result]["refresh_token"])
+
+                    # 判断RF_Token是否有效
+                    if ac_status:
+                        status.update(label="**即将完成！请耐心等待...**", state="running", expanded=False)
+                        sa_status, name, token_result = get_sharetoken(
+                            user_name,
+                            user_ac_tk,
+                            config[user_name]["site_limit"],
+                            config[user_name]["expires_in"],
+                            config[user_name]["gpt35_limit"],
+                            config[user_name]["gpt4_limit"],
+                            config[user_name]["show_conversations"]
+                        )
+
+                        config[user_name]["token"] = token_result
+                        config_json = json.dumps(config, indent=2)
+                        with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
+                            json_file.write(config_json)
+                        accounts[group_result]["access_token"] = user_ac_tk
+                        accounts_json = json.dumps(accounts, indent=2)
+                        with open(current_path + 'accounts.json', 'w', encoding='utf-8') as json_file:
+                            json_file.write(accounts_json)
+                        logging.info(f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新成功！")
+                    else:
+                        error_status = "RF过期"
+                        logging.error(
+                            f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新失败！请检查RF_Token是否正确！")
+            else:
+                error_status = "过期"
+                logging.error(f"<用户> 【SA验证】 用户 {user_name} 的SA_Token已经过期！")
+
+        status.update(label="**环境验证成功！**", state="complete", expanded=False)
+    return error_status, token_result
 
 
 @st.experimental_dialog("成为我们的新伙伴！")  # 注册模块
@@ -207,16 +210,17 @@ def choose(user_name, login_result, token_result, group_result):
     st.write("")
 
     if web_setting["web"]["choose_domain"] == "不允许":
+        error_status, token_result = check_login_status(token_result, user_name, group_result)
+
         with st.status("**正在验证您的身份...**") as status:
-            error, token_result = check_login_status(token_result, user_name, group_result)
-            if error == "RF过期":
+            if error_status == "RF过期":
                 status.update(label="**啊哦！出错了！**", state="error", expanded=True)
                 st.write("")
-                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
-            elif error == "过期":
+                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
+            elif error_status == "过期":
                 status.update(label="**啊哦！出错了！**", state="error", expanded=True)
                 st.write("")
-                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
             else:
                 status.update(label="**即将验证完毕...感谢您的等待！**", state="running", expanded=False)
                 domain = web_setting["web"]["domain"]
@@ -228,21 +232,22 @@ def choose(user_name, login_result, token_result, group_result):
 
                 st.write("")
                 st.link_button("**开始使用**", url, use_container_width=True)
-                status.update(label="**验证成功!**", state="complete", expanded=True)
+                status.update(label="**用户验证成功!**", state="complete", expanded=True)
 
     else:
+        error_status, token_result = check_login_status(token_result, user_name, group_result)
+
         with st.status("**正在验证您的身份...**") as status:
-            error, token_result = check_login_status(token_result, user_name, group_result)
-            if error == "RF过期":
+            if error_status == "RF过期":
                 status.update(label="**啊哦！出错了！**", state="error", expanded=True)
                 st.write("")
-                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
-            elif error == "过期":
+                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
+            elif error_status == "过期":
                 status.update(label="**啊哦！出错了！**", state="error", expanded=True)
                 st.write("")
-                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
             else:
-                status.update(label="**即将验证完毕...请稍后！**", state="running", expanded=False)
+                status.update(label="**即将验证完毕...感谢您的等待！**", state="running", expanded=False)
                 st.write("")
                 for domain in web_setting["web"]["user_domain"]:
                     if domain_data[domain]['type'] == "Classic":  # 判断服务站类型
@@ -252,7 +257,7 @@ def choose(user_name, login_result, token_result, group_result):
                     st.write("")
                     name = domain_data[domain]['name']
                     st.link_button(f"**{name}**", url, use_container_width=True)
-                status.update(label="**验证成功!**", state="complete", expanded=True)
+                status.update(label="**用户验证成功!**", state="complete", expanded=True)
 
 
 def authenticate(username, password):
@@ -328,7 +333,6 @@ with col5:
             st.toast('**账户密码错误，请重新输入！**', icon=':material/error:')
         elif login_result == 2:
             st.session_state.role = "role"
-            logger.info(f"【用户登录】 用户：{account} 登录成功！")
             st.toast('账户密码验证成功!', icon=':material/check_circle:')
         elif login_result == 3:
             st.session_state.role = "admin"
@@ -341,7 +345,6 @@ with col5:
     try:
         if st.session_state.role == "role":
             choose(account, login_result, token_result, group_result)
-            st.session_state.role = None
     except:
         pass
 
