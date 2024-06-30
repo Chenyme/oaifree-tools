@@ -273,7 +273,7 @@ if st.session_state.role == "admin":
     def upload():
         st.write("")
         st.write("**请上传配置文件**")
-        sac.alert(label="**仅支持V1.1.1版本后的配置文件**", description=" 若为V1.1.0及更低版本，请删除config.zip中的不兼容配置：`setting.toml`、`invite.json` ！ ", banner=True, color="info", variant='filled', size="lg", radius="lg", icon=True, closable=True)
+        sac.alert(label="**仅支持V1.1.2版本后的配置文件**", description=" 若为V1.1.1及更低版本，请删除config.zip中的不兼容配置：`setting.toml`、`invite.json`、`config.json` ！ ", banner=True, color="info", variant='filled', size="lg", radius="lg", icon=True, closable=True)
         st.write("")
         uploaded_file = st.file_uploader("上传配置文件", type=['zip'], label_visibility="collapsed")
         st.write("")
@@ -330,6 +330,7 @@ if st.session_state.role == "admin":
     def new_invite():
         st.write("")
         it_group = st.selectbox("**选择用户组**", list(accounts.keys()), index=0)
+        note = st.text_input("**备注**", value=time.strftime('%Y-%m-%d %H:%M:%S'), help="备注信息，可为空")
         auto_it_gen = st.checkbox("**批量生成**")
         if auto_it_gen:
             num_it_gen = st.number_input("**生成数量**", value=5, min_value=1, max_value=100)
@@ -344,12 +345,14 @@ if st.session_state.role == "admin":
                 for i in range(num_it_gen):
                     invite_config["it-" + secrets.token_urlsafe(len_it_gen)] = {
                         "group": it_group,
+                        "note": note,
                         "used": False
                     }
                 logger.info(f"<管理员> 【邀请令牌】 生成了{num_it_gen}个新的邀请令牌！")
             else:
                 invite_config[it_token] = {
                     "group": it_group,
+                    "note": note,
                     "used": False
                 }
                 logger.info(f"<管理员> 【邀请令牌】 生成了新的邀请令牌：{it_token}！")
@@ -429,6 +432,7 @@ if st.session_state.role == "admin":
             gpt35_limit = st.number_input("**限制GPT-3.5**", value=-1, help="GPT-3.5对话限制，填 -1 则不限制", key="gpt35_limit_new")
             gpt4_limit = st.number_input("**限制GPT-4**", value=-1, help="GPT-4对话限制，填 -1 则不限制", key="gpt4_limit_new")
             show_conversations = st.selectbox("**会话无需隔离**", ['true', 'false'], index=1, help="false为隔离会话", key="show_conversations_new")
+        note = st.text_input("**备注**", value=time.strftime('%Y-%m-%d %H:%M:%S'), help="备注信息，可为空", key="note_new")
         auto_rf_gen = st.checkbox("**批量生成**")
         if auto_rf_gen:
             num_rf_gen = st.number_input("**生成数量**", value=5, min_value=1, max_value=100, key="num_rf_gen_new")
@@ -447,6 +451,7 @@ if st.session_state.role == "admin":
                         "gpt35_limit": gpt35_limit,
                         "gpt4_limit": gpt4_limit,
                         "show_conversations": show_conversations,
+                        "note": note,
                         "used": False
                     }
                 logger.info(f"<管理员> 【刷新令牌】 生成了{num_rf_gen}个新的刷新令牌！")
@@ -458,9 +463,11 @@ if st.session_state.role == "admin":
                     "gpt35_limit": gpt35_limit,
                     "gpt4_limit": gpt4_limit,
                     "show_conversations": show_conversations,
+                    "note": note,
                     "used": False
                 }
                 logger.info(f"<管理员> 【刷新令牌】 生成了新的刷新令牌：{rf_token}！")
+
             with open(current_path + "refresh.json", "w", encoding="utf-8") as f:
                 json.dump(refresh_data, f, indent=2)
             sac.alert(label="生成成功！", color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
@@ -479,7 +486,7 @@ if st.session_state.role == "admin":
             sac.SegmentedItem(label='基本设置', icon='gear-fill'),
             sac.SegmentedItem(label='号池管理', icon='pc-display'),
             sac.SegmentedItem(label='用户管理', icon='person-fill-gear'),
-            sac.SegmentedItem(label='更多功能', icon='github'),
+            sac.SegmentedItem(label='更多功能', icon='tools'),
         ], align='center', use_container_width=True, color='dark'
     )
 
@@ -819,9 +826,44 @@ if st.session_state.role == "admin":
             invite_link_enable = st.checkbox("**显示发卡链接**", value=web_setting["web"]["invite_link_enable"], key="invite_link_enable")
             invite_link = st.text_input("**发卡链接(完整网址)**", value=web_setting["web"]["invite_link"], key="invite_link")
             st.write("")
-            rows = [[IV_Token, invite_config[IV_Token]["group"], invite_config[IV_Token]["used"]] for IV_Token, Group in invite_config.items()]
-            df3 = pd.DataFrame(rows, columns=['Invite_Token', '用户组', '是否使用'])
-            edited_df3 = st.data_editor(df3, hide_index=True, use_container_width=True, height=248, num_rows="dynamic", column_config={"group": st.column_config.SelectboxColumn(options=accounts.keys())})
+            rows = [[IV_Token, invite_config[IV_Token]["group"], invite_config[IV_Token]["note"], invite_config[IV_Token]["used"]] for IV_Token, Group in invite_config.items()]
+            df3 = pd.DataFrame(rows, columns=['Invite_Token', '用户组', '备注', '是否使用'])
+
+            with st.expander("**表格工具**", expanded=False, icon=":material/construction:"):
+                col1, col2, col3, col4, col5 = st.columns(5)
+                with col1:
+                    hide_index = st.selectbox("**隐藏索引**", [True, False], index=0, key="hide_index_invite")
+                    if st.button("删除已用令牌", use_container_width=True, key="delete_invite"):
+                        for i in list(invite_config.keys()):
+                            if invite_config[i]["used"]:
+                                invite_config.pop(i)
+                        with open(current_path + "invite.json", "w", encoding="utf-8") as f:
+                            json.dump(invite_config, f, indent=2)
+                        st.toast("删除成功!", icon=':material/check_circle:')
+                        logger.info(f"<管理员> 【邀请令牌】 删除了已使用的邀请令牌！")
+                        st.rerun()
+                with col2:
+                    height = st.number_input("**表格高度**", value=248, min_value=100, max_value=1000, step=100, key="height_invite")
+                    if st.button("删除所有令牌", use_container_width=True, key="delete_all_invite"):
+                        invite_config.clear()
+                        with open(current_path + "invite.json", "w", encoding="utf-8") as f:
+                            json.dump(invite_config, f, indent=2)
+                        st.toast("删除成功!", icon=':material/check_circle:')
+                        logger.info(f"<管理员> 【邀请令牌】 删除了所有的邀请令牌！")
+                        st.rerun()
+                with col3:
+                    order_what = st.selectbox("**排序列名**", ["Invite_Token", "用户组", "备注", "是否使用"], index=3, key="order_what")
+                with col4:
+                    order_row = st.selectbox("**排序方式**", ["默认", "升序", "降序"], index=0, key="order_row")
+                with col5:
+                    order = st.multiselect("**数据显示**", ["Invite_Token", "用户组", "备注", "是否使用"], key="order")
+
+                if order_row == "升序":
+                    df3 = df3.sort_values(by=order_what, ascending=True)
+                elif order_row == "降序":
+                    df3 = df3.sort_values(by=order_what, ascending=False)
+
+            edited_df3 = st.data_editor(df3, hide_index=hide_index, use_container_width=True, height=height, column_order=order, num_rows="dynamic", column_config={"group": st.column_config.SelectboxColumn(options=accounts.keys())}, disabled=["是否使用"])
 
             col1, col2, col3, col4, col5 = st.columns(5)
             col6, col7 = st.columns([0.99999, 0.00001])
@@ -929,12 +971,45 @@ if st.session_state.role == "admin":
             with col2:
                 refresh_link_enable = st.checkbox("**显示发卡链接**", value=web_setting["web"]["refresh_link_enable"], key="refresh_link_enable")
             refresh_link = st.text_input("**发卡链接(完整网址)**", value=web_setting["web"]["refresh_link"], key="refresh_link")
-            st.write("")
 
-            fields = ['userRF_Token', '用户组', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离', '是否使用']
+            fields = ['userRF_Token', '用户组', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离', '备注', '是否使用']
             rows = [[rf_token] + list(datas.values()) for rf_token, datas in refresh_data.items()]
             df4 = pd.DataFrame(rows, columns=fields)
-            edited_df4 = st.data_editor(df4, hide_index=True, use_container_width=True, height=248, num_rows="dynamic", disabled=["是否使用"])
+            with st.expander("**表格工具**", expanded=False, icon=":material/construction:"):
+                col1, col2, col3, col4, col5 = st.columns(5)
+                with col1:
+                    hide_index = st.selectbox("**隐藏索引**", [True, False], index=0, key="hide_index_refresh")
+                    if st.button("删除已用令牌", use_container_width=True, key="delete_refresh"):
+                        for i in list(refresh_data.keys()):
+                            if refresh_data[i]["used"]:
+                                refresh_data.pop(i)
+                        with open(current_path + "refresh.json", "w", encoding="utf-8") as f:
+                            json.dump(refresh_data, f, indent=2)
+                        st.toast("删除成功!", icon=':material/check_circle:')
+                        logger.info(f"<管理员> 【刷新令牌】 删除了已使用的刷新令牌！")
+                        st.rerun()
+                with col2:
+                    height = st.number_input("**表格高度**", value=248, min_value=100, max_value=1000, step=100, key="height_refresh")
+                    if st.button("删除所有令牌", use_container_width=True, key="delete_all_refresh"):
+                        refresh_data.clear()
+                        with open(current_path + "refresh.json", "w", encoding="utf-8") as f:
+                            json.dump(refresh_data, f, indent=2)
+                        st.toast("删除成功!", icon=':material/check_circle:')
+                        logger.info(f"<管理员> 【刷新令牌】 删除了所有的刷新令牌！")
+                        st.rerun()
+                with col3:
+                    order_what = st.selectbox("**排序列名**", ['userRF_Token', '用户组', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离', '备注', '是否使用'], index=8, key="order_what")
+                with col4:
+                    order_row = st.selectbox("**排序方式**", ["默认", "升序", "降序"], index=0, key="order_row_refresh")
+                with col5:
+                    order = st.multiselect("**数据显示**", ['userRF_Token', '用户组', '限制网站', '过期秒数', 'GPT3.5限制', 'GPT4限制', '会话无需隔离', '备注', '是否使用'], ['userRF_Token', '用户组', '过期秒数', 'GPT3.5限制', 'GPT4限制', '备注', '是否使用'], key="order_refresh")
+
+                if order_row == "升序":
+                    df4 = df4.sort_values(by=order_what, ascending=True)
+                elif order_row == "降序":
+                    df4 = df4.sort_values(by=order_what, ascending=False)
+
+            edited_df4 = st.data_editor(df4, hide_index=hide_index, use_container_width=True, height=height, num_rows="dynamic", disabled=["是否使用"], column_order=order, column_config={"用户组": st.column_config.SelectboxColumn(options=accounts.keys())})
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
                 if st.button("**保存修改**", use_container_width=True, key="save_refresh"):
@@ -1055,7 +1130,7 @@ if st.session_state.role == "admin":
 
             st.divider()
             st.write("**关于**")
-            st.write("版本：OaiT V1.1.1")
+            st.write("版本：OaiT V1.1.2")
             st.write("作者：@Chenyme")
             st.write("鸣谢：@Neo")
             st.write("GitHub：https://github.com/Chenyme/oaifree-tools")

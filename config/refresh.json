@@ -1,29 +1,32 @@
 {
-  "rf-pajINbace8A1WiEx-KSEYQ": {
+  "rf-qqn8ugnnixyMZ_4izVDHBg": {
     "group": "groupA",
     "site_limit": "",
     "expires_in": 0,
     "gpt35_limit": -1,
     "gpt4_limit": -1,
     "show_conversations": "false",
+    "note": "2024-06-30 17:47:43",
     "used": false
   },
-  "rf-AwYsR1b4NQv4YIbd2JZNtQ": {
+  "rf-w123b7f1Rg0I31XOfs1BPQ": {
     "group": "groupA",
     "site_limit": "",
     "expires_in": 0,
     "gpt35_limit": -1,
     "gpt4_limit": -1,
     "show_conversations": "false",
+    "note": "2024-06-30 17:47:43",
     "used": false
   },
-  "rf-3tXuKGDvviOvs8r6sWYtVw": {
+  "rf-icHlWY8mKxojVLh0ujNacA": {
     "group": "groupA",
     "site_limit": "",
     "expires_in": 0,
     "gpt35_limit": -1,
     "gpt4_limit": -1,
     "show_conversations": "false",
+    "note": "2024-06-30 17:47:43",
     "used": false
   }
 }

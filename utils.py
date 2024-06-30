@@ -98,6 +98,7 @@ def df_to_json3(df):
     json_data = df.to_dict('records')
     json_data = {str(record['Invite_Token']): {
         'group': record['用户组'],
+        'note': record['备注'],
         'used': record['是否使用'],
     } for record in json_data}
     return json_data, json.dumps(json_data, indent=2)
@@ -112,6 +113,7 @@ def df_to_json4(df):
         'gpt35_limit': record['GPT3.5限制'],
         'gpt4_limit': record['GPT4限制'],
         'show_conversations': record['会话无需隔离'],
+        'note': record['备注'],
         'used': record['是否使用']
     } for record in json_data}
     return json.dumps(json_data, indent=2)

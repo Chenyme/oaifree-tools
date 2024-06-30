@@ -2,7 +2,7 @@
   "login_test1": {
     "password": "test1",
     "token": "fk-",
-    "group": "groupB",
+    "group": "groupA",
     "type": "Plus",
     "site_limit": "",
     "expires_in": "0",

@@ -161,8 +161,8 @@ def select():
         elif user_new_acc in config:
             st.error("该账户已存在!", icon=":material/error:")
         elif user_new_invite not in invite_config.keys():
-            st.error("此注册邀请码无效，请重新输入！", icon=":material/error:")
-        else:
+            st.error("无效的邀请令牌！", icon=":material/error:")
+        elif not invite_config[user_new_invite]['used']:
             user_new_group = invite_config[user_new_invite]['group']
             group_data = accounts[user_new_group]
             acc = group_data['access_token']
@@ -186,7 +186,7 @@ def select():
                 config.update(json_data)
                 config_json = json.dumps(config, indent=2)
 
-                del invite_config[user_new_invite]
+                invite_config[user_new_invite]['used'] = True
                 with open(current_path + '/invite.json', 'w') as file:
                     json.dump(invite_config, file, indent=2)
 
@@ -198,6 +198,8 @@ def select():
                 sac.alert(label="**注册成功！请前往登录！**", color="success", variant="quote", size="md", radius="md", icon=True, closable=True)
             else:
                 sac.alert(label="**注册失败，请联系管理员！**", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+        else:
+            st.error("邀请令牌已被使用！请更换令牌", icon=":material/error:")
     if web_setting["web"]["invite_link_enable"]:
         st.link_button("**获取邀请令牌**", web_setting["web"]["invite_link"], use_container_width=True)
     st.write("")

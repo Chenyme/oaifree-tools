@@ -141,41 +141,44 @@ with col2:
                 if user_account != "" and user_password != "":
                     if login_result == 2:
                         if refresh in refresh_data.keys():
-                            if refresh_data[refresh]['group'] == group_result:
-                                refresh_token = accounts[group_result]['refresh_token']
-                                status, access_token = get_accesstoken(refresh_token)
+                            if not refresh_data[refresh]['used']:
+                                if refresh_data[refresh]['group'] == group_result:
+                                    refresh_token = accounts[group_result]['refresh_token']
+                                    status, access_token = get_accesstoken(refresh_token)
 
-                                if status:
-                                    accounts[group_result]['access_token'] = access_token
-                                    with open(current_path + '/accounts.json', 'w', encoding='utf-8') as file:
-                                        json.dump(accounts, file, indent=2)
-
-                                    status, name, token_key = get_sharetoken(user_account, access_token, refresh_data[refresh]['site_limit'], refresh_data[refresh]["expires_in"], refresh_data[refresh]['gpt35_limit'], refresh_data[refresh]['gpt4_limit'], refresh_data[refresh]['show_conversations'])
                                     if status:
-                                        config[user_account]['token'] = token_key
-                                        config[user_account]['site_limit'] = refresh_data[refresh]['site_limit']
-                                        config[user_account]['expires_in'] = refresh_data[refresh]['expires_in']
-                                        config[user_account]['gpt35_limit'] = refresh_data[refresh]['gpt35_limit']
-                                        config[user_account]['gpt4_limit'] = refresh_data[refresh]['gpt4_limit']
-                                        config[user_account]['show_conversations'] = refresh_data[refresh]['show_conversations']
+                                        accounts[group_result]['access_token'] = access_token
+                                        with open(current_path + '/accounts.json', 'w', encoding='utf-8') as file:
+                                            json.dump(accounts, file, indent=2)
 
-                                        with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
-                                            json.dump(config, file, indent=2)
+                                        status, name, token_key = get_sharetoken(user_account, access_token, refresh_data[refresh]['site_limit'], refresh_data[refresh]["expires_in"], refresh_data[refresh]['gpt35_limit'], refresh_data[refresh]['gpt4_limit'], refresh_data[refresh]['show_conversations'])
+                                        if status:
+                                            config[user_account]['token'] = token_key
+                                            config[user_account]['site_limit'] = refresh_data[refresh]['site_limit']
+                                            config[user_account]['expires_in'] = refresh_data[refresh]['expires_in']
+                                            config[user_account]['gpt35_limit'] = refresh_data[refresh]['gpt35_limit']
+                                            config[user_account]['gpt4_limit'] = refresh_data[refresh]['gpt4_limit']
+                                            config[user_account]['show_conversations'] = refresh_data[refresh]['show_conversations']
 
-                                        del refresh_data[refresh]
-                                        with open(current_path + '/refresh.json', 'w', encoding='utf-8') as file:
-                                            json.dump(refresh_data, file, indent=2)
+                                            with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
+                                                json.dump(config, file, indent=2)
 
-                                        logger.info(f"【账户刷新】 账户：{user_account} 刷新成功！")
-                                        st.toast('刷新成功！', icon=':material/check:')
+                                            refresh_data[refresh]['used'] = True
+                                            with open(current_path + '/refresh.json', 'w', encoding='utf-8') as file:
+                                                json.dump(refresh_data, file, indent=2)
+
+                                            logger.info(f"【账户刷新】 账户：{user_account} 刷新成功！")
+                                            st.toast('刷新成功！', icon=':material/check:')
+                                        else:
+                                            logger.error(f"【账户刷新】 账户：{user_account} 刷新失败！请检查AC_Token是否有效！")
+                                            sac.alert("刷新失败！请联系管理员！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
                                     else:
-                                        logger.error(f"【账户刷新】 账户：{user_account} 刷新失败！请检查AC_Token是否有效！")
+                                        logger.error(f"【账户刷新】 账户：{user_account} 刷新失败！请检查RF_Token是否有效！")
                                         sac.alert("刷新失败！请联系管理员！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
                                 else:
-                                    logger.error(f"【账户刷新】 账户：{user_account} 刷新失败！请检查RF_Token是否有效！")
-                                    sac.alert("刷新失败！请联系管理员！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                                    sac.alert("刷新令牌与账户不匹配！请联系管理员更换！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
                             else:
-                                sac.alert("刷新令牌与账户不匹配！请联系管理员更换！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
+                                sac.alert("刷新令牌已被使用！请联系管理员更换！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
                         else:
                             sac.alert("刷新令牌无效！", color="error", variant="quote", size="md", radius="md", icon=True, closable=True)
                     else:
