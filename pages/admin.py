@@ -906,13 +906,12 @@ if st.session_state.role == "admin":
                     web_setting["web"]["button_style"] = button_style
                     web_setting["web"]["super_user"] = super_user
                     web_setting["web"]["super_key"] = super_key
+                    web_setting["web"]["title"] = title
+                    web_setting["web"]["subtitle"] = subtitle
                     if button_style not in ["Primary", "Secondary"]:
                         web_setting["web"]["button_border"] = button_border
                         web_setting["web"]["button_border_radius"] = button_border_radius
 
-                    if login_theme == "classic":
-                        web_setting["web"]["title"] = title
-                        web_setting["web"]["subtitle"] = subtitle
                     with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
                         toml.dump(web_setting, f)
                     logger.info(f"<管理员> 【基本设置】 更新了网站基本设置！")
@@ -1490,4 +1489,4 @@ else:
                 st.switch_page("home.py")
             st.write("")
 
-st.markdown(footer, unsafe_allow_html=True)# 底部信息,魔改请勿删除
+st.markdown(footer, unsafe_allow_html=True)  # 底部信息,魔改请勿删除

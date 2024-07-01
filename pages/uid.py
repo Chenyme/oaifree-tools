@@ -459,4 +459,4 @@ try:
 except:
     pass
 
-st.markdown(footer, unsafe_allow_html=True)# 底部信息,魔改请勿删除
+st.markdown(footer, unsafe_allow_html=True)  # 底部信息,魔改请勿删除

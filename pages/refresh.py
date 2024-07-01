@@ -365,4 +365,4 @@ with col2:
         st.switch_page("home.py")
 
 st.logo("LOGO.png", link="https://github.com/Chenyme/oaifree-tools")
-st.markdown(footer, unsafe_allow_html=True)# 底部信息,魔改请勿删除
+st.markdown(footer, unsafe_allow_html=True)  # 底部信息,魔改请勿删除
