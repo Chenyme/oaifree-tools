@@ -14,25 +14,27 @@ png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
-with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
-    web_setting = toml.load(file)
-with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
-    share_data = json.load(file)
+with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
+    invite_config = json.load(file)
 with open(current_path + '/config.json', 'r', encoding='utf-8') as file:
     config = json.load(file)
 with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
     accounts = json.load(file)
+with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
+    web_setting = toml.load(file)
+with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
+    share_data = json.load(file)
 with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:
     domain_data = json.load(file)
 
-st.set_page_config(page_title=web_setting["web"]["title"], page_icon="LOGO.png")
+st.set_page_config(layout="wide", page_title=web_setting["web"]["title"], page_icon="LOGO.png")
 
 if web_setting["web"]["button_style"] == "Classic-black":
     st.markdown("""
         <style>
         .st-emotion-cache-keje6w.e1f1d6gn3 {
-            float: left !important;
-            text-align: left !important;
+            float: right !important;
+            text-align: right !important;
             display: inline-block;
         }
         .st-emotion-cache-1vt4y43 {
@@ -108,8 +110,8 @@ elif web_setting["web"]["button_style"] == "Simple-white":
     st.markdown("""
         <style>
         .st-emotion-cache-keje6w.e1f1d6gn3 {
-            float: left !important;
-            text-align: left !important;
+            float: right !important;
+            text-align: right !important;
             display: inline-block;
         }
         .st-emotion-cache-1vt4y43 {
@@ -234,6 +236,47 @@ footer = """
 </div>
 """
 
+st.markdown(
+    """
+    <style>
+    .centered-title {
+        position: relative;
+        top: -60px;
+        text-align: center;
+        margin-bottom: 0; 
+        font-size: 2em;
+    }
+    .centered-subtitle {
+        text-align: center;
+        margin-top: -50px;
+        font-size: 1em;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
+st.markdown(f"<div class='centered-title'><h1>" + web_setting["web"][
+    "title"] + "</h1></div><div class='centered-subtitle'><div>" + web_setting["web"]["subtitle"] + "</div></div>",
+            unsafe_allow_html=True)
+
+st.write("")
+st.write("")
+st.write("")
+
+st.logo("LOGO.png", link="https://github.com/Chenyme/oaifree-tools")
+
+def find_user_details_by_uid(uid):
+    user_name, user_token, user_group = None, None, None
+    for key, value in config.items():
+        if value["uid"] == uid:
+            user_name = key
+            user_token = value["token"]
+            user_group = value["group"]
+            break
+    return user_name, user_token, user_group
+
 
 def check_login_status(token_result, user_name, group_result):
     error_status = False
@@ -308,11 +351,12 @@ def check_login_status(token_result, user_name, group_result):
     return error_status, token_result
 
 
-
-@st.experimental_dialog("状态验证")  # 选择模块
+@st.experimental_dialog("UID验证")  # 选择模块
 def choose(user_name, login_result, token_result, group_result):
-    st.write(f"## 欢迎使用共享服务！")
+    st.write(f"## 欢迎您，{user_name}！")
     st.divider()
+    st.write("**用户UID:**")
+    st.write(f"**{config[user_name]['uid']}**")
     st.write("")
     if web_setting["web"]["choose_domain"] == "不允许":
         error_status, token_result = check_login_status(token_result, user_name, group_result)
@@ -371,118 +415,48 @@ def choose(user_name, login_result, token_result, group_result):
         st.write("")
 
 
-st.markdown(
-    """
-    <style>
-    .centered-title {
-        position: relative;
-        top: -60px;
-        text-align: center;
-        margin-bottom: 0; 
-        font-size: 2em;
-    }
-    .centered-subtitle {
-        text-align: center;
-        margin-top: -50px;
-        font-size: 1em;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+@st.experimental_dialog("什么是UID？")
+def read():
+    st.write("UID 是您的唯一标识符，用于识别您的账户。")
+    st.write("它是在您**注册时自动生成的**，唯一且重要。")
+    st.write("当您登录时，验证系统会显示您的 UID，请牢记。")
+    st.write("UID 可用于**直接登录**，也可以用于**找回密码**。")
+    st.write("如果您忘记了您的 UID，可以联系管理员获取。")
+    st.write("请妥善保管您的 UID，不要随意泄露给他人。")
 
-st.markdown(f"<div class='centered-title'><h1>" + web_setting["web"][
-    "title"] + "</h1></div><div class='centered-subtitle'><div>" + web_setting["web"]["subtitle"] + "</div></div>",
-            unsafe_allow_html=True)
 
-st.write("")
-st.write("")
-sac.alert(label=web_setting["web"]["share_notice"], color=web_setting["web"]["notice_color"], variant=web_setting["web"]["notice_style"], banner=web_setting["web"]["notice_banner"], size=web_setting["web"]["notice_size"], radius=web_setting["web"]["notice_radius"])
-st.logo("LOGO.png", link="https://github.com/Chenyme/oaifree-tools")
-if web_setting["web"]["share"]:
-    st.divider()
-    st.write("")
-    key = st.selectbox("**选择要登录的Share账户**", list(share_data.keys()), index=0)
-    st.write("")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("**点我登录**", use_container_width=True, key="login1", type=button_type):
-            st.session_state.role = "role"
-        try:
-            if st.session_state.role == "role":
-                choose(key, True, share_data[key]['token'], share_data[key]['group'])
-                st.session_state.role = None
-        except:
-            pass
-
-    with col2:
-        if st.button("**返回首页**", use_container_width=True, key="home", type=button_type):
-            st.switch_page("home.py")
-    st.write("")
-    st.write("")
-    i = 1
-    col1, col2 = st.columns(2)
-    for key in share_data.keys():
-        if i % 2 == 1:
-            with col1:
-                with st.expander("**共享账户** " + str(i), expanded=True, icon=":material/apps:"):
-                    st.write("")
-                    if share_data[key]['type'] == "Free":
-                        sac.tags([sac.Tag("GPT-3.5", color="green")], size="md", key=i)
-                        st.write("账户昵称：**" + key + "**")
-                    elif share_data[key]['type'] == "Plus":
-                        sac.tags([sac.Tag("GPT-3.5", color="green"), sac.Tag("GPT-4", color="blue"), sac.Tag("GPT-4o", color="red")], size="md", key=i)
-                        st.write("账户昵称：**" + key + "**")
-                        if str(share_data[key]['gpt4_limit']) == "-1":
-                            st.write("GPT4 次数：**无限制**")
-                        else:
-                            st.write("GPT4 次数：**限制 - " + str(share_data[key]['gpt4_limit']) + "次**")
-
-                    if str(share_data[key]['gpt35_limit']) == "-1":
-                        st.write("GPT3.5 次数：**无限制**")
+col4, col5, col6 = st.columns([0.35, 0.3, 0.35])
+with col5:
+    with st.container(border=True):
+        col1, col2, col3 = st.columns([0.35, 0.3, 0.35])
+        with col2:
+            st.image("LOGO.png", use_column_width=True)
+        st.write("**UID**")
+        uid = st.text_input("请输入UID", key="uid", placeholder="你的UID/Enter your UID", type="password", label_visibility="collapsed")
+        if st.button("**验证UID**", use_container_width=True, type=button_type):
+            with st.spinner("正在验证..."):
+                if uid:
+                    user_name, token, group = find_user_details_by_uid(uid)
+                    if user_name is not None:
+                        st.session_state.success = "success"
                     else:
-                        st.write("GPT3.5 次数：**限制 - " + str(share_data[key]['gpt35_limit']) + "次**")
+                        sac.alert(label="**未查询到相关UID！**", color="error", variant="filled", size="sm", radius="md", icon=True, closable=True)
+                else:
+                    sac.alert(label="**UID不能为空！**", color="error", variant="filled", size="sm", radius="md", icon=True, closable=True)
 
-                    if str(share_data[key]['expires_in']) == "0":
-                        st.write("账户到期时间：**永不过期**")
-                    else:
-                        st.write("账户到期时间：**" + str(share_data[key]['expires_in']) + "**")
-                    st.write("")
-        if i % 2 == 0:
-            with col2:
-                with st.expander("**共享账户** " + str(i), expanded=True, icon=":material/apps:"):
-                    st.write("")
-                    if share_data[key]['type'] == "Free":
-                        sac.tags([sac.Tag("GPT-3.5", color="green")], size="md", key=i)
-                        st.write("账户昵称：**" + key + "**")
-                    elif share_data[key]['type'] == "Plus":
-                        sac.tags([sac.Tag("GPT-3.5", color="green"), sac.Tag("GPT-4", color="blue"), sac.Tag("GPT-4o", color="red")], size="md", key=i)
-                        st.write("账户昵称：**" + key + "**")
-                        if str(share_data[key]['gpt4_limit']) == "-1":
-                            st.write("GPT4 次数：**无限制**")
-                        else:
-                            st.write("GPT4 次数：**限制 - " + str(share_data[key]['gpt4_limit']) + " 次**")
-
-                    if str(share_data[key]['gpt35_limit']) == "-1":
-                        st.write("GPT3.5 次数：**无限制**")
-                    else:
-                        st.write("GPT3.5 次数：**限制 - " + str(share_data[key]['gpt35_limit']) + " 次**")
-
-                    if str(share_data[key]['expires_in']) == "0":
-                        st.write("账户到期时间：**永不过期**")
-                    else:
-                        st.write("账户到期时间：**" + str(share_data[key]['expires_in']) + "**")
-                    st.write("")
-        i += 1
-
-else:
-    st.write("")
-    col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
-    with col2:
-        st.divider()
-        sac.alert(label="**无权限访问！**", description="**Share共享站管理员暂未开放！**", color="error", variant="filled", size="lg", radius="lg", icon=True, closable=False)
-        if st.button("**返回首页**", use_container_width=True, key="home2", type=button_type):
+        sac.divider("**OR**", align="center")
+        if st.button("**我没有UID?**", use_container_width=True, type=button_type):
+            read()
+        if st.button("**返回首页**", use_container_width=True, type=button_type):
             st.switch_page("home.py")
         st.write("")
+
+try:
+    if st.session_state.success == "success":
+        choose(user_name, None, token, group)
+        del st.session_state["login"]
+        st.session_state.success = "error"
+except:
+    pass
 
 st.markdown(footer, unsafe_allow_html=True)# 底部信息,魔改请勿删除

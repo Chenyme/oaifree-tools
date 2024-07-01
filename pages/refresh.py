@@ -45,72 +45,212 @@ def login(username, password):
 
 st.set_page_config(layout="wide", page_title=web_setting["web"]["title"], page_icon="LOGO.png")
 
-st.markdown("""
-    <style>
-    .st-emotion-cache-consg2.e16zdaao0 {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 2.5em;
-        background-color: #333 !important;
-        color: #fff !important;
-        border: none;
-        border-radius: 10px;
-        font-size: 1em;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
-        text-decoration: none;
-        padding: 0 1em;
-    }
-    .st-emotion-cache-consg2.e16zdaao0:hover {
-        background-color: #444 !important;
-        color: #fff !important;
-        transform: scale(1.05);
-    }
-    .st-emotion-cache-consg2.e16zdaao0:active {
-        background-color: #222 !important;
-        color: #fff !important;
-        transform: scale(0.95);
-    }
-    .st-emotion-cache-187vdiz.e1nzilvr4 {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
+if web_setting["web"]["button_style"] == "Classic-black":
+    st.markdown("""
+        <style>
+        .st-emotion-cache-keje6w.e1f1d6gn3 {
+            float: right !important;
+            text-align: right !important;
+            display: inline-block;
+        }
+        .st-emotion-cache-1vt4y43 {
+            background-color:  white !important;
+            color: black !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+        }
+        .eyeqlp52.st-emotion-cache-1pbsqtx.ex0cdmw0 {
+            fill: black !important;
+        }
+        .st-emotion-cache-consg2.e16zdaao0 {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.5em;
+            background-color: #333 !important;
+            color: #fff !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
+            text-decoration: none;
+            padding: 0 1em;
+        }
+        .st-emotion-cache-consg2.e16zdaao0:hover {
+            background-color: #444 !important;
+            color: #fff !important;
+            transform: scale(1.05);
+        }
+        .st-emotion-cache-consg2.e16zdaao0:active {
+            background-color: #222 !important;
+            color: #fff !important;
+            transform: scale(0.95);
+        }
+        .st-emotion-cache-187vdiz.e1nzilvr4 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            background-color: transparent !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .stButton>button {
+            width: 100%;
+            height: 2.5em;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
+        }
+        .stButton>button:hover {
+            background-color: #444;
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .stButton>button:active {
+            background-color: #222;
+            color: #fff;
+            transform: scale(0.95);
+        }
+        </style>
+        """, unsafe_allow_html=True)  # 按钮设置
+    button_type = "secondary"
+
+elif web_setting["web"]["button_style"] == "Simple-white":
+    st.markdown("""
+        <style>
+        .st-emotion-cache-keje6w.e1f1d6gn3 {
+            float: right !important;
+            text-align: right !important;
+            display: inline-block;
+        }
+        .st-emotion-cache-1vt4y43 {
+            background-color:  white !important;
+            color: black !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+        }
+        .eyeqlp52.st-emotion-cache-1pbsqtx.ex0cdmw0 {
+            fill: black !important;
+        }
+        .st-emotion-cache-consg2.e16zdaao0 {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.5em;
+            background-color: white !important;
+            color: black !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
+            text-decoration: none;
+            padding: 0 1em;
+        }
+        .st-emotion-cache-consg2.e16zdaao0:hover {
+            background-color: #f0f0f0 !important;
+            color: black !important;
+            transform: scale(1.05);
+        }
+        .st-emotion-cache-consg2.e16zdaao0:active {
+            background-color: #e0e0e0 !important;
+            color: black !important;
+            transform: scale(0.95);
+        }
+        .st-emotion-cache-187vdiz.e1nzilvr4 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            background-color: transparent !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .stButton button {
+            width: 100%;
+            height: 2.5em;
+            background-color: white !important;
+            color: black !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+            font-size: 1em !important;
+            cursor: pointer !important;
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
+            padding: 0.5em 1em !important;
+        }
+        .stButton button:hover {
+            background-color: #f0f0f0 !important;
+            color: black !important;
+            transform: scale(1.05) !important;
+        }
+        .stButton button:active {
+            background-color: #e0e0e0 !important;
+            color: black !important;
+            transform: scale(0.95) !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)  # 按钮设置
+    button_type = "secondary"
+
+elif web_setting["web"]["button_style"] == "Primary":
+    button_type = "primary"
+else:
+    button_type = "secondary"
+
+footer = """
+<style>
+.footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+    font-size: 14px;
+    color: #555;
+}
+.footer p {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.footer a {
+    color: #0073e6;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.footer a:hover {
+    color: #005bb5;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+    .footer {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        margin: 0 auto;
         width: 100%;
-        background-color: transparent !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        background-color: white;
+        border-top: 1px solid #ddd;
+        justify-content: center;
+        text-align: center;
     }
-    </style>
-    """, unsafe_allow_html=True)  # 链接按钮样式
-
-st.markdown("""
-    <style>
-    .stButton>button {
-        height: 2.5em;
-        background-color: #333;
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        font-size: 1em;
-
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
-    }
-    .stButton>button:hover {
-        background-color: #444;
-        color: #fff;
-        transform: scale(1.05);
-    }
-    .stButton>button:active {
-        background-color: #222;
-        color: #fff;
-        transform: scale(0.95);
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
+}
+</style>
+<div class="footer">
+    <p><strong>Powered by <a href="https://zhile.io/" target="_blank">@Neo</a>，</strong> 
+    <strong>Created by <a href="https://github.com/Chenyme" target="_blank">@Chenyme</a></strong></p>
+</div>
+"""
 
 col1, col2, col3 = st.columns(3)
 with col2:
@@ -133,7 +273,7 @@ with col2:
         st.divider()
         st.write("")
 
-        if st.button("**修改密码**", use_container_width=True):
+        if st.button("**修改密码**", use_container_width=True, type=button_type):
             if user_account != "" and user_password is not None:
                 if user_account in config.keys():
                     if user_password != config[user_account]['password']:
@@ -170,7 +310,7 @@ with col2:
 
             st.divider()
             st.write("")
-            if st.button("**执行刷新**", use_container_width=True):
+            if st.button("**执行刷新**", use_container_width=True, type=button_type):
                 if user_account != "" and user_password != "":
                     if login_result == 2:
                         if refresh in refresh_data.keys():
@@ -220,35 +360,9 @@ with col2:
                     st.toast('**验证失败，账户密码不能为空！**', icon=':material/error:')
 
             if web_setting["web"]["refresh_link_enable"]:
-                st.link_button("**获取令牌**", web_setting["web"]["refresh_link"], use_container_width=True)
-    if st.button("**返回首页**", use_container_width=True, key="rf_home"):
+                st.link_button("**获取令牌**", web_setting["web"]["refresh_link"], use_container_width=True, type=button_type)
+    if st.button("**返回首页**", use_container_width=True, key="rf_home", type=button_type):
         st.switch_page("home.py")
-col4, col5, col6 = st.columns([0.3, 0.23, 0.3])
-with col5:
-    footer = """
-        <style>
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
-            color: #555;
-        }
-        .footer a {
-            color: #0073e6;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        .footer a:hover {
-            color: #005bb5;
-        }
-        </style>
-        <div class="footer">
-            <p><strong>Powered by <a href="https://zhile.io/" target="_blank">@Neo</a>, </strong> 
-            <strong>Created by <a href="https://github.com/Chenyme" target="_blank">@Chenyme</a></strong></p>
-        </div>
-        """
 
-    st.markdown(footer, unsafe_allow_html=True)
+st.logo("LOGO.png", link="https://github.com/Chenyme/oaifree-tools")
+st.markdown(footer, unsafe_allow_html=True)# 底部信息,魔改请勿删除

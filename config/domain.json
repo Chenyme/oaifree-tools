@@ -1,12 +1,12 @@
 {
   "new.oaifree.com": {
     "name": "Pandora Newest UI",
-    "speed": "0.96013s",
+    "speed": "0.61s",
     "type": "Newest"
   },
   "demo.oaifree.com": {
     "name": "Pandora Classic UI",
-    "speed": "0.94619s",
+    "speed": "0.91s",
     "type": "Classic"
   }
 }

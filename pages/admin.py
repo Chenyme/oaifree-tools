@@ -42,101 +42,243 @@ with open(current_path + '/refresh.json', 'r', encoding='utf-8') as file:
 
 st.set_page_config(layout="wide", page_title=web_setting["web"]["title"], page_icon="LOGO.png")
 
-st.markdown("""
-    <style>
-    .stButton>button {
-        height: 2.5em;
-        background-color: #333;
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        font-size: 1em;
+if web_setting["web"]["button_style"] == "Classic-black":
+    st.markdown("""
+        <style>
+        .st-emotion-cache-keje6w.e1f1d6gn3 {
+            float: right !important;
+            text-align: right !important;
+            display: inline-block;
+        }
+        .st-emotion-cache-1vt4y43 {
+            background-color:  white !important;
+            color: black !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+        }
+        .eyeqlp52.st-emotion-cache-1pbsqtx.ex0cdmw0 {
+            fill: black !important;
+        }
+        .st-emotion-cache-consg2.e16zdaao0 {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.5em;
+            background-color: #333 !important;
+            color: #fff !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
+            text-decoration: none;
+            padding: 0 1em;
+        }
+        .st-emotion-cache-consg2.e16zdaao0:hover {
+            background-color: #444 !important;
+            color: #fff !important;
+            transform: scale(1.05);
+        }
+        .st-emotion-cache-consg2.e16zdaao0:active {
+            background-color: #222 !important;
+            color: #fff !important;
+            transform: scale(0.95);
+        }
+        .st-emotion-cache-187vdiz.e1nzilvr4 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            background-color: transparent !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .stButton>button {
+            width: 100%;
+            height: 2.5em;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
+        }
+        .stButton>button:hover {
+            background-color: #444;
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .stButton>button:active {
+            background-color: #222;
+            color: #fff;
+            transform: scale(0.95);
+        }
+        </style>
+        """, unsafe_allow_html=True)  # 按钮设置
+    button_type = "secondary"
 
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
-    }
-    .stButton>button:hover {
-        background-color: #444;
-        color: #fff;
-        transform: scale(1.05);
-    }
-    .stButton>button:active {
-        background-color: #222;
-        color: #fff;
-        transform: scale(0.95);
-    }
-    </style>
-    """, unsafe_allow_html=True)  # 按钮样式
+elif web_setting["web"]["button_style"] == "Simple-white":
+    st.markdown("""
+        <style>
+        .st-emotion-cache-keje6w.e1f1d6gn3 {
+            float: right !important;
+            text-align: right !important;
+            display: inline-block;
+        }
+        .st-emotion-cache-1vt4y43 {
+            background-color:  white !important;
+            color: black !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+        }
+        .eyeqlp52.st-emotion-cache-1pbsqtx.ex0cdmw0 {
+            fill: black !important;
+        }
+        .st-emotion-cache-consg2.e16zdaao0 {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.5em;
+            background-color: white !important;
+            color: black !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
+            text-decoration: none;
+            padding: 0 1em;
+        }
+        .st-emotion-cache-consg2.e16zdaao0:hover {
+            background-color: #f0f0f0 !important;
+            color: black !important;
+            transform: scale(1.05);
+        }
+        .st-emotion-cache-consg2.e16zdaao0:active {
+            background-color: #e0e0e0 !important;
+            color: black !important;
+            transform: scale(0.95);
+        }
+        .st-emotion-cache-187vdiz.e1nzilvr4 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            background-color: transparent !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .stButton button {
+            width: 100%;
+            height: 2.5em;
+            background-color: white !important;
+            color: black !important;
+            border: 1px solid """ + web_setting["web"]["button_border"] + """ !important;
+            border-radius: """ + str(web_setting["web"]["button_border_radius"]) + """px !important;
+            font-size: 1em !important;
+            cursor: pointer !important;
+            transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
+            padding: 0.5em 1em !important;
+        }
+        .stButton button:hover {
+            background-color: #f0f0f0 !important;
+            color: black !important;
+            transform: scale(1.05) !important;
+        }
+        .stButton button:active {
+            background-color: #e0e0e0 !important;
+            color: black !important;
+            transform: scale(0.95) !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)  # 按钮设置
+    button_type = "secondary"
 
-st.markdown("""
-    <style>
-    .st-emotion-cache-consg2.e16zdaao0 {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 2.5em;
-        background-color: #333 !important;
-        color: #fff !important;
-        border: none;
-        border-radius: 10px;
-        font-size: 1em;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease;
-        text-decoration: none;
-        padding: 0 1em;
-    }
-    .st-emotion-cache-consg2.e16zdaao0:hover {
-        background-color: #444 !important;
-        color: #fff !important;
-        transform: scale(1.05);
-    }
-    .st-emotion-cache-consg2.e16zdaao0:active {
-        background-color: #222 !important;
-        color: #fff !important;
-        transform: scale(0.95);
-    }
-    .st-emotion-cache-187vdiz.e1nzilvr4 {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
+elif web_setting["web"]["button_style"] == "Primary":
+    button_type = "primary"
+else:
+    button_type = "secondary"
+
+footer = """
+<style>
+.footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+    font-size: 14px;
+    color: #555;
+}
+.footer p {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.footer a {
+    color: #0073e6;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.footer a:hover {
+    color: #005bb5;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+    .footer {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        margin: 0 auto;
         width: 100%;
-        background-color: transparent !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        background-color: white;
+        border-top: 1px solid #ddd;
+        justify-content: center;
+        text-align: center;
     }
-    </style>
-    """, unsafe_allow_html=True)  # 链接按钮样式
-
-
+}
+</style>
+<div class="footer">
+    <p><strong>Powered by <a href="https://zhile.io/" target="_blank">@Neo</a>，</strong> 
+    <strong>Created by <a href="https://github.com/Chenyme" target="_blank">@Chenyme</a></strong></p>
+</div>
+"""
+st.logo("LOGO.png", link="https://github.com/Chenyme/oaifree-tools")
 # 阻止非法访问
 if "role" not in st.session_state:
     st.session_state.role = None
 if st.session_state.role == "admin":
-
     @st.experimental_dialog("安全保护")
     def key():
         col1, col2, col3 = st.columns([0.42, 0.26, 0.42])
         with col2:
             st.image("LOGO.png", width=200, caption="安全保护", use_column_width=True)
+
         st.write("")
+        sac.alert(label='**首次登入请修改super_key(管理员密钥)**', color="info", size='sm', radius='sm', icon=True, variant="filled")
         super_user = st.text_input("**新的昵称**", placeholder="请输入您的新昵称！")
         super_key = st.text_input("**新的密钥**", type="password", placeholder="请输入您的新密钥！")
         st.write("")
-        sac.alert(label='**首次登入请修改super_key(管理员密钥)**', color="warning", size='md', radius='lg', icon=True,
-                  closable=True)
-        st.write("")
-        if st.button("**保存更改**", use_container_width=True, type="primary"):
-            if len(super_key) < 8:
+
+        if st.button("**保存更改**", use_container_width=True, type=button_type):
+            if super_user == "" or super_user is None:
                 st.write("")
-                st.error("密码需大于等于8位，请重新输入！", icon=":material/error:")
+                sac.alert(label="**昵称不能为空，请重新输入！**", color="error", variant='filled', size="sm", radius="sm", icon=True, closable=True)
+            elif len(super_key) < 8:
+                st.write("")
+                sac.alert(label="**密码长度不得少于8位，请重新输入！**", color="error", variant='filled', size="sm", radius="sm", icon=True, closable=True)
             elif super_key == "12345678":
                 st.write("")
-                st.error("密码与原密码相同，请重新输入！", icon=":material/error:")
+                sac.alert(label="**密码不得为默认密码，请重新输入！**", color="error", variant='filled', size="sm", radius="sm", icon=True, closable=True)
             else:
                 web_setting["web"]["super_user"] = super_user
                 web_setting["web"]["super_key"] = super_key
-                st.success("修改成功!", icon=":material/check_circle:")
+                sac.alert(label="**保存成功！**", color="success", variant='filled', size="sm", radius="sm", icon=True, closable=True)
                 time.sleep(1)
                 with open(current_path + "/setting.toml", "w", encoding="utf-8") as f:
                     toml.dump(web_setting, f)
@@ -150,29 +292,30 @@ if st.session_state.role == "admin":
         with col2:
             st.image("LOGO.png", width=50, use_column_width=True)
         st.markdown("""
-            - **制作不易，不许白嫖，请给一颗免费的心叭！开源项目可魔改，但请务必保留原作者信息、遵循开源协议。**
+            - **制作不易，不许白嫖，请给一颗免费的心叭！开源项目可自由修改，但请保留原作者信息并遵循开源协议。**
+
+            - **OAIFree 管理后台提供丰富的管理功能，包括：**
             
-            - **OAIFree的管理后台，提供大量管理功能，包括：**
-            
-                - **站点工具**：登录统计、运行日志、站点迁移。
-                - **账户管理**：管理号池、管理用户、管理权限。
-                - **个性化设置**：修改站点标题、站点副标题、站点公告。
-                - **多域名管理**：负载分流、支持新老UI。
-                - **TOKEN刷新**：自动刷新SA_Token、AC_Token。
-                - **Share共享**：共享账户登录。
-                - **邀请令牌**：可用于自动化管理新用户注册。
-                - **刷新令牌**：可用于自动化续费账户状态。
+                - **站点工具**：登录统计、运行日志、站点迁移等。
+                - **账户管理**：管理账号池、用户和权限。
+                - **个性化设置**：修改站点标题、多种主题样式。
+                - **多域名管理**：负载分流，支持新旧 UI。
+                - **TOKEN 刷新**：自动刷新 SA_Token 和 AC_Token。
+                - **共享功能**：共享账户登录。
+                - **UID登录**：UID直接登录、UID修改密码。
+                - **邀请令牌**：用于自动化管理新用户注册。
+                - **刷新令牌**：用于自动化续费账户状态。
             
             ---
             
             - **注意事项：**
-                
-                - **请勿随意上传错误的配置文件，否则可能导致程序无法正常运行。**
-                - **设置时务必及时保存修改，每个模块均有保存按钮，否则不会生效。**
-                - **新增号池用户组时，请务必保证用户组的名称不重复，因为用户组是账号的唯一标识。**
-                - **当你修改任意表格时，请修改后点击空白处，否则有可能保存失败。（可能会发生）**
-                - **登陆时若出现 Press Enter To Apply，请及时按回车或点击页面空白处，否则有可能登录失败。（可能会发生）**
             
+                - **请勿上传错误的配置文件，否则可能导致程序无法正常运行。**
+                - **设置时务必及时保存，每个模块都有保存按钮，否则修改不会生效。**
+                - **新增账号池用户组时，请确保名称唯一，因为用户组是账号的唯一标识。**
+                - **修改表格后，请点击空白处以确保保存成功。**
+                - **登录时若出现 "Press Enter To Apply"，请及时按回车或点击页面空白处，否则可能登录失败。**
+
             ---
             
             - **特别鸣谢：**
@@ -183,15 +326,14 @@ if st.session_state.role == "admin":
             # OpenAI，Not CloseAI！愿开源精神永存！
                 
             ---
-
         """)
 
-        if st.button("**我已知晓，不再弹出**", use_container_width=True):
+        if st.button("**我已知晓，不再弹出**", use_container_width=True, type=button_type):
             web_setting["web"]["readme"] = True
             with open(current_path + "/setting.toml", "w", encoding="utf-8") as f:
                 toml.dump(web_setting, f)
             st.rerun()
-        st.link_button("**来GitHub给我一颗星叭！**", "https://github.com/Chenyme/oaifree-tools", use_container_width=True)
+        st.link_button("**来GitHub给我一颗星叭！**", "https://github.com/Chenyme/oaifree-tools", use_container_width=True, type=button_type)
 
     @st.experimental_dialog("新增账户")
     def new_account():
@@ -204,7 +346,7 @@ if st.session_state.role == "admin":
         new_access_token = st.text_input("**AC_Token***", help="AC_Token，登录刷新必要的Token，不可为空", placeholder="AC_Token，登录刷新必要的Token，不可为空")
         new_refresh_token = st.text_input("**RF_Token**", help="RF_Token，用于AC刷新的Token，可为空，为空则刷新功能不可用", placeholder="RF_Token，用于AC刷新的Token，若无可为空")
         st.write("")
-        if st.button("**保存新账户**", use_container_width=True, type="primary"):
+        if st.button("**保存新账户**", use_container_width=True, type=button_type):
             if new_group in accounts.keys():
                 sac.alert(label="该用户组已存在，请重新命名！", color="error", variant='quote', size="md", radius="lg", icon=True, closable=True)
             elif new_group == "":
@@ -234,12 +376,11 @@ if st.session_state.role == "admin":
         st.write("")
         files = st.multiselect("选择的文件", ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json", "app.log", "refresh.json", "domain.json"], ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json", "app.log", "refresh.json", "domain.json"], label_visibility="collapsed")
         st.write("")
-        if st.button("**导出数据**", use_container_width=True):
-            st.write("")
+        if st.button("**导出数据**", use_container_width=True, type=button_type):
             directory_path = current_path
             zip_buffer = BytesIO()
             try:
-                sac.alert(label="准备数据中,请耐心等待...", color="info", variant='quote', size="sm", radius="lg", icon=True, closable=True)
+                sac.alert(label="准备数据中,请耐心等待...", color="info", variant='filled', size="sm", radius="sm", icon=True, closable=True)
                 with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
                     for root, _, _ in os.walk(directory_path):
                         for file in files:
@@ -250,10 +391,10 @@ if st.session_state.role == "admin":
                 col1, col2 = st.columns(2)
                 i = 1
                 for file in files:
-                    if i%2 == 0:
+                    if i%2 == 1:
                         with col1:
                             sac.alert(label=f"{file}", color="success", variant='quote', size="sm", radius="lg", icon=True, closable=True)
-                    if i%2 == 1:
+                    if i%2 == 0:
                         with col2:
                             sac.alert(label=f"{file}", color="success", variant='quote', size="sm", radius="lg", icon=True, closable=True)
                     i += 1
@@ -272,37 +413,37 @@ if st.session_state.role == "admin":
 
     @st.experimental_dialog("站点迁移-配置导入")
     def upload():
-        sac.alert(label="**仅支持V1.1.3版本后的配置文件**", description="V1.1.2版本及更低，请删除zip中以下文件：**`setting.toml` 、`invite.json` 、`config.json` 、`refresh.json`** ", banner=True, color="info", variant='filled', size="md", radius="lg", icon=True, closable=True)
+        sac.alert(label="**仅支持V1.1.4版本后的配置文件**", description=" 上传V1.1.3版本配置时，请删除zip中的冲突文件：**`setting.toml`**，更低版本请慎重上传！ ", banner=True, color="info", variant='filled', size="md", radius="sm", closable=True)
 
         st.write("**请上传配置文件**")
         uploaded_file = st.file_uploader("上传配置文件", type=['zip'], label_visibility="collapsed")
         st.write("")
+
         required_files = ["accounts.json", "config.json", "invite.json", "setting.toml", "share.json", "app.log", "refresh.json", "domain.json"]
-        if st.button("**上传并配置**", use_container_width=True, type="primary"):
+        if st.button("**上传并配置**", use_container_width=True, type=button_type):
             if uploaded_file is not None:
                 zip_buffer = BytesIO(uploaded_file.getvalue())
                 with zipfile.ZipFile(zip_buffer, "r") as zip_ref:
                     zip_file_list = zip_ref.namelist()
                     success_files = [file for file in required_files if file in zip_file_list]
                     error_files = [file for file in zip_file_list if file not in required_files]
-                    sac.alert(label="上传成功！请稍等片刻，正在配置文件...", color="info", variant='quote', size="md", radius="lg", icon=True, closable=True)
+                    sac.alert(label="**上传成功！请稍等片刻，正在配置文件...**", color="info", variant='filled', size="sm", radius="sm", icon=True, closable=True)
                     col1, col2 = st.columns(2)
                     i = 1
                     for file in success_files:
                         zip_ref.extract(file, current_path)
-                        if i % 2 == 0:
-                            with col1:
-                                sac.alert(label=f"{file}", color="success", variant='quote', size="sm", radius="lg", icon=True, closable=True)
                         if i % 2 == 1:
+                            with col1:
+                                sac.alert(label=f"{file}", color="success", variant='quote', size="sm", radius="sm", icon=True)
+                        if i % 2 == 0:
                             with col2:
-                                sac.alert(label=f"{file}", color="success", variant='quote', size="sm", radius="lg", icon=True, closable=True)
+                                sac.alert(label=f"{file}", color="success", variant='quote', size="sm", radius="sm", icon=True)
                         i += 1
-
                     for file in error_files:
-                        sac.alert(label=f"未知文件 {file}", color="error", variant='quote', size="sm", radius="lg", icon=True, closable=True)
-                sac.alert(label="所有文件均成功配置！请及时刷新界面以生效！", banner=True, color="success", variant='filled', size="md", radius="lg", icon=True, closable=True)
+                        sac.alert(label=f"未知文件 {file}", color="error", variant='quote', size="sm", radius="sm", icon=True)
+                sac.alert(label="所有文件均成功配置！请及时刷新界面以生效！", banner=True, color="success", variant='filled', size="sm", radius="lg", icon=True)
             else:
-                sac.alert(label="请先上传文件！", color="error", variant='quote', size="md", radius="lg", icon=True, closable=True)
+                sac.alert(label="**请先上传配置文件！**", color="error", variant='filled', size="sm", radius="sm", icon=True, closable=True)
         st.write("")
 
     @st.experimental_dialog("配置新用户权限")
@@ -313,7 +454,7 @@ if st.session_state.role == "admin":
         gpt4_limit = st.number_input("限制GPT-4", value=web_setting["web"]["gpt4_limit"], min_value=-1, max_value=1000000, step=5, help="GPT-4对话限制，填 -1 则不限制")
         show_conversations = st.selectbox("会话无需隔离", ['true', 'false'], index=['true', 'false'].index(web_setting["web"]["show_conversations"]), help="false为隔离会话")
         st.write("")
-        if st.button("**保存默认配置**", use_container_width=True, type="primary"):
+        if st.button("**保存默认配置**", use_container_width=True, type=button_type):
             web_setting["web"]["site_limit"] = site_limit
             web_setting["web"]["expires_in"] = expires_in
             web_setting["web"]["gpt35_limit"] = gpt35_limit
@@ -340,7 +481,7 @@ if st.session_state.role == "admin":
             it_token = st.text_input("**邀请令牌**", placeholder="it-xxxxxxxxxxxxxxxx")
 
         st.write("")
-        if st.button("**生成邀请令牌**", use_container_width=True, key="new_invite"):
+        if st.button("**生成邀请令牌**", use_container_width=True, key="new_invite_token_gen", type=button_type):
             if auto_it_gen:
                 for i in range(num_it_gen):
                     invite_config["it-" + secrets.token_urlsafe(len_it_gen)] = {
@@ -395,7 +536,7 @@ if st.session_state.role == "admin":
             status_list = st.multiselect("选择需要检测的用户", list(config.keys()), default=default, key="status_list", label_visibility="collapsed")
 
         st.write("")
-        if st.button("**状态检测**", use_container_width=True):
+        if st.button("**状态检测**", use_container_width=True, key="check_user_account", type=button_type):
             sc_list = []
             er_list = []
             for user in status_list:
@@ -422,7 +563,7 @@ if st.session_state.role == "admin":
         st.write("**需要刷新的账户**")
         user_group = st.multiselect("选择需要刷新的用户", st.session_state.er_list, key="user_groups", label_visibility="collapsed")
         st.write("")
-        if st.button("**刷新状态**", use_container_width=True):
+        if st.button("**刷新状态**", use_container_width=True, type=button_type):
             for user in user_group:
                 status, name, token_key = get_sharetoken(user_group, accounts[config[user]["group"]]["access_token"], config[user]["site_limit"], config[user]["expires_in"], config[user]["gpt35_limit"], config[user]["gpt4_limit"], config[user]["show_conversations"])
                 if status:
@@ -456,7 +597,7 @@ if st.session_state.role == "admin":
             rf_token = st.text_input("**刷新令牌**", key="rf_token_new", placeholder="rf-xxxxxxxxxxxxxxxx")
 
         st.write("")
-        if st.button("**生成刷新令牌**", use_container_width=True, key="new_refresh"):
+        if st.button("**生成刷新令牌**", use_container_width=True, key="new_refresh", type=button_type):
             if auto_rf_gen:
                 for i in range(num_rf_gen):
                     refresh_data["rf-" + secrets.token_urlsafe(len_rf_gen)] = {
@@ -528,7 +669,8 @@ if st.session_state.role == "admin":
             size_bytes1 = os.path.getsize(current_path + "app.log")
             size_bytes2 = 0
             for file in os.listdir("config"):
-                size_bytes2 += os.path.getsize("config/" + file)
+                if file != "app.log":
+                    size_bytes2 += os.path.getsize("config/" + file)
 
             if size_bytes1 == 0:
                 size1 = "0B"
@@ -555,14 +697,14 @@ if st.session_state.role == "admin":
             col2.metric("号池总数", len(accounts.keys()), len(accounts.keys())-1)
             col3.metric("服务累计", st.session_state.count_people, st.session_state.count_people)
             col4.metric("日志信息", size1, size_bytes1-36)
-            col5.metric("配置信息", size2, size_bytes2-3755)
+            col5.metric("配置信息", size2, size_bytes2-4935)
 
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
-                if st.button("**导出配置**", use_container_width=True):
+                if st.button("**导出配置**", use_container_width=True, type=button_type):
                     download()
             with col2:
-                if st.button("**导入配置**", use_container_width=True):
+                if st.button("**导入配置**", use_container_width=True, type=button_type):
                     upload()
 
             st.divider()
@@ -610,7 +752,7 @@ if st.session_state.role == "admin":
                     horizontal = st.selectbox('**水平显示**', [True, False], index=0)
                 with col5:
                     st.write("")
-                    if st.button("**保存设置**", use_container_width=True):
+                    if st.button("**保存设置**", use_container_width=True, type=button_type):
                         web_setting["chart"]["start_date"] = start_date
                         web_setting["chart"]["end_date"] = end_date
                         web_setting["chart"]["height"] = height
@@ -724,7 +866,7 @@ if st.session_state.role == "admin":
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
                 st.write("")
-                if st.button("**清理日志**", use_container_width=True):
+                if st.button("**清理日志**", use_container_width=True, type=button_type):
                     log_content = "【OaiT服务已成功开启！】\n"
                     with open(current_path + "app.log", "w", encoding="utf-8") as log_file:
                         log_file.write(log_content)
@@ -739,24 +881,43 @@ if st.session_state.role == "admin":
             st.write("**网站设置**")
             col1, col2 = st.columns(2)
             with col1:
-                title = st.text_input("**站点标题**", value=web_setting["web"]["title"])
-                subtitle = st.text_input("**站点副标题**", value=web_setting["web"]["subtitle"])
-            with col2:
                 super_user = st.text_input("**管理员昵称**", value=web_setting["web"]["super_user"])
                 super_key = st.text_input("**管理员密钥**", value=web_setting["web"]["super_key"], type="password")
+            with col2:
+                title = st.text_input("**站点标题**", value=web_setting["web"]["title"])
+                subtitle = st.text_input("**站点副标题**", value=web_setting["web"]["subtitle"])
+            col1, col2 = st.columns(2)
+            with col1:
+                login_theme = st.selectbox("**主题**", ["free", "classic"], index=["free", "classic"].index(web_setting["web"]["login_Theme"]))
+            with col2:
+                button_style = st.selectbox("**按钮样式**", ["Classic-black", "Simple-white", "Primary", "Secondary"], index=["Classic-black", "Simple-white", "Primary", "Secondary"].index(web_setting["web"]["button_style"]))
+            if button_style not in ["Primary", "Secondary"]:
+                col1, col2 = st.columns(2)
+                with col1:
+                    button_border = st.selectbox("**按钮边框**", ["#000", "#111", "#222", "#333", "#444", "#666", "#888", "#AAA", "#CCC", "#FFF"], index=["#000", "#111", "#222", "#333", "#444", "#666", "#888", "#AAA", "#CCC", "#FFF"].index(web_setting["web"]["button_border"]))
+                with col2:
+                    button_border_radius = st.number_input("**按钮圆角**", value=web_setting["web"]["button_border_radius"], min_value=0, max_value=50, step=1)
 
             st.write("")
             col6, col7, col8, col9, col10 = st.columns(5)
             with col6:
-                if st.button("**保存修改**", use_container_width=True, key="save_setting_web"):
-                    web_setting["web"]["title"] = title
-                    web_setting["web"]["subtitle"] = subtitle
+                if st.button("**保存更改**", use_container_width=True, key="save_setting_web", type=button_type):
+                    web_setting["web"]["login_Theme"] = login_theme
+                    web_setting["web"]["button_style"] = button_style
                     web_setting["web"]["super_user"] = super_user
                     web_setting["web"]["super_key"] = super_key
+                    if button_style not in ["Primary", "Secondary"]:
+                        web_setting["web"]["button_border"] = button_border
+                        web_setting["web"]["button_border_radius"] = button_border_radius
+
+                    if login_theme == "classic":
+                        web_setting["web"]["title"] = title
+                        web_setting["web"]["subtitle"] = subtitle
                     with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
                         toml.dump(web_setting, f)
                     logger.info(f"<管理员> 【基本设置】 更新了网站基本设置！")
                     st.toast("保存成功!", icon=':material/check_circle:')
+                    st.rerun()
 
             st.divider()
             st.write("**服务域名**")
@@ -790,7 +951,7 @@ if st.session_state.role == "admin":
 
             col6, col7, col8, col9, col10 = st.columns(5)
             with col6:
-                if st.button("**保存修改**", use_container_width=True, key="save_domain"):
+                if st.button("**保存更改**", use_container_width=True, key="save_domain", type=button_type):
                     web_setting["web"]["choose_domain"] = choose_domain
                     if choose_domain == "不允许":
                         web_setting["web"]["domain"] = domain
@@ -810,7 +971,7 @@ if st.session_state.role == "admin":
                     with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
                         toml.dump(web_setting, f)
             with col7:
-                if st.button("**测试延迟**", use_container_width=True):
+                if st.button("**测试延迟**", use_container_width=True, type=button_type):
                     delay = []
                     for i in rows:
                         try:
@@ -818,7 +979,7 @@ if st.session_state.role == "admin":
                             response = requests.get("https://" + i[1])
                             end_time = time.time()
                             total_time = end_time - start_time
-                            delay.append(str(round(total_time, 5)) + "s")
+                            delay.append(str(round(total_time, 2)) + "s")
                         except:
                             delay.append("无法连接")
                     json_data = {}
@@ -864,7 +1025,7 @@ if st.session_state.role == "admin":
             st.write("")
             col6, col7, col8, col9, col10 = st.columns(5)
             with col6:
-                if st.button("**保存修改**", use_container_width=True, key="save_notice"):
+                if st.button("**保存更改**", use_container_width=True, key="save_notice", type=button_type):
                     web_setting["web"]["notice_enable"] = notice_enable
                     web_setting["web"]["notice_enable"] = notice_enable
                     web_setting["web"]["notice_banner"] = notice_banner
@@ -912,7 +1073,7 @@ if st.session_state.role == "admin":
 
             col6, col7, col8, col9, col10 = st.columns(5)
             with col6:
-                if st.button("**保存修改**", use_container_width=True):
+                if st.button("**保存更改**", use_container_width=True, type=button_type):
                     web_setting["excel"]["hide_index_account"] = hide_index
                     web_setting["excel"]["height_account"] = height
                     web_setting["excel"]["order_what_account"] = order_what
@@ -928,10 +1089,10 @@ if st.session_state.role == "admin":
                     logger.info(f"<管理员> 【账户更改】 更新了账户信息！")
                     st.toast("保存成功!", icon=':material/check_circle:')
             with col7:
-                if st.button("**新增账户**", use_container_width=True):
+                if st.button("**新增账户**", use_container_width=True, type=button_type):
                     new_account()
             with col8:
-                st.link_button("**获取RF_Token**", "https://token.oaifree.com/auth", use_container_width=True)
+                st.link_button("**获取RF_Token**", "https://token.oaifree.com/auth", use_container_width=True, type=button_type)
 
             st.divider()
             st.write("**邀请令牌**")
@@ -959,7 +1120,7 @@ if st.session_state.role == "admin":
                 with col1:
                     order = st.multiselect("**数据显示**", fields, web_setting["excel"]["order_invite"], key="order", label_visibility="collapsed")
                 with col2:
-                    if st.button("删除已用令牌", use_container_width=True, key="delete_invite"):
+                    if st.button("删除已用令牌", use_container_width=True, key="delete_invite", type=button_type):
                         for i in list(invite_config.keys()):
                             if invite_config[i]["used"]:
                                 invite_config.pop(i)
@@ -969,7 +1130,7 @@ if st.session_state.role == "admin":
                         logger.info(f"<管理员> 【邀请令牌】 删除了已使用的邀请令牌！")
                         st.rerun()
                 with col3:
-                    if st.button("删除所有令牌", use_container_width=True, key="delete_all_invite"):
+                    if st.button("删除所有令牌", use_container_width=True, key="delete_all_invite", type=button_type):
                         invite_config.clear()
                         with open(current_path + "invite.json", "w", encoding="utf-8") as f:
                             json.dump(invite_config, f, indent=2)
@@ -987,7 +1148,7 @@ if st.session_state.role == "admin":
             col1, col2, col3, col4, col5 = st.columns(5)
             col6, col7 = st.columns([0.99999, 0.00001])
             with col1:
-                if st.button("**保存修改**", use_container_width=True, key="save_invite"):
+                if st.button("**保存更改**", use_container_width=True, key="save_invite", type=button_type):
                     web_setting["excel"]["hide_index_invite"] = hide_index
                     web_setting["excel"]["height_invite"] = height
                     web_setting["excel"]["order_what_invite"] = order_what
@@ -1015,10 +1176,10 @@ if st.session_state.role == "admin":
                         with col6:
                             sac.alert(label="保存失败！您必须设置完整的注册码并选择正确的组别，不允许为空值!", color="error", variant='quote', size="md", radius="lg", icon=True, closable=True)
             with col2:
-                if st.button("**配置新用户权限**", use_container_width=True):
+                if st.button("**配置新用户权限**", use_container_width=True, type=button_type):
                     invite()
             with col3:
-                if st.button("**生成邀请令牌**", use_container_width=True, key="new_invite_token"):
+                if st.button("**生成邀请令牌**", use_container_width=True, key="new_invite_token", type=button_type):
                     new_invite()
 
             st.divider()
@@ -1031,7 +1192,7 @@ if st.session_state.role == "admin":
 
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
-                if st.button("**保存修改**", use_container_width=True, key="save_AC_Token刷新"):
+                if st.button("**保存更改**", use_container_width=True, key="save_AC_Token刷新", type=button_type):
                     web_setting["web"]["refresh_all"] = refresh
                     with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
                         toml.dump(web_setting, f)
@@ -1043,7 +1204,7 @@ if st.session_state.role == "admin":
             col6, col7 = st.columns([0.99999, 0.00001])
             with col1:
                 st.write("")
-                if st.button(f"**刷新 - {group}**", use_container_width=True):
+                if st.button(f"**刷新 - {group}**", use_container_width=True, type=button_type):
                     status, new_access_token = get_accesstoken(accounts[group]['refresh_token'])
                     if status:
                         st.toast(f"刷新成功！", icon=':material/check_circle:')
@@ -1089,7 +1250,7 @@ if st.session_state.role == "admin":
             st.write('')
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
-                if st.button("**保存修改** ", use_container_width=True, key="save_user"):
+                if st.button("**保存更改** ", use_container_width=True, key="save_user", type=button_type):
                     web_setting["excel"]["hide_index_user"] = hide_index
                     web_setting["excel"]["height_user"] = height
                     web_setting["excel"]["order_what_user"] = order_what
@@ -1103,10 +1264,10 @@ if st.session_state.role == "admin":
                     st.toast("保存修改成功！", icon=':material/check_circle:')
                     logger.info(f"<管理员> 【用户更改】 更新了用户信息！")
             with col2:
-                if st.button("**状态刷新**", use_container_width=True):
+                if st.button("**状态刷新**", use_container_width=True, type=button_type):
                     refresh_user()
             with col3:
-                st.link_button("**获取SA_Token**", "https://chat.oaifree.com/token", use_container_width=True)
+                st.link_button("**获取SA_Token**", "https://chat.oaifree.com/token", use_container_width=True, type=button_type)
 
 
             st.divider()
@@ -1139,7 +1300,7 @@ if st.session_state.role == "admin":
                 with col1:
                     order = st.multiselect("**数据显示**", fields, web_setting["excel"]["order_refresh"], key="order_refresh", label_visibility="collapsed")
                 with col2:
-                    if st.button("删除已用令牌", use_container_width=True, key="delete_refresh"):
+                    if st.button("删除已用令牌", use_container_width=True, key="delete_refresh", type=button_type):
                         for i in list(refresh_data.keys()):
                             if refresh_data[i]["used"]:
                                 refresh_data.pop(i)
@@ -1149,7 +1310,7 @@ if st.session_state.role == "admin":
                         logger.info(f"<管理员> 【刷新令牌】 删除了已使用的刷新令牌！")
                         st.rerun()
                 with col3:
-                    if st.button("删除所有令牌", use_container_width=True, key="delete_all_refresh"):
+                    if st.button("删除所有令牌", use_container_width=True, key="delete_all_refresh", type=button_type):
                         refresh_data.clear()
                         with open(current_path + "refresh.json", "w", encoding="utf-8") as f:
                             json.dump(refresh_data, f, indent=2)
@@ -1165,7 +1326,7 @@ if st.session_state.role == "admin":
             edited_df4 = st.data_editor(df4, hide_index=hide_index, use_container_width=True, height=height, num_rows="dynamic", disabled=["是否使用"], column_order=order, column_config={"用户组": st.column_config.SelectboxColumn(options=accounts.keys())})
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
-                if st.button("**保存修改**", use_container_width=True, key="save_refresh"):
+                if st.button("**保存更改**", use_container_width=True, key="save_refresh", type=button_type):
                     web_setting["web"]["user_refresh"] = user_refresh
                     web_setting["web"]["refresh_link_enable"] = refresh_link_enable
                     web_setting["web"]["refresh_link"] = refresh_link
@@ -1177,7 +1338,7 @@ if st.session_state.role == "admin":
                     st.toast("保存成功！", icon=':material/check_circle:')
                     logger.info(f"<管理员> 【刷新令牌】 更新了刷新令牌信息！")
             with col2:
-                if st.button("**生成刷新令牌**", use_container_width=True, key="new_refresh_token"):
+                if st.button("**生成刷新令牌**", use_container_width=True, key="new_refresh_token", type=button_type):
                     new_refresh()
             st.write("")
 
@@ -1195,12 +1356,12 @@ if st.session_state.role == "admin":
                 expires_in = st.number_input("**有效期（秒**）", value=0, help="token有效期（单位为秒），填 0 则永久有效")
                 gpt35_limit = st.number_input("**限制GPT-3.5**", value=-1, help="GPT-3.5对话限制，填 -1 则不限制")
                 gpt4_limit = st.number_input("**限制GPT-4**", value=-1, help="GPT-4对话限制，填 -1 则不限制")
-            uid = st.text_input("**UID(32位)**", value="UID-" + secrets.token_urlsafe(32), help="用户的UID，为空则自动生成，用于用户修改密码", disabled=True)
+            uid = st.text_input("**UID(32位)**", value="UID-" + secrets.token_urlsafe(32), help="用户的UID，自动生成，用于用户登录、修改密码", disabled=True)
             st.write('')
             col1, col2, col3, col4, col5 = st.columns(5)
             col6, col7 = st.columns([0.99999, 0.00001])
             with col1:
-                if st.button("**注册该用户**", use_container_width=True):
+                if st.button("**注册用户**", use_container_width=True, key="register_user_admin", type=button_type):
                     if user_new_acc == "":
                         with col6:
                             sac.alert(label="请填写账户!", color="error", variant='quote', size="md", radius="lg", icon=True, closable=True)
@@ -1243,7 +1404,7 @@ if st.session_state.role == "admin":
 
                 st.write("")
             with col2:
-                if st.button("**前往首页登录**", use_container_width=True):
+                if st.button("**前往首页**", use_container_width=True, key="go_home", type=button_type):
                     st.switch_page("home.py")
 
     if set_choose == '更多功能':
@@ -1262,7 +1423,7 @@ if st.session_state.role == "admin":
             col1, col2, col3, col4, col5 = st.columns(5)
             col6, col7 = st.columns([0.99999, 0.00001])
             with col1:
-                if st.button("**保存更改**", use_container_width=True):
+                if st.button("**保存更改**", use_container_width=True, type=button_type, key="save_share_setting"):
                     web_setting["web"]["share"] = share
                     if share:
                         web_setting["web"]["share_notice"] = share_notice
@@ -1280,19 +1441,19 @@ if st.session_state.role == "admin":
                         toml.dump(web_setting, f)
                     logger.info(f"<管理员> 【Share设置】 更新了Share设置！")
             with col2:
-                if st.button("**前往Share站**", use_container_width=True):
+                if st.button("**前往Share站**", use_container_width=True, type=button_type):
                     st.switch_page("pages/share.py")
 
             st.divider()
             st.write("**关于**")
-            st.write("版本：OaiT V1.1.3")
+            st.write("版本：OaiT V1.1.4")
             st.write("作者：@Chenyme")
             st.write("鸣谢：@Neo")
             st.write("GitHub：https://github.com/Chenyme/oaifree-tools")
             st.write("有任何问题欢迎提 issue，如果觉得好用请给我一个 Star 吧，感谢支持！")
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
-                if st.button("**更多**", use_container_width=True):
+                if st.button("**更多**", use_container_width=True, type=button_type):
                     readme()
 
             st.divider()
@@ -1303,7 +1464,6 @@ if st.session_state.role == "admin":
     col1, col2, col3 = st.columns([0.4, 0.2, 0.4])
     with col2:
         st.image("LOGO.png", width=200, caption="一键管理Oaifree镜像服务，简单上手", use_column_width=True)
-
 
 else:
     col1, col2, col3 = st.columns(3)
@@ -1318,7 +1478,7 @@ else:
             admin = st.text_input("**管理账户：**")
             key = st.text_input("**管理密钥：**", type="password")
             st.divider()
-            if st.button("**验证身份**", use_container_width=True):
+            if st.button("**验证身份**", use_container_width=True, type=button_type):
                 if admin == web_setting["web"]["super_user"] and key == web_setting["web"]["super_key"]:
                     st.session_state.role = "admin"
                     logger.info(f"【管理登录】 管理员：{admin} 登录成功！")
@@ -1326,6 +1486,8 @@ else:
                     st.switch_page("pages/admin.py")
                 else:
                     st.toast("**身份验证失败，如果您不是管理员请前往首页进行登录！**", icon=":material/error:")
-            if st.button("**返回首页**", use_container_width=True):
+            if st.button("**返回首页**", use_container_width=True, type=button_type):
                 st.switch_page("home.py")
             st.write("")
+
+st.markdown(footer, unsafe_allow_html=True)# 底部信息,魔改请勿删除
