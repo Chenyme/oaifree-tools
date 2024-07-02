@@ -11,19 +11,20 @@
 </div>
 
 ## 项目功能
-> - 支持多种个性化设置。
-> - 支持Oauth安全登录、支持UID登录。
-> - 支持号池管理、用户管理、域名管理、共享。
-> - 支持OpenAI的最新UI、Classic经典UI。
-> - 支持手动/自动刷新AC_Token状态。
-> - 支持自动检测用户SA_Token状态并刷新。
-> - 支持刷新令牌、邀请令牌，实现自助发卡维护。
+  - **UID**：UID标识/UID登录/UID改密
+  - **个性化**：站点标题/站点公告/登录主题/按钮样式
+  - **站点工具**：登录统计/运行日志/站点迁移/数据导出
+  - **用户权限**：自助登录/自助续费/自由改密/自由共享
+  - **账户管理**：账号/用户/共享池管理、账户/共享/新用户权限
+  - **域名管理**：负载分流/新旧 UI/延迟测速/自定义域名/自由选择
+  - **授权令牌**：邀请令牌(注册)/刷新令牌(续费)/链接发卡网站/自助发卡
+  - **Token 管理**SA-Token/AC—Token自动/手动检测、自动刷新SA_Token/AC_Token
 
 ## 项目部署
 #### docker
 ```shell
-docker pull chenyme/oait:v1.1.4
-docker run -d -p 8501:8501 chenyme/oait:v1.1.4
+docker pull chenyme/oait:v1.1.5
+docker run -d -p 8501:8501 chenyme/oait:v1.1.5
 
 # docker pull ghcr.io/chenyme/oait:latest
 # docker run -d -p 8501:8501 ghcr.io/chenyme/oait:latest
@@ -32,8 +33,8 @@ docker run -d -p 8501:8501 chenyme/oait:v1.1.4
 #### Git
 ```shell
 git clone https://github.com/Chenyme/oaifree-tools
-docker build -t chenyme/oait:v1.1.4 .
-docker run -d -p 8501:8501 chenyme/oait:v1.1.4
+docker build -t chenyme/oait:v1.1.5 .
+docker run -d -p 8501:8501 chenyme/oait:v1.1.5
 ```
 
 #### Python
@@ -47,8 +48,8 @@ streamlit run home.py
 在`项目运行`日志下导出所有配置文件
 
 ```shell
-docker pull chenyme/oait:v1.1.4
-docker run -d -p 8501:8501 chenyme/oait:v1.1.4
+docker pull chenyme/oait:v1.1.5
+docker run -d -p 8501:8501 chenyme/oait:v1.1.5
 
 # docker pull ghcr.io/chenyme/oait:latest
 # docker run -d -p 8501:8501 ghcr.io/chenyme/oait:latest
