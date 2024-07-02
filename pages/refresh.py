@@ -1,6 +1,7 @@
+import os
 import json
 import toml
-import os
+import base64
 import logging
 import streamlit as st
 import streamlit_antd_components as sac
@@ -24,6 +25,10 @@ with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
     web_setting = toml.load(file)
 with open(current_path + '/refresh.json', 'r', encoding='utf-8') as file:
     refresh_data = json.load(file)
+with open("LOGO.png", "rb") as image_file:
+    encoded_image = base64.b64encode(image_file.read()).decode()
+
+version = "v1.1.5"
 
 
 def authenticate(username, password):
@@ -252,117 +257,197 @@ footer = """
 </div>
 """
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns([0.32, 0.36, 0.32])
 with col2:
     set_choose = sac.segmented(
         items=[
-            sac.SegmentedItem(label='更改密码', icon='file-text'),
+            sac.SegmentedItem(label='密码变更', icon='file-text'),
             sac.SegmentedItem(label='账户续费', icon='tools'),
         ], align='center', use_container_width=True, color='dark'
     )
     st.write("")
     st.write("")
-    if set_choose == '更改密码':
-        st.write("### 更改密码")
-        st.write("")
-        st.write("")
-        user_account = st.text_input("**账户**", placeholder="您的账户", key="user_account")
-        user_password = st.text_input("**新密码**", type="password", placeholder="您的新密码", key="user_password")
-        uid = st.text_input("**UID**", placeholder="唯一标识UID", key="uid")
+    if set_choose == '密码变更':
 
-        st.divider()
-        st.write("")
+        if "change" not in st.session_state:
+            st.session_state.change = "password"
 
-        if st.button("**修改密码**", use_container_width=True, type=button_type):
-            if user_account != "" and user_password is not None:
-                if user_account in config.keys():
-                    if user_password != config[user_account]['password']:
-                        if config[user_account]['uid'] == uid:
-                            config[user_account]['password'] = user_password
-                            with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
-                                json.dump(config, file, indent=2)
-                            logger.info(f"【密码更改】 账户：{user_account} 密码更改成功！new_password:{user_password}")
-                            st.toast('**密码已成功更改！**', icon=':material/check_circle:')
+        with st.container(border=True):
+            st.write("### 密码变更")
+            st.write("")
+            st.write("")
+
+            if st.session_state.change == "password":
+
+                user_account = st.text_input("**账户**", placeholder="您的账户", key="user_account1")
+                user_password = st.text_input("**旧密码**", type="password", placeholder="您的旧密码", key="user_password1")
+                user_password_new = st.text_input("**新密码**", type="password", placeholder="您的新密码", key="user_password_new1")
+
+                st.divider()
+                st.write("")
+                if st.button("**立即更改**", use_container_width=True, type=button_type):
+                    if user_account != "" and user_account is not None:
+                        if user_password != "" and user_password is not None:
+                            if user_password_new != "" and user_password_new is not None:
+                                if user_account in config.keys():
+                                    if user_password == config[user_account]['password']:
+                                        if user_password_new != config[user_account]['password']:
+                                            if len(user_password_new) >= 8:
+                                                config[user_account]['password'] = user_password_new
+                                                with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
+                                                    json.dump(config, file, indent=2)
+                                                logger.info(
+                                                    f"【密码更改】 账户：{user_account} 密码更改成功！new_password:{user_password}")
+                                                st.toast('**密码已成功更改！**', icon=':material/check_circle:')
+                                            else:
+                                                st.toast('**密码长度不足，请填写8位及以上的密码！**', icon=':material/error:')
+                                        else:
+                                            st.toast('**修改失败，新密码不能与旧密码相同！**', icon=':material/error:')
+                                    else:
+                                        st.toast('**密码错误，请检查您填写的旧密码是否正确！**', icon=':material/error:')
+                                else:
+                                    st.toast('**账户不存在，请检查您填写的账户名称是否正确！**', icon=':material/error:')
+                            else:
+                                st.toast('**新密码不能为空，请填写您的新密码！**', icon=':material/error:')
                         else:
-                            st.toast('**错误的UID，UID是您注册时和登陆时显示的令牌！**', icon=':material/error:')
+                            st.toast('**旧密码不能为空，请填写您的旧密码！**', icon=':material/error:')
                     else:
-                        st.toast('**修改失败，新密码不能与旧密码相同！**', icon=':material/error:')
-                else:
-                    st.toast('**账户不存在，请检查您填写的账户名称是否正确！**', icon=':material/error:')
-            else:
-                st.toast('**账户不能为空，请填写您的账户！**', icon=':material/error:')
+                        st.toast('**账户不能为空，请填写您的账户！**', icon=':material/error:')
+
+                if st.button("**使用 UID 变更**", use_container_width=True, type=button_type):
+                    st.session_state.change = "uid"
+                    st.switch_page("pages/refresh.py")
+
+            elif st.session_state.change == "uid":
+                user_account = st.text_input("**账户**", placeholder="您的账户", key="user_account2")
+                user_password = st.text_input("**新密码**", type="password", placeholder="您的新密码", key="user_password2")
+                uid = st.text_input("**UID**", placeholder="你的唯一标识 - UID", key="uid")
+
+                st.divider()
+                st.write("")
+                if st.button("**立即更改**", use_container_width=True, type=button_type):
+                    if user_account != "" and user_account is not None:
+                        if user_password != "" and user_password is not None:
+                            if uid != "" and uid is not None:
+                                if user_account in config.keys():
+                                    if user_password != config[user_account]['password']:
+                                        if len(user_password) >= 8:
+                                            if config[user_account]['uid'] == uid:
+                                                config[user_account]['password'] = user_password
+                                                with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
+                                                    json.dump(config, file, indent=2)
+                                                logger.info(f"【密码更改】 账户：{user_account} 密码更改成功！new_password:{user_password}")
+                                                st.toast('**密码已成功更改！**', icon=':material/check_circle:')
+                                            else:
+                                                st.toast('**错误的UID，UID是您注册时和登陆时显示的令牌！**', icon=':material/error:')
+                                        else:
+                                            st.toast('**密码长度不足，请填写8位及以上的密码！**', icon=':material/error:')
+                                    else:
+                                        st.toast('**修改失败，新密码不能与旧密码相同！**', icon=':material/error:')
+                                else:
+                                    st.toast('**账户不存在，请检查您填写的账户名称是否正确！**', icon=':material/error:')
+                            else:
+                                st.toast('**UID不能为空，请填写您的UID！**', icon=':material/error:')
+                        else:
+                            st.toast('**密码不能为空，请填写您的密码！**', icon=':material/error:')
+                    else:
+                        st.toast('**账户不能为空，请填写您的账户！**', icon=':material/error:')
+
+                if st.button("**使用密码变更**", use_container_width=True, type=button_type):
+                    st.session_state.change = "password"
+                    st.switch_page("pages/refresh.py")
+
+            st.page_link("home.py", label="**:blue[返回首页]**")
+            st.write("")
     else:
         if not web_setting["web"]["user_refresh"]:
-            col1, col2, col3 = st.columns([0.35, 0.3, 0.35])
-            with col2:
-                st.image("LOGO.png", width=200, use_column_width=True)
-            sac.alert("**诶呀！出错啦！**",description="**管理员暂未开放相关功能！**", color="error", variant="filled", size="lg", radius="lg", icon=True, closable=True)
-
+            with st.container(border=True):
+                st.markdown(
+                    f"""
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <img src="data:image/png;base64,{encoded_image}" alt="LOGO" style="width: 100px;">
+                        <p style="text-align: center; color: gray; font-size: 12px; margin-top: -20px;">{version}</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+                st.write("")
+                st.write("")
+                sac.alert("**抱歉！出错啦！**",description="**管理员暂未开放相关功能！**", color="error", variant="filled", size="lg", radius="sm", icon=True)
+                st.write("")
+                st.write("")
+                if st.button("**返回首页**", use_container_width=True, key="rf_home3", type=button_type):
+                    st.switch_page("home.py")
+                st.write("")
+                st.write("")
         else:
-            st.write("### 账户续费")
-            st.write("")
-            st.write("")
+            with st.container(border=True):
+                st.write("### 账户续费")
+                st.write("")
+                st.write("")
 
-            user_account = st.text_input("**账户**", placeholder="您的账户")
-            user_password = st.text_input("**密码**", type="password", placeholder="您的密码")
-            refresh = st.text_input("**刷新令牌**", placeholder="您的刷新令牌，输入后请Enter确认！")
-            login_result, token_result, group_result = login(user_account, user_password)
+                user_account = st.text_input("**账户**", placeholder="您的账户")
+                user_password = st.text_input("**密码**", type="password", placeholder="您的密码")
+                refresh = st.text_input("**刷新令牌**", placeholder="您的刷新令牌，输入后请Enter确认！")
+                login_result, token_result, group_result = login(user_account, user_password)
 
-            st.divider()
-            st.write("")
-            if st.button("**执行刷新**", use_container_width=True, type=button_type):
-                if user_account != "" and user_password != "":
-                    if login_result == 2:
-                        if refresh in refresh_data.keys():
-                            if not refresh_data[refresh]['used']:
-                                if refresh_data[refresh]['group'] == group_result:
-                                    refresh_token = accounts[group_result]['refresh_token']
-                                    status, access_token = get_accesstoken(refresh_token)
+                st.divider()
+                st.write("")
+                if st.button("**执行刷新**", use_container_width=True, type=button_type):
+                    if user_account != "" and user_password != "":
+                        if login_result == 2:
+                            if refresh in refresh_data.keys():
+                                if not refresh_data[refresh]['used']:
+                                    if refresh_data[refresh]['group'] == group_result:
+                                        refresh_token = accounts[group_result]['refresh_token']
+                                        status, access_token = get_accesstoken(refresh_token)
 
-                                    if status:
-                                        accounts[group_result]['access_token'] = access_token
-                                        with open(current_path + '/accounts.json', 'w', encoding='utf-8') as file:
-                                            json.dump(accounts, file, indent=2)
-
-                                        status, name, token_key = get_sharetoken(user_account, access_token, refresh_data[refresh]['site_limit'], refresh_data[refresh]["expires_in"], refresh_data[refresh]['gpt35_limit'], refresh_data[refresh]['gpt4_limit'], refresh_data[refresh]['show_conversations'])
                                         if status:
-                                            config[user_account]['token'] = token_key
-                                            config[user_account]['site_limit'] = refresh_data[refresh]['site_limit']
-                                            config[user_account]['expires_in'] = refresh_data[refresh]['expires_in']
-                                            config[user_account]['gpt35_limit'] = refresh_data[refresh]['gpt35_limit']
-                                            config[user_account]['gpt4_limit'] = refresh_data[refresh]['gpt4_limit']
-                                            config[user_account]['show_conversations'] = refresh_data[refresh]['show_conversations']
+                                            accounts[group_result]['access_token'] = access_token
+                                            with open(current_path + '/accounts.json', 'w', encoding='utf-8') as file:
+                                                json.dump(accounts, file, indent=2)
 
-                                            with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
-                                                json.dump(config, file, indent=2)
+                                            status, name, token_key = get_sharetoken(user_account, access_token, refresh_data[refresh]['site_limit'], refresh_data[refresh]["expires_in"], refresh_data[refresh]['gpt35_limit'], refresh_data[refresh]['gpt4_limit'], refresh_data[refresh]['show_conversations'])
+                                            if status:
+                                                config[user_account]['token'] = token_key
+                                                config[user_account]['site_limit'] = refresh_data[refresh]['site_limit']
+                                                config[user_account]['expires_in'] = refresh_data[refresh]['expires_in']
+                                                config[user_account]['gpt35_limit'] = refresh_data[refresh]['gpt35_limit']
+                                                config[user_account]['gpt4_limit'] = refresh_data[refresh]['gpt4_limit']
+                                                config[user_account]['show_conversations'] = refresh_data[refresh]['show_conversations']
 
-                                            refresh_data[refresh]['used'] = True
-                                            with open(current_path + '/refresh.json', 'w', encoding='utf-8') as file:
-                                                json.dump(refresh_data, file, indent=2)
+                                                with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
+                                                    json.dump(config, file, indent=2)
 
-                                            logger.info(f"【账户续费】 账户：{user_account} 续费成功！续费:{refresh_data[refresh]['expires_in']}秒！")
-                                            st.toast('续费成功！', icon=':material/check_circle:')
+                                                refresh_data[refresh]['used'] = True
+                                                with open(current_path + '/refresh.json', 'w', encoding='utf-8') as file:
+                                                    json.dump(refresh_data, file, indent=2)
+
+                                                logger.info(f"【账户续费】 账户：{user_account} 续费成功！续费:{refresh_data[refresh]['expires_in']}秒！")
+                                                st.toast('续费成功！', icon=':material/check_circle:')
+                                            else:
+                                                logger.error(f"【账户续费】 账户：{user_account} 续费失败！请检查AC_Token是否有效！")
+                                                st.toast('续费失败！请联系管理员更新相关Token！', icon=':material/error:')
                                         else:
-                                            logger.error(f"【账户续费】 账户：{user_account} 续费失败！请检查AC_Token是否有效！")
+                                            logger.error(f"【账户续费】 账户：{user_account} 续费失败！请检查RF_Token是否有效！")
                                             st.toast('续费失败！请联系管理员更新相关Token！', icon=':material/error:')
                                     else:
-                                        logger.error(f"【账户续费】 账户：{user_account} 续费失败！请检查RF_Token是否有效！")
-                                        st.toast('续费失败！请联系管理员更新相关Token！', icon=':material/error:')
+                                        st.toast('**验证失败，此刷新令牌与账户用户组不匹配！**', icon=':material/error:')
                                 else:
-                                    st.toast('**验证失败，此刷新令牌与账户用户组不匹配！**', icon=':material/error:')
+                                    st.toast('**验证失败，此刷新令牌已被使用！**', icon=':material/error:')
                             else:
-                                st.toast('**验证失败，此刷新令牌已被使用！**', icon=':material/error:')
+                                st.toast('**验证失败，此刷新令牌不存在！**', icon=':material/error:')
                         else:
-                            st.toast('**验证失败，此刷新令牌不存在！**', icon=':material/error:')
+                            st.toast('**验证失败，账户密码错误！**', icon=':material/error:')
                     else:
-                        st.toast('**验证失败，账户密码错误！**', icon=':material/error:')
-                else:
-                    st.toast('**验证失败，账户密码不能为空！**', icon=':material/error:')
+                        st.toast('**验证失败，账户密码不能为空！**', icon=':material/error:')
 
-            if web_setting["web"]["refresh_link_enable"]:
-                st.link_button("**获取令牌**", web_setting["web"]["refresh_link"], use_container_width=True, type=button_type)
-    if st.button("**返回首页**", use_container_width=True, key="rf_home", type=button_type):
-        st.switch_page("home.py")
+                if web_setting["web"]["refresh_link_enable"]:
+                    st.link_button("**获取令牌**", web_setting["web"]["refresh_link"], use_container_width=True, type=button_type)
+
+                st.page_link("home.py", label="**:blue[返回首页]**")
+                st.write("")
+
 
 st.logo("LOGO.png", link="https://github.com/Chenyme/oaifree-tools")
 st.markdown(footer, unsafe_allow_html=True)  # 底部信息,魔改请勿删除

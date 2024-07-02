@@ -1,6 +1,7 @@
 import os
 import json
 import toml
+import base64
 import logging
 import streamlit as st
 import streamlit_antd_components as sac
@@ -26,6 +27,10 @@ with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
     share_data = json.load(file)
 with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:
     domain_data = json.load(file)
+with open("LOGO.png", "rb") as image_file:
+    encoded_image = base64.b64encode(image_file.read()).decode()
+
+version = "v1.1.5"
 
 st.set_page_config(layout="wide", page_title=web_setting["web"]["title"], page_icon="LOGO.png")
 
@@ -288,6 +293,7 @@ def check_login_status(token_result, user_name, group_result):
             token_result = token_result
             logger.info(f"【用户登录】 用户：{user_name} 登录成功！")
         else:
+            st.session_state.role = None
             if web_setting["web"]["refresh_all"]:
                 if str(config[user_name]["expires_in"]) == "0":
                     status.update(label="**SA状态已失效！尝试刷新中...**", state="running", expanded=True)
@@ -365,15 +371,15 @@ def choose(user_name, login_result, token_result, group_result):
             if error_status == "RF过期":
                 status.update(label="**啊哦！出错了！**", state="error", expanded=True)
                 st.write("")
-                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="filled", size="md", radius="md", icon=True)
             elif error_status == "过期":
                 status.update(label="**啊哦！出错了！**", state="error", expanded=True)
                 st.write("")
-                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="filled", size="md", radius="md", icon=True)
             elif error_status == "SA已过期":
                 status.update(label="**啊哦！出错了！**", state="error", expanded=True)
                 st.write("")
-                sac.alert(label="**SA已过期，请联系管理员续费！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label="**SA已过期，请联系管理员续费！**", color="error", variant="filled", size="md", radius="md", icon=True)
             else:
                 status.update(label="**即将验证完毕...感谢您的等待！**", state="running", expanded=False)
                 domain = web_setting["web"]["domain"]
@@ -395,11 +401,11 @@ def choose(user_name, login_result, token_result, group_result):
             if error_status == "RF过期":
                 status.update(label="**啊哦！出错了！**", state="error", expanded=True)
                 st.write("")
-                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label="**验证失败，请联系管理员！**", color="error", variant="filled", size="md", radius="md", icon=True)
             elif error_status == "过期":
                 status.update(label="**啊哦！出错了！**", state="error", expanded=True)
                 st.write("")
-                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="filled", size="md", radius="md", icon=True, closable=True)
+                sac.alert(label="**账户已过期，请联系管理员续费！**", color="error", variant="filled", size="md", radius="md", icon=True)
             else:
                 status.update(label="**即将验证完毕...感谢您的等待！**", state="running", expanded=False)
                 st.write("")
@@ -425,26 +431,33 @@ def read():
     st.write("请妥善保管您的 UID，不要随意泄露给他人。")
 
 
-col4, col5, col6 = st.columns([0.35, 0.3, 0.35])
+col4, col5, col6 = st.columns([0.32, 0.36, 0.32])
 with col5:
     with st.container(border=True):
-        col1, col2, col3 = st.columns([0.35, 0.3, 0.35])
-        with col2:
-            st.image("LOGO.png", use_column_width=True)
+        st.markdown(
+            f"""
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <img src="data:image/png;base64,{encoded_image}" alt="LOGO" style="width: 100px;">
+                <p style="text-align: center; color: gray; font-size: 12px; margin-top: -20px;">{version}</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         st.write("**UID**")
+        st.write("")
         uid = st.text_input("请输入UID", key="uid", placeholder="你的UID/Enter your UID", type="password", label_visibility="collapsed")
         if st.button("**验证UID**", use_container_width=True, type=button_type):
-            with st.spinner("正在验证..."):
-                if uid:
-                    user_name, token, group = find_user_details_by_uid(uid)
-                    if user_name is not None:
-                        st.session_state.success = "success"
-                    else:
-                        sac.alert(label="**未查询到相关UID！**", color="error", variant="filled", size="sm", radius="md", icon=True, closable=True)
+            if uid:
+                user_name, token, group = find_user_details_by_uid(uid)
+                if user_name is not None:
+                    st.session_state.role = "role"
                 else:
-                    sac.alert(label="**UID不能为空！**", color="error", variant="filled", size="sm", radius="md", icon=True, closable=True)
-
+                    sac.alert(label="**未查询到相关UID！**", color="error", variant="filled", size="sm", radius="sm", icon=True)
+            else:
+                sac.alert(label="**UID不能为空！**", color="error", variant="filled", size="sm", radius="sm", icon=True)
+        st.write("")
         sac.divider("**OR**", align="center")
+        st.write("")
         if st.button("**我没有UID?**", use_container_width=True, type=button_type):
             read()
         if st.button("**返回首页**", use_container_width=True, type=button_type):
@@ -452,10 +465,8 @@ with col5:
         st.write("")
 
 try:
-    if st.session_state.success == "success":
+    if st.session_state.role == "role":
         choose(user_name, None, token, group)
-        del st.session_state["login"]
-        st.session_state.success = "error"
 except:
     pass
 
