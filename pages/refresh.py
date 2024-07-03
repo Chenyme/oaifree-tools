@@ -296,8 +296,7 @@ with col2:
                                                 config[user_account]['password'] = user_password_new
                                                 with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
                                                     json.dump(config, file, indent=2)
-                                                logger.info(
-                                                    f"【密码更改】 账户：{user_account} 密码更改成功！new_password:{user_password}")
+                                                logger.info(f"【密码更改】 账户：{user_account} 密码更改成功！新密码为:{user_password}")
                                                 st.toast('**密码已成功更改！**', icon=':material/check_circle:')
                                             else:
                                                 st.toast('**密码长度不足，请填写8位及以上的密码！**', icon=':material/error:')
@@ -336,7 +335,7 @@ with col2:
                                                 config[user_account]['password'] = user_password
                                                 with open(current_path + '/config.json', 'w', encoding='utf-8') as file:
                                                     json.dump(config, file, indent=2)
-                                                logger.info(f"【密码更改】 账户：{user_account} 密码更改成功！new_password:{user_password}")
+                                                logger.info(f"【密码更改】 账户：{user_account} 密码更改成功！新密码为:{user_password}")
                                                 st.toast('**密码已成功更改！**', icon=':material/check_circle:')
                                             else:
                                                 st.toast('**错误的UID，UID是您注册时和登陆时显示的令牌！**', icon=':material/error:')

@@ -704,7 +704,7 @@ if st.session_state.role == "admin":
             col2.metric("号池总数", len(accounts.keys()), len(accounts.keys())-1)
             col3.metric("服务累计", st.session_state.count_people, st.session_state.count_people)
             col4.metric("日志信息", size1, size_bytes1-36)
-            col5.metric("配置信息", size2, size_bytes2-4936)
+            col5.metric("配置信息", size2, size_bytes2-4937)
 
             col1, col2, col3 = st.columns([0.2, 0.2, 0.6])
             with col1:
@@ -721,7 +721,7 @@ if st.session_state.role == "admin":
                 logs = file.read()
 
             pattern_user = re.compile(r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【用户登录】 用户：(\w+) 登录成功！')
-            pattern_share = re.compile(r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【Share登录】 共享账户：(\w+) 被登录！')
+            pattern_share = re.compile(r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【Share登录】 共享账户：(\w+) 登录成功！')
             pattern_sign = re.compile(r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【用户注册】 新用户：(\w+) 注册成功！')
 
             matches_user = pattern_user.findall(logs)
@@ -1513,13 +1513,12 @@ else:
             if st.button("**验证身份**", use_container_width=True, type=button_type):
                 if admin == web_setting["web"]["super_user"] and key == web_setting["web"]["super_key"]:
                     st.session_state.role = "admin"
-                    logger.info(f"【管理登录】 管理员：{admin} 登录成功！")
                     st.write("")
                     st.switch_page("pages/admin.py")
                 else:
                     st.toast("**身份验证失败，如果您不是管理员请前往首页进行登录！**", icon=":material/error:")
             st.write("")
-            st.page_link("home.py", label="**:blue[返回首页]**")
+            st.page_link("home.py", label="**:blue[返回首页登录]**")
             st.write("")
 
 st.markdown(footer, unsafe_allow_html=True)  # 底部信息,魔改请勿删除

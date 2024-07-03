@@ -243,7 +243,7 @@ def check_login_status(token_result, user_name, group_result):
         if check_sharetoken(token_result):
             st.session_state.role = None
             token_result = token_result
-            logger.info(f"【用户登录】 用户：{user_name} 登录成功！")
+            logger.info(f"【Share登录】 共享账户：{user_name} 登录成功！")
         else:
             if web_setting["web"]["refresh_all"]:
                 if str(config[user_name]["expires_in"]) == "0":
@@ -266,7 +266,7 @@ def check_login_status(token_result, user_name, group_result):
                         with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
                             json_file.write(config_json)
                         logging.info(f"<用户> 【SA刷新】 用户 {user_name} 的SA_Token刷新成功！")
-
+                        logger.info(f"【Share登录】 共享账户：{user_name} 登录成功！")
                     else:
                         logging.info(f"<用户> 【AC刷新】 用户 {user_name} 的AC_Token已经失效！尝试刷新中...")
                         status.update(label="**AC状态已失效！尝试刷新中...**", state="running", expanded=False)
@@ -274,6 +274,7 @@ def check_login_status(token_result, user_name, group_result):
 
                         # 判断RF_Token是否有效
                         if ac_status:
+                            logger.info(f"【Share登录】 共享账户：{user_name} 登录成功！")
                             status.update(label="**即将完成！请耐心等待...**", state="running", expanded=False)
                             sa_status, name, token_result = get_sharetoken(
                                 user_name,
@@ -296,8 +297,7 @@ def check_login_status(token_result, user_name, group_result):
                             logging.info(f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新成功！")
                         else:
                             error_status = "RF过期"
-                            logging.error(
-                                f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新失败！请检查RF_Token是否正确！")
+                            logging.error(f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新失败！请检查RF_Token是否正确！")
                 else:
                     error_status = "过期"
                     logging.error(f"<用户> 【SA验证】 用户 {user_name} 的SA_Token已经过期！")
@@ -306,7 +306,6 @@ def check_login_status(token_result, user_name, group_result):
                 logging.error(f"<用户> 【SA验证】 用户 {user_name} 的SA_Token已经过期！")
         status.update(label="**环境验证成功！**", state="complete", expanded=False)
     return error_status, token_result
-
 
 
 @st.experimental_dialog("状态验证")  # 选择模块

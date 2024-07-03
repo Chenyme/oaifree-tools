@@ -274,6 +274,7 @@ def check_login_status(token_result, user_name, group_result):
                         with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
                             json_file.write(config_json)
                         logging.info(f"<用户> 【SA刷新】 用户 {user_name} 的SA_Token刷新成功！")
+                        logger.info(f"【用户登录】 用户：{user_name} 登录成功！")
 
                     else:
                         logging.info(f"<用户> 【AC刷新】 {user_name} 的AC_Token已经失效！尝试刷新中...")
@@ -302,6 +303,7 @@ def check_login_status(token_result, user_name, group_result):
                             with open(current_path + 'accounts.json', 'w', encoding='utf-8') as json_file:
                                 json_file.write(accounts_json)
                             logging.info(f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新成功！")
+                            logger.info(f"【用户登录】 用户：{user_name} 登录成功！")
                         else:
                             error_status = "RF过期"
                             logging.error(f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新失败！请检查RF_Token是否正确！")
@@ -381,9 +383,6 @@ def select():
                 sac.alert(label="**注册失败，请联系管理员！**", color="error", variant="filled", size="sm", radius="md", icon=True)
         else:
             sac.alert(label="**邀请令牌已被使用！**", color="error", variant="filled", size="sm", radius="md", icon=True)
-
-
-
 
 
 @st.experimental_dialog("身份验证")
@@ -522,7 +521,6 @@ if web_setting["web"]["login_Theme"] == "classic" or st.session_state.theme == "
                 st.toast('**账户密码验证成功!**', icon=':material/check_circle:')
             elif login_result == 3:
                 st.session_state.role = "admin"
-                logger.info(f"【管理登录】 管理员：{account} 登录成功！")
                 st.switch_page("pages/admin.py")
         if st.button("**注册**", use_container_width=True, type=button_type):
             select()

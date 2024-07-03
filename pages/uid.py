@@ -315,7 +315,7 @@ def check_login_status(token_result, user_name, group_result):
                         with open(current_path + 'config.json', 'w', encoding='utf-8') as json_file:
                             json_file.write(config_json)
                         logging.info(f"<用户> 【SA刷新】 用户 {user_name} 的SA_Token刷新成功！")
-
+                        logger.info(f"【用户登录】 用户：{user_name} 登录成功！")
                     else:
                         logging.info(f"<用户> 【AC刷新】 用户 {user_name} 的AC_Token已经失效！尝试刷新中...")
                         status.update(label="**AC状态已失效！尝试刷新中...**", state="running", expanded=False)
@@ -343,6 +343,7 @@ def check_login_status(token_result, user_name, group_result):
                             with open(current_path + 'accounts.json', 'w', encoding='utf-8') as json_file:
                                 json_file.write(accounts_json)
                             logging.info(f"<用户> 【AC刷新】 用户组 {group_result} 的AC_Token刷新成功！")
+                            logger.info(f"【用户登录】 用户：{user_name} 登录成功！")
                         else:
                             error_status = "RF过期"
                             logging.error(
