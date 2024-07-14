@@ -470,7 +470,7 @@ elif st.session_state.theme == "Classic Black":
                     st.write("")
                     if st.button("**继续**", use_container_width=True):
                         try:
-                            sure = openai_data[st.session_state.login]["password"]
+                            sure = users[st.session_state.login]["password"]
                         except:
                             sure = "Not Set"
                         if admin_password == web_setting["web"]["super_key"]:
@@ -551,7 +551,7 @@ elif st.session_state.theme == "Retro Orange":
                 st.write("")
                 if st.button("Continues / 继续", use_container_width=True):
                     try:
-                        sure = openai_data[st.session_state.login]["password"]
+                        sure = users[st.session_state.login]["password"]
                     except:
                         sure = "Not Set"
                     if admin_password == web_setting["web"]["super_key"]:
@@ -560,7 +560,7 @@ elif st.session_state.theme == "Retro Orange":
                         st.switch_page("pages/admin.py")
                     elif sure == "Not Set":
                         st.toast('**Password error!**\n\n**密码错误！**', icon=':material/error:')
-                    elif admin_password == openai_data[st.session_state.login]["password"]:
+                    elif admin_password == users[st.session_state.login]["password"]:
                         st.session_state.role = "role"
                         login = st.session_state.login
                         token = openai_data[login]["token"]
