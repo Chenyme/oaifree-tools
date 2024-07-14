@@ -115,25 +115,18 @@ if st.session_state.role == "admin":
         st.write("")
         if st.button("**保存更改**", use_container_width=True, type=button_type):
             if new_super_user == "" or new_super_user is None:
-                sac.alert(label="**昵称不允许为空，请重新输入！**", color="error", variant='filled', size="sm",
-                          radius="sm", icon=True, closable=True)
+                st.error("**昵称不可为空，请重新输入！**", icon=":material/error:")
             elif len(new_super_key) < 8:
-                sac.alert(label="**密钥不允许少于8位，请重新输入！**", color="error", variant='filled', size="sm",
-                          radius="sm", icon=True, closable=True)
+                st.error("**密钥长度不得小于 8 位，请重新输入！**", icon=":material/error:")
             elif new_super_key == "12345678":
-                sac.alert(label="**密钥不允许为默认密钥，请重新输入！**", color="error", variant='filled', size="sm",
-                          radius="sm", icon=True, closable=True)
+                st.error("**请勿使用默认密钥，重新输入！**", icon=":material/error:")
             else:
                 web_setting["web"]["super_user"] = new_super_user
                 web_setting["web"]["super_key"] = new_super_key
-                sac.alert(label="**更改成功！**", color="success", variant='filled', size="sm", radius="sm", icon=True,
-                          closable=True)
-                sac.alert(label="**即将自动刷新页面！**", color="success", variant='filled', size="sm", radius="sm",
-                          icon=True, closable=True)
                 logger.info(f"<管理员> 【密钥修改】 修改了新的密钥！")
                 with open(current_path + "/setting.toml", "w", encoding="utf-8") as file:
                     toml.dump(web_setting, file)
-                time.sleep(1)
+                st.session_state.success = True
                 st.rerun()
         st.write("")
 
@@ -311,6 +304,7 @@ if st.session_state.role == "admin":
                 }
                 with open(current_path + "domain.json", "w", encoding="utf-8") as file:
                     json.dump(domain_data, file, indent=2)
+                logger.info(f"【管理员】 新增了服务域名 {new_domain_name}！")
                 st.session_state.add = True
                 st.rerun()
         st.write("")
@@ -341,9 +335,7 @@ if st.session_state.role == "admin":
             elif new_group == "":
                 st.error("**用户组不可为空，请重新填写！**", icon=":material/error:")
             elif new_access_token == "":
-                st.error("**SS_Token / AC_Token不可为空，请重新填写！**", icon=":material/error:")
-            elif new_refresh_token == "":
-                st.error("**RF_Token不可为空，请重新填写！**", icon=":material/error:")
+                st.error("**SE_Token / AC_Token不可为空，请重新填写！**", icon=":material/error:")
             else:
                 accounts[new_group] = {
                     "service_provider": new_service_provider,
@@ -354,6 +346,7 @@ if st.session_state.role == "admin":
                 }
                 with open(current_path + "accounts.json", "w", encoding="utf-8") as file:
                     json.dump(accounts, file, indent=2)
+                logger.info(f"【管理员】 新增了 {new_service_provider} 的账户 {new_group}！")
                 st.session_state.add = True
                 st.rerun()
 
@@ -394,7 +387,8 @@ if st.session_state.role == "admin":
                 st.error("**此邀请令牌已存在，请重新填写！**", icon=":material/error:")
             elif auto_it_gen:
                 for i in range(num_it_gen):
-                    invite_config["it-" + secrets.token_urlsafe(len_it_gen)] = {
+                    it_token = "it-" + secrets.token_urlsafe(len_it_gen)
+                    invite_config[it_token] = {
                         "openai-group": it_openai_group,
                         "chatgpt": it_openai,
                         "anthropic-group": it_anthropic_group,
@@ -410,8 +404,10 @@ if st.session_state.role == "admin":
                         "expires_in_claude": "",
                         "show_conversations_claude": ""
                     }
+                    logger.info(f"【管理员】 生成了新的邀请令牌 {it_token}！")
                 with open(current_path + "invite.json", "w", encoding="utf-8") as f:
                     json.dump(invite_config, f, indent=2)
+
                 st.session_state.add = True
                 st.rerun()
             else:
@@ -433,6 +429,7 @@ if st.session_state.role == "admin":
                 }
                 with open(current_path + "invite.json", "w", encoding="utf-8") as f:
                     json.dump(invite_config, f, indent=2)
+                logger.info(f"【管理员】 生成了新的邀请令牌 {it_token}！")
                 st.session_state.add = True
                 st.rerun()
 
@@ -456,7 +453,6 @@ if st.session_state.role == "admin":
             st.session_state.er_list = []
         if st.button("**状态检测**", use_container_width=True, key="check_user_account", type=button_type):
             if len(status_list) != 0:
-
                 for user in status_list:
                     status = check_sharetoken(openai_data[user]["token"])
                     if status:
@@ -464,6 +460,7 @@ if st.session_state.role == "admin":
                     else:
                         er_list.append(user)
                 if len(er_list) == 0:
+                    logger.info(f"【管理员】 检测到所有账户状态正常！")
                     st.success("**所有账户状态正常！**", icon=":material/check_circle:")
                 else:
                     st.info("滚动查看完整表格", icon=":material/double_arrow:")
@@ -491,8 +488,10 @@ if st.session_state.role == "admin":
                         openai_data[user]["token"] = token_key
                         with open(current_path + '/openai.json', 'w', encoding='utf-8') as file:
                             json.dump(openai_data, file, indent=2)
+                        logger.info(f"【管理员】 {name} 的 SA 刷新成功！")
                         st.success(f"**{user} 刷新成功！**", icon=":material/check_circle:")
                     else:
+                        logger.error(f"【管理员】 {name} 的 SA 刷新失败，请检查 AC 是否失效！")
                         st.error(f"**{user} 刷新失败！**", icon=":material/error:")
             else:
                 st.error("**请先刷新，然后选择需要刷新的用户组！**", icon=":material/error:")
@@ -526,7 +525,8 @@ if st.session_state.role == "admin":
                 st.error("**此刷新令牌已存在，请重新填写！**", icon=":material/error:")
             elif auto_rf_gen:
                 for i in range(num_rf_gen):
-                    refresh_data["rf-" + secrets.token_urlsafe(len_rf_gen)] = {
+                    rf_token = "rf-" + secrets.token_urlsafe(len_rf_gen)
+                    refresh_data[rf_token] = {
                         "group": rf_group,
                         "site_limit": site_limit,
                         "expires_in": expires_in,
@@ -536,6 +536,7 @@ if st.session_state.role == "admin":
                         "note": note,
                         "used": False
                     }
+                    logger.info(f"【管理员】 生成了新的刷新令牌：{rf_token}！")
                 with open(current_path + "refresh.json", "w", encoding="utf-8") as f:
                     json.dump(refresh_data, f, indent=2)
                 st.session_state.add = True
@@ -915,7 +916,7 @@ if st.session_state.role == "admin":
                     openai_domain.append(domain)
 
             choose_domain = st.selectbox("**允许用户自由选择服务域名**", ["允许", "不允许"], index=["允许", "不允许"].index(web_setting["domain"]["choose_domain"]))
-            user_domain = True
+
             if choose_domain == "不允许":
                 col1, col2 = st.columns(2)
                 with col1:
@@ -953,6 +954,7 @@ if st.session_state.role == "admin":
 
             st.write("")
             col1, col2 = st.columns([0.2, 0.8])
+
             with col1:
                 if st.button("**保存更改**", use_container_width=True, key="save_domain_setting2", type=button_type):
                     web_setting["domain"]["choose_domain"] = choose_domain
@@ -961,18 +963,22 @@ if st.session_state.role == "admin":
                     if choose_domain == "不允许":
                         web_setting["domain"]["domain_default_openai"] = domain_default_openai
                         web_setting["domain"]["domain_default_anthropic"] = domain_default_anthropic
-
-                    if not user_domain:
+                        with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
+                            toml.dump(web_setting, f)
+                        st.session_state.success = True
+                        st.rerun()
+                    else:
                         if len(user_domain) == 0:
                             st.toast("**允许用户使用的域名不能为空！**", icon=':material/error:')
                             st.stop()
                         else:
                             web_setting["domain"]["domain_select"] = user_domain
-                    with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
-                        toml.dump(web_setting, f)
-                    st.session_state.success = True
-                    st.rerun()
-            st.write("")
+                        with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
+                            toml.dump(web_setting, f)
+                        logger.info(f"【管理员】 修改了服务域名设置！")
+                        st.session_state.success = True
+                        st.rerun()
+                st.write("")
     if set_choose == '主题样式':
         if not web_setting["web"]["readme"]:
             readme()
@@ -1018,7 +1024,7 @@ if st.session_state.role == "admin":
                         web_setting["web"]["subtitle"] = subtitle
                         with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
                             toml.dump(web_setting, f)
-                        logger.info(f"<管理员> 【基本设置】 更新了网站基本设置！")
+                        logger.info(f"【管理员】 修改了网站设置！")
                         st.session_state.success = True
                         st.rerun()
 
@@ -1179,11 +1185,13 @@ if st.session_state.role == "admin":
                     status, new_access_token = get_accesstoken(accounts[group]['refresh_token'])
                     if status:
                         st.toast(f"**刷新 {group} 成功！**", icon=':material/check_circle:')
+                        logger.info(f"【管理员】 成功刷新了 {group} 的 AC_Token！")
                         accounts[group]['access_token'] = new_access_token
                         with open(current_path + "accounts.json", "w", encoding="utf-8") as f:
                             json.dump(accounts, f, indent=2)
                     else:
                         with col6:
+                            logger.info(f"【管理员】 刷新 {group} 失败！请检查对应的 RF_Token 是否失效！")
                             st.toast(f"**刷新 {group} 失败！**", icon=':material/error:')
     if set_choose == '邀请令牌':
         with st.container(border=True):
@@ -1218,13 +1226,14 @@ if st.session_state.role == "admin":
                                 invite_config.pop(i)
                         with open(current_path + "invite.json", "w", encoding="utf-8") as f:
                             json.dump(invite_config, f, indent=2)
+                        logger.info(f"【管理员】 删除了已使用的邀请令牌！")
                         st.session_state.delete = True
                         st.rerun()
-                    if st.button("**删除所有**", use_container_width=True, key="delete_all_invite",
-                                 type=button_type):
+                    if st.button("**删除所有**", use_container_width=True, key="delete_all_invite", type=button_type):
                         invite_config.clear()
                         with open(current_path + "invite.json", "w", encoding="utf-8") as f:
                             json.dump(invite_config, f, indent=2)
+                        logger.info(f"【管理员】 删除了所有邀请令牌！")
                         st.session_state.delete = True
                         st.rerun()
 
@@ -1279,6 +1288,7 @@ if st.session_state.role == "admin":
                     web_setting["web"]["invite_link"] = invite_link
                     with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
                         toml.dump(web_setting, f)
+                    logger.info(f"【管理员】 修改了邀请令牌自助服务！")
                     st.toast("**更改成功!**", icon=':material/check_circle:')
             st.write("")
     if set_choose == '刷新令牌':
@@ -1565,6 +1575,7 @@ if st.session_state.role == "admin":
                         with open(current_path + 'users.json', 'w', encoding='utf-8') as json_file:
                             json_file.write(user_data)
                         del st.session_state.signup1
+                        logger.info(f"【管理员】 注册了新用户 {user_new_acc}，OpenAI组别：{user_new_group_openai}，Anthropic组别：{user_new_group_anthropic}")
                         st.session_state.add = True
                         st.rerun()
             st.write("")
@@ -1723,6 +1734,7 @@ if st.session_state.role == "admin":
             col6, col7 = st.columns([0.99999, 0.00001])
             with col1:
                 if st.button("**保存更改**", use_container_width=True, type=button_type, key="save_share_setting"):
+                    logger.info(f"【管理员】 更改了共享服务设置！")
                     web_setting["web"]["share"] = share
                     if share:
                         web_setting["web"]["share_notice"] = share_notice
@@ -1732,22 +1744,23 @@ if st.session_state.role == "admin":
                                 json.dump(share_data, share_file, indent=2)
                             st.toast("保存成功！", icon=":material/check_circle:")
                         else:
+
                             share_data = {
                                 i: {
                                     "openai": {
-                                        "token": openai_data[i]["token"],
-                                        "group": openai_data[i]["group"],
-                                        "type": openai_data[i]["type"],
-                                        "site_limit": openai_data[i]["site_limit"],
-                                        "expires_in": openai_data[i]["expires_in"],
-                                        "gpt35_limit": openai_data[i]["gpt35_limit"],
-                                        "gpt4_limit": openai_data[i]["gpt4_limit"],
-                                        "show_conversations": openai_data[i]["show_conversations"]
+                                        "token": openai_data[i]["token"] if user_data[i]["allow_chatgpt"] else None,
+                                        "group": openai_data[i]["group"] if user_data[i]["allow_chatgpt"] else None,
+                                        "type": openai_data[i]["type"] if user_data[i]["allow_chatgpt"] else None,
+                                        "site_limit": openai_data[i]["site_limit"] if user_data[i]["allow_chatgpt"] else None,
+                                        "expires_in": openai_data[i]["expires_in"] if user_data[i]["allow_chatgpt"] else None,
+                                        "gpt35_limit": openai_data[i]["gpt35_limit"] if user_data[i]["allow_chatgpt"] else None,
+                                        "gpt4_limit": openai_data[i]["gpt4_limit"] if user_data[i]["allow_chatgpt"] else None,
+                                        "show_conversations": openai_data[i]["show_conversations"] if user_data[i]["allow_chatgpt"] else None
                                     },
                                     "anthropic": {
-                                        "token": anthropic_data[i]["token"],
-                                        "group": anthropic_data[i]["group"],
-                                        "type": anthropic_data[i]["type"]
+                                        "token": anthropic_data[i]["token"] if user_data[i]["allow_claude"] else None,
+                                        "group": anthropic_data[i]["group"] if user_data[i]["allow_claude"] else None,
+                                        "type": anthropic_data[i]["type"] if user_data[i]["allow_claude"] else None
                                     }
                                 }
                                 for i in share_account

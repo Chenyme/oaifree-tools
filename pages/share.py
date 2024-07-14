@@ -52,6 +52,7 @@ def check_openai(token_result, user_name, group_result):
             st.session_state.role = None
             if web_setting["web"]["refresh_all"]:
                 if str(openai_data[user_name]["expires_in"]) == "0":
+                    logger.info(f"【Share登录】 共享账户：{user_name} 的 SA 已经失效！")
                     status.update(label="**SA状态已失效！尝试刷新中...**", state="running", expanded=True)
                     sa_status, name, token_result = get_sharetoken(
                         user_name,
@@ -63,14 +64,17 @@ def check_openai(token_result, user_name, group_result):
                         openai_data[user_name]["show_conversations"])
 
                     if sa_status:
+                        logger.info(f"【Share登录】 共享账户：{user_name} 的 SA 刷新成功！")
                         openai_data[user_name]["token"] = token_result
                         config_json = json.dumps(openai_data, indent=2)
                         with open(current_path + 'openai.json', 'w', encoding='utf-8') as json_file:
                             json_file.write(config_json)
                     else:
+                        logger.info(f"【Share登录】 共享账户：{user_name} 的 AC 已经失效！")
                         status.update(label="**AC状态已失效！尝试刷新中...**", state="running", expanded=False)
                         ac_status, user_ac_token = get_accesstoken(accounts[group_result]["refresh_token"])
                         if ac_status:
+                            logger.info(f"【Share登录】 共享账户：{user_name} 的 AC 刷新成功！")
                             status.update(label="**即将完成！请耐心等待...**", state="running", expanded=False)
                             sa_status, name, token_result = get_sharetoken(
                                 user_name,
@@ -90,6 +94,7 @@ def check_openai(token_result, user_name, group_result):
                             with open(current_path + 'accounts.json', 'w', encoding='utf-8') as json_file:
                                 json_file.write(accounts_json)
                         else:
+                            logger.info(f"【Share登录】 共享账户：{user_name} 的 AC 刷新失败！")
                             error_status = "RF过期"
                 else:
                     error_status = "过期"
@@ -114,9 +119,14 @@ def choose(user_name):
         openai_token = openai_data[user_name]["token"]
         group_result = openai_data[user_name]["group"]
         openai_error_status, openai_token = check_openai(openai_token, user_name, group_result)  # 查询状态
+    else:
+        openai_error_status = True
     if users[user_name]["allow_claude"]:
         anthropic_token = anthropic_data[user_name]["token"]
         anthropic_error_status, anthropic_token = check_anthropic(anthropic_token, user_name)  # 查询状态，暂无实质性检测
+    else:
+        anthropic_error_status = True
+
     with st.status("**正在验证您的身份...**") as status:
         if users[user_name]["allow_chatgpt"]:
             if openai_error_status == "RF过期":
@@ -139,23 +149,24 @@ def choose(user_name):
                 status.update(label="**检测服务连通性...**", state="running", expanded=False)
 
         if web_setting["domain"]["choose_domain"] == "不允许":
-            if not openai_error_status:
-                if users[user_name]["allow_chatgpt"]:
-                    openai_domain = web_setting["domain"]["domain_default_openai"]
-                    if domains[openai_domain]['type'] == "Pandora":
-                        openai_url = "https://" + openai_domain + "/auth/login_share?token=" + openai_token
-                    else:
-                        openai_url = get_oaifree_login_url(openai_domain, openai_token)
-                    st.write("")
-                    if openai_url:  # 判断是否有链接
-                        st.link_button("**ChatGPT**", openai_url, use_container_width=True)
-                        status.update(label="**用户验证成功!**", state="complete", expanded=True)
-                    else:
-                        st.error("**ChatGPT 连接失败！**", icon=":material/error:")
-                        status.update(label="**ChatGPT 连接失败！**", state="error", expanded=True)
-                    logger.info(f"【用户登录】 用户：{user_name} 登录成功！")
-            if not anthropic_error_status:
-                if users[user_name]["allow_claude"]:
+            logger.info(f"【Share登录】 共享账户：{user_name} 登录成功！")
+            if users[user_name]["allow_chatgpt"]:
+                if not openai_error_status:
+                        openai_domain = web_setting["domain"]["domain_default_openai"]
+                        if domains[openai_domain]['type'] == "Pandora":
+                            openai_url = "https://" + openai_domain + "/auth/login_share?token=" + openai_token
+                        else:
+                            openai_url = get_oaifree_login_url(openai_domain, openai_token)
+                        st.write("")
+                        if openai_url:  # 判断是否有链接
+                            st.link_button("**ChatGPT**", openai_url, use_container_width=True)
+                            status.update(label="**用户验证成功!**", state="complete", expanded=True)
+                        else:
+                            st.error("**ChatGPT 连接失败！**", icon=":material/error:")
+                            status.update(label="**ChatGPT 连接失败！**", state="error", expanded=True)
+
+            if users[user_name]["allow_claude"]:
+                if not anthropic_error_status:
                     anthropic_domain = web_setting["domain"]["domain_default_anthropic"]
                     anthropic_token = anthropic_data[user_name]["token"]
                     anthropic_url = get_fucladue_login_url(anthropic_domain, anthropic_token, user_name)
@@ -166,37 +177,38 @@ def choose(user_name):
                     else:
                         st.error("**Claude 连接失败！**", icon=":material/error:")
                         status.update(label="**Claude 连接失败！**", state="error", expanded=True)
-            logger.info(f"【Share登录】 共享账户：{user_name} 登录成功！")
             st.write("")
 
         else:
             st.write("")
+            logger.info(f"【Share登录】 共享账户：{user_name} 登录成功！")
             for domain in web_setting["domain"]["domain_select"]:
                 name = domains[domain]['name']
-                if not openai_error_status:
-                    if domains[domain]['type'] == "Pandora":
-                        openai_url = "https://" + domain + "/auth/login_share?token=" + openai_token
-                        st.link_button(f"**{name}**", openai_url, use_container_width=True)
-                    elif domains[domain]['type'] == "Oaifree":
-                        openai_url = get_oaifree_login_url(domain, openai_token)
-                        if openai_url:
+                if users[user_name]["allow_chatgpt"]:
+                    if not openai_error_status:
+                        if domains[domain]['type'] == "Pandora":
+                            openai_url = "https://" + domain + "/auth/login_share?token=" + openai_token
                             st.link_button(f"**{name}**", openai_url, use_container_width=True)
-                            status.update(label="**用户验证成功!**", state="complete", expanded=True)
-                        else:
-                            st.error(f"**{name} 连接失败！**", icon=":material/error:")
-                            status.update(label=f"**{name} 连接失败！**", state="error", expanded=True)
+                        elif domains[domain]['type'] == "Oaifree":
+                            openai_url = get_oaifree_login_url(domain, openai_token)
+                            if openai_url:
+                                st.link_button(f"**{name}**", openai_url, use_container_width=True)
+                                status.update(label="**用户验证成功!**", state="complete", expanded=True)
+                            else:
+                                st.error(f"**{name} 连接失败！**", icon=":material/error:")
+                                status.update(label=f"**{name} 连接失败！**", state="error", expanded=True)
 
-                if not anthropic_error_status:
-                    if domains[domain]['type'] == "Fuclaude":
-                        anthropic_token = anthropic_data[user_name]["token"]
-                        anthropic_url = get_fucladue_login_url(domain, anthropic_token, user_name)
-                        if anthropic_url:
-                            st.link_button(f"**{name}**", anthropic_url, use_container_width=True)
-                            status.update(label="**用户验证成功!**", state="complete", expanded=True)
-                        else:
-                            st.error(f"**{name} 连接失败！**", icon=":material/error:")
-                            status.update(label=f"**{name} 连接失败！**", state="error", expanded=True)
-            logger.info(f"【Share登录】 共享账户：{user_name} 登录成功！")
+                if users[user_name]["allow_claude"]:
+                    if not anthropic_error_status:
+                        if domains[domain]['type'] == "Fuclaude":
+                            anthropic_token = anthropic_data[user_name]["token"]
+                            anthropic_url = get_fucladue_login_url(domain, anthropic_token, user_name)
+                            if anthropic_url:
+                                st.link_button(f"**{name}**", anthropic_url, use_container_width=True)
+                                status.update(label="**用户验证成功!**", state="complete", expanded=True)
+                            else:
+                                st.error(f"**{name} 连接失败！**", icon=":material/error:")
+                                status.update(label=f"**{name} 连接失败！**", state="error", expanded=True)
             st.write("")
 
 
@@ -347,7 +359,7 @@ if web_setting["web"]["share"]:
                     st.write("")
                     st.markdown("<div style='display: flex; justify-content: left; align-items: left;'><b>账户名称：" + key + "</b></div>", unsafe_allow_html=True)
                     st.write("")
-                    if share_data[key]['openai']['expires_in'] == "0":
+                    if share_data[key]['openai']['expires_in'] == "0" or share_data[key]['openai']['expires_in'] == 0:
                         st.markdown("<div style='display: flex; justify-content: left; align-items: left;'><b>过期时间：永不过期</b></div>", unsafe_allow_html=True)
                     else:
                         st.markdown("<div style='display: flex; justify-content: left; align-items: left;'><b>过期时间：" + str(share_data[key]['openai']['expires_in']) + " 秒</b></div>", unsafe_allow_html=True)
@@ -379,7 +391,7 @@ if web_setting["web"]["share"]:
                         "<div style='display: flex; justify-content: left; align-items: left;'><b>账户名称：" + key + "</b></div>",
                         unsafe_allow_html=True)
                     st.write("")
-                    if share_data[key]['openai']['expires_in'] == "0":
+                    if share_data[key]['openai']['expires_in'] == "0" or share_data[key]['openai']['expires_in'] == 0:
                         st.markdown(
                             "<div style='display: flex; justify-content: left; align-items: left;'><b>过期时间：永不过期</b></div>",
                             unsafe_allow_html=True)
