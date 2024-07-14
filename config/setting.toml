@@ -1,14 +1,10 @@
 [web]
-readme = false
-login_Theme = "free"
-button_style = "Classic-black"
-button_border = "#FFF"
-button_border_radius = 5
-title = " 🏁 OaiT For OaiFree"
-subtitle = "OaiT v1.1.5"
-domain = "new.oaifree.com"
-choose_domain = "允许"
-user_domain = [ "new.oaifree.com", "demo.oaifree.com",]
+super_user = "admin"
+super_key = "12345678"
+title = " 🏁 OaiT For OaiFree / FuClaude"
+subtitle = "OaiT v1.2.0"
+login_theme = "Retro Orange"
+sidebar_state = "auto"
 notice_enable = true
 notice_title = "**欢迎使用！**"
 notice_subtitle = "本服务基于@Neo的oaifree服务，由@Chenyme制作登录管理界面，如果觉得好用麻烦给个Star叭！  "
@@ -17,46 +13,69 @@ notice_radius = "sm"
 notice_style = "outline"
 notice_color = "dark"
 notice_banner = true
-super_user = "admin"
-super_key = "12345678"
+Retro_Orange_notice = "<div style=\"text-align: center; font-family: 'Times New Roman', '宋体'; font-size: 15px;\">\n  <p style=\"font-size: 20px;\">欢迎使用<strong> Chenyme-Oait </strong>服务</p>\n  <p style=\"font-size: 20px;\">点击<strong>左上角箭头</strong>可获取更多服务内容</p>\n</div>\n<div style=\"text-align: left;\">\n    <hr>\n    <p style=\"font-size: 30px;\"><strong>免责声明 / 服务条款</strong></p>\n    <p style=\"font-size: 20px;\"><strong>1. 本项目开发者不对使用本项目产生的任何后果负责。</strong></p>\n    <p style=\"font-size: 20px;\"><strong>2. 本项目保留随时修改或终止本站点的权利，恕不另行通知。</strong></p>\n    <p style=\"font-size: 20px;\"><strong>3. 本项目所有功能仅供学习和娱乐交流使用，不代表微软的官方观点或立场。</strong></p>\n    <p style=\"font-size: 20px;\"><strong>4. 本项目不对任何由使用本项目产生的直接或间接损失负责，包括但不限于数据丢失、系统损坏、法律风险等。</strong></p>\n    <p style=\"font-size: 20px;\"><strong>5. 本项目不保证本站点的功能完整性、稳定性、安全性和准确性，也不保证本项目与OpenAI、Claude的一致性。</strong></p>\n    <p style=\"font-size: 20px;\"><strong>6. 本项目不对本站点的内容进行审核或监督，用户应自行承担使用本站点的风险和责任。</strong></p>\n    <p style=\"font-size: 20px;\"><strong>7. 在中国大陆范围内使用请遵循《生成式人工智能服务管理暂行办法》的要求，请勿对中国地区公众提供一切未经备案的生成式人工智能服务。</strong></p>\n    <p style=\"font-size:20px;\"><strong>8. 请自觉遵守道德规范，文明使用，禁止输入色情、暴力、恐怖等违法犯罪内容，一经发现，立即封禁，并永久拉黑！若有任何导致违法犯罪行为，用户应自行承担使用本站点的风险和责任。</strong></p>\n  <hr>\n  <p style=\"font-size: 25px;\"><strong> OpenAI，Not CloseAI </strong></p>\n  <p style=\"font-size: 25px;\"><strong> ChatGPT/Claude can make mistakes. Check important info.</strong></p>\n  <p style=\"font-size: 25px;\"><strong>愿科技无国界，开源精神永存 </strong></p>\n</div>\n\n"
+refresh_all = true
+readme = false
 user_refresh = false
-refresh_all = false
-site_limit = ""
-expires_in = 0
-gpt35_limit = -1
-gpt4_limit = -1
-show_conversations = "false"
-share = false
-share_notice = "**请自觉遵守道德规范，文明使用，禁止输入色情、暴力、恐怖等违法内容，一经发现，立即封禁！**"
 invite_link_enable = false
 invite_link = "https://"
 refresh_link_enable = false
 refresh_link = "https://"
+share = true
+share_notice = "**请自觉遵守道德规范，文明使用，禁止输入色情、暴力、恐怖等违法内容，一经发现，立即封禁！**"
+
+[domain]
+choose_domain = "不允许"
+domain_default_openai = "new.oaifree.com"
+domain_default_anthropic = "不启用"
+domain_select = true
 
 [excel]
 hide_index_account = true
 height_account = 248
 order_what_account = "用户组"
 order_row_account = "默认"
-order_account = [ "用户组", "订阅类型", "账户邮箱", "AC_Token", "RF_Token",]
+order_account = [ "用户组", "服务商", "订阅类型", "账户邮箱", "AC_Token", "RF_Token",]
 hide_index_invite = true
 height_invite = 248
 order_what_invite = "是否使用"
 order_row_invite = "默认"
-order_invite = [ "Invite_Token", "用户组", "备注", "是否使用",]
+order_invite = [ "Invite_Token", "OpenAI_用户组", "Anthropic_用户组", "ChatGPT", "Claude", "是否使用", "备注",]
 hide_index_user = true
 height_user = 248
-order_what_user = "用户组"
+order_what_user = "账户"
 order_row_user = "默认"
-order_user = [ "账户", "密码", "UID", "SA_Token", "用户组", "订阅类型",]
+order_user = [ "账户", "密码", "UID", "ChatGPT", "Claude", "备注",]
+hide_index_oaifree = true
+height_oaifree = 448
+order_what_oaifree = "账户"
+order_row_oaifree = "默认"
+order_oaifree = [ "账户", "SA_Token", "用户组", "订阅类型", "限制网站", "过期秒数", "GPT3.5限制", "GPT4限制", "会话无需隔离",]
+hide_index_fuclaude = true
+height_fuclaude = 448
+order_what_fuclaude = "账户"
+order_row_fuclaude = "默认"
+order_fuclaude = [ "账户", "用户组", "SE_Token", "订阅类型",]
 hide_index_refresh = true
 height_refresh = 248
 order_what_refresh = "用户组"
 order_row_refresh = "默认"
 order_refresh = [ "userRF_Token", "用户组", "限制网站", "过期秒数", "GPT3.5限制", "GPT4限制", "会话无需隔离", "备注", "是否使用",]
 
+[new]
+site_limit = ""
+expires_in = 0
+gpt35_limit = -1
+gpt4_limit = -1
+show_conversations = "false"
+set1 = ""
+set2 = ""
+set3 = ""
+set4 = ""
+set5 = ""
+
 [chart]
-start_date = 2024-07-03
-end_date = 2024-07-03
+start_date = 2024-07-13
+end_date = 2024-07-13
 height = 400
 horizontal = true

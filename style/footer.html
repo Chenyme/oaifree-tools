@@ -1,0 +1,42 @@
+<style>
+.footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+    font-size: 14px;
+    color: #555;
+}
+.footer p {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.footer a {
+    color: #0073e6;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.footer a:hover {
+    color: #005bb5;
+}
+@media (max-width: 768px) {
+    .footer {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        margin: 0 auto;
+        width: 100%;
+        background-color: {{color}};
+        border-top: 1px solid #ddd;
+        justify-content: center;
+        text-align: center;
+    }
+}
+</style>
+<div class="footer">
+    <p><strong>Powered by <a href="https://zhile.io/" target="_blank">@Neo</a>，</strong>
+    <strong>Created by <a href="https://github.com/Chenyme" target="_blank">@Chenyme</a></strong></p>
+</div>

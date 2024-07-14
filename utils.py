@@ -5,7 +5,7 @@ import requests
 
 def check_sharetoken(share_token):
     url = f"https://chat.oaifree.com/token/info/{share_token}"
-    response = requests.get(url)
+    response = requests.get(url, timeout=(5, 5))
     if response.status_code == 200:
         return True
     else:
@@ -55,7 +55,7 @@ def get_sharetoken(name, access_token, site_limit, expires_in, gpt35_limit, gpt4
     return status, name, token_key
 
 
-def get_login_url(yourdomain, sharetoken):
+def get_oaifree_login_url(yourdomain, sharetoken):
     url = f'https://{yourdomain}/api/auth/oauth_token'
     headers = {
         'Origin': f'https://{yourdomain}',
@@ -64,8 +64,28 @@ def get_login_url(yourdomain, sharetoken):
     data = {
         'share_token': sharetoken
     }
+
     response = requests.post(url, headers=headers, json=data)
-    return response.json().get('login_url')
+    if response.status_code == 200:
+        return response.json().get('login_url')
+    else:
+        return False
+
+
+def get_fucladue_login_url(url, token, name):
+    url = f'https://{url}/manage-api/auth/oauth_token'
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'session_key': token,
+        'unique_name': name
+    }
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code == 200:
+        return response.json().get('login_url')
+    else:
+        return False
 
 
 def get_size(size_bytes):
@@ -79,9 +99,11 @@ def get_size(size_bytes):
         size = f"{s} {size_name[i]}"
     return size
 
+
 def df_to_json1(df):
     json_data = df.to_dict('records')
     json_data = {str(record['用户组']): {
+        'service_provider': record['服务商'],
         'account_type': record['订阅类型'],
         'account': record['账户邮箱'],
         'access_token': record['AC_Token'],
@@ -90,11 +112,9 @@ def df_to_json1(df):
     return json.dumps(json_data, indent=2)
 
 
-def df_to_json2(df):
+def df_to_json_oaifree(df):
     json_data = df.to_dict('records')
     json_data = {str(record['账户']): {
-        'password': record['密码'],
-        'uid': record['UID'],
         'token': record['SA_Token'],
         'group': record['用户组'],
         'type': record['订阅类型'],
@@ -107,14 +127,25 @@ def df_to_json2(df):
     return json.dumps(json_data, indent=2)
 
 
-def df_to_json3(df):
+def df_to_json_invite(df):
     json_data = df.to_dict('records')
     json_data = {str(record['Invite_Token']): {
-        'group': record['用户组'],
-        'note': record['备注'],
-        'used': record['是否使用'],
+        "openai-group": record['OpenAI_用户组'],
+        "chatgpt": record['ChatGPT'],
+        "anthropic-group": record['Anthropic_用户组'],
+        "claude": record['Claude'],
+        "note": record['备注'],
+        "used": record['是否使用'],
+        "site_limit": record['限制网站'],
+        "expires_in": record['过期秒数'],
+        "gpt35_limit": record['GPT3.5限制'],
+        "gpt4_limit": record['GPT4限制'],
+        "show_conversations": record['会话无需隔离'],
+        "claude_limit": record['限制网站-claude'],
+        "expires_in_claude": record['过期秒数-claude'],
+        "show_conversations_claude": record['会话无需隔离-claude'],
     } for record in json_data}
-    return json_data, json.dumps(json_data, indent=2)
+    return json.dumps(json_data, indent=2)
 
 
 def df_to_json4(df):
@@ -131,3 +162,24 @@ def df_to_json4(df):
     } for record in json_data}
     return json.dumps(json_data, indent=2)
 
+
+def df_to_json_user_data(df):
+    json_data = df.to_dict('records')
+    json_data = {str(record['账户']): {
+        'password': record['密码'],
+        'uid': record['UID'],
+        'allow_chatgpt': record['ChatGPT'],
+        'allow_claude': record['Claude'],
+        'note': record['备注']
+    } for record in json_data}
+    return json.dumps(json_data, indent=2)
+
+
+def df_to_json_fuclaude(df):
+    json_data = df.to_dict('records')
+    json_data = {str(record['账户']): {
+        'token': record['SE_Token'],
+        'group': record['用户组'],
+        'type': record['订阅类型']
+    } for record in json_data}
+    return json.dumps(json_data, indent=2)
