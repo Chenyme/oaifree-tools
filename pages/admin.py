@@ -123,7 +123,7 @@ if st.session_state.role == "admin":
             else:
                 web_setting["web"]["super_user"] = new_super_user
                 web_setting["web"]["super_key"] = new_super_key
-                logger.info(f"<管理员> 【密钥修改】 修改了新的密钥！")
+                logger.info(f"【安全保护】 管理员修改了新的密钥！")
                 with open(current_path + "/setting.toml", "w", encoding="utf-8") as file:
                     toml.dump(web_setting, file)
                 st.session_state.success = True
@@ -246,7 +246,7 @@ if st.session_state.role == "admin":
 
         **仅支持 V1.2.0 版本后的配置文件导入！**
 
-        **请慎重上传 V1.x 或 更早版本 的配置文件！**
+        **请慎重上传 V1.1.x 或 更早版本 的配置文件！**
 
         """, icon=':material/sd_card_alert:')
         uploaded_file = st.file_uploader("上传文件", type=['zip'], label_visibility="collapsed")
@@ -316,7 +316,7 @@ if st.session_state.role == "admin":
         new_group = st.text_input("**命名新用户组***", value="", help="所有模块串联的唯一标识，不可为空", placeholder="唯一标识，不可为空！")
         col1, col2 = st.columns(2)
         with col1:
-            new_service_provider = st.selectbox("**服务商**", ["Claude", "OpenAI"], index=0, help="服务商选择，不可为空！")
+            new_service_provider = st.selectbox("**服务商**", ["Anthropic", "OpenAI"], index=0, help="服务商选择，不可为空！")
         with col2:
             new_account_type = st.selectbox("**订阅类型***", ["Free", "Plus"], index=1, help="订阅套餐情况，不可为空！")
 
