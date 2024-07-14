@@ -344,7 +344,7 @@ def choose(user_name):
                             anthropic_token = anthropic_data[user_name]["token"]
                             anthropic_url = get_fucladue_login_url(domain, anthropic_token, user_name)
                             if anthropic_url:
-                                st.link_button(f"**{name}**", anthropic_url, use_container_width=True)
+                                st.link_button(f"**{name}**", f"https://{domain}{anthropic_url}", use_container_width=True)
                                 status.update(label="**用户验证成功!**", state="complete", expanded=True)
                             else:
                                 st.error(f"**{name} 连接失败！**", icon=":material/error:")
