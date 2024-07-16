@@ -495,11 +495,15 @@ elif st.session_state.theme == "Classic Black":
                 password = st.text_input("PASSWORD", type="password", label_visibility="collapsed", placeholder="登录密码")
                 if st.button("**继续**", use_container_width=True):
                     if st.session_state.login == web_setting["web"]["super_user"]:
+                        try:
+                            verify = users[st.session_state.login]["password"]
+                        except:
+                            verify = False
                         if password == web_setting["web"]["super_key"]:
                             del st.session_state["login"]
                             st.session_state.role = "admin"
                             st.switch_page("pages/admin.py")
-                        elif password == users[st.session_state.login]["password"]:
+                        elif password == users[st.session_state.login]["password"] and verify:
                             st.session_state.role = "role"
                             choose(st.session_state.login)
                             del st.session_state["login"]
@@ -559,12 +563,16 @@ elif st.session_state.theme == "Retro Orange":
                 password = st.text_input("PASSWORD", type="password", label_visibility="collapsed", placeholder="Enter your Password / 填写您的密码")
                 st.write("")
                 if st.button("Continues / 继续", use_container_width=True):
+                    try:
+                        verify = users[st.session_state.login]["password"]
+                    except:
+                        verify = False
                     if st.session_state.login == web_setting["web"]["super_user"]:
                         if password == web_setting["web"]["super_key"]:
                             st.session_state.role = "admin"
                             del st.session_state["login"]
                             st.switch_page("pages/admin.py")
-                        elif password == users[st.session_state.login]["password"]:
+                        elif password == users[st.session_state.login]["password"] and verify:
                             st.session_state.role = "role"
                             choose(st.session_state.login)
                             del st.session_state["login"]
