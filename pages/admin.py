@@ -1982,7 +1982,11 @@ if st.session_state.role == "admin":
 
             st.divider()
             st.write("##### LINUX.DO 用户权限配置")
-            st.warning("""**警告：当前版本开启此服务后，重新更改配置不会对已使用过Linux.do登录的账户进行账号重置！请谨慎修改！**""", icon=':material/sd_card_alert:')
+            st.warning("""
+            **警告：当前版本开启此服务后，重新更改配置不会对已使用过Linux.do登录的账户进行账号重置！请谨慎修改！**
+            
+            **首次添加号池账户后，请将下面的所有级别全部保存一次，因为初始值默认为空，必须重新点击保存！**
+            """, icon=':material/sd_card_alert:')
             st.write("")
 
             @st.experimental_fragment
