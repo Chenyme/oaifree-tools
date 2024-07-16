@@ -1,6 +1,7 @@
 import os
 import json
 import toml
+import time
 import logging
 import streamlit as st
 import streamlit_antd_components as sac
@@ -217,11 +218,15 @@ st.set_page_config(page_title=web_setting["web"]["title"], page_icon="LOGO.png",
 with st.sidebar:
     st.write("")
     st.write("**服务面板**")
-    st.page_link("pages/uid.py", label="UID 登录", use_container_width=True, icon=":material/badge:")
-    st.page_link("pages/change.py", label="密码变更", use_container_width=True, icon=":material/change_circle:")
-    st.page_link("pages/refresh.py", label="账户续费", use_container_width=True, icon=":material/history:")
-    st.page_link("pages/share.py", label="免费使用", use_container_width=True, icon=":material/supervisor_account:")
-    st.page_link("pages/admin.py", label="管理员登录", use_container_width=True, icon=":material/account_circle:")
+
+    @st.experimental_fragment
+    def sider():
+        st.page_link("pages/uid.py", label="UID 登录", use_container_width=True, icon=":material/badge:")
+        st.page_link("pages/change.py", label="密码变更", use_container_width=True, icon=":material/change_circle:")
+        st.page_link("pages/refresh.py", label="账户续费", use_container_width=True, icon=":material/history:")
+        st.page_link("pages/share.py", label="免费使用", use_container_width=True, icon=":material/supervisor_account:")
+        st.page_link("pages/admin.py", label="管理员登录", use_container_width=True, icon=":material/account_circle:")
+    sider()
 
     st.divider()
     st.write("**更换主题**")
@@ -232,7 +237,6 @@ with st.sidebar:
         st.session_state.theme = "Classic Black"
     if st.button("Retro Orange"):
         st.session_state.theme = "Retro Orange"
-
     if st.session_state.theme == "Simple White":
         sidebar_html = sidebar_html.replace("#ffffff", "#f7f7f7")
         sidebar_html = sidebar_html.replace("#efede4", "#ffffff")
@@ -357,7 +361,7 @@ if web_setting["web"]["share"]:
             with col1:
                 with st.expander("**共享账户** " + str(i), expanded=True, icon=":material/apps:"):
                     st.write("")
-                    st.markdown("<div style='display: flex; justify-content: left; align-items: left;'><b>账户名称：" + key + "</b></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='display: flex; justify-content: left; align-items: left;'><b>账户：" + key + "</b></div>", unsafe_allow_html=True)
                     st.write("")
                     if share_data[key]['openai']['expires_in'] == "0" or share_data[key]['openai']['expires_in'] == 0:
                         st.markdown("<div style='display: flex; justify-content: left; align-items: left;'><b>过期时间：永不过期</b></div>", unsafe_allow_html=True)
@@ -366,7 +370,7 @@ if web_setting["web"]["share"]:
                     st.divider()
                     if users[key]["allow_claude"]:
                         st.markdown(f"<div style='display: flex; justify-content: left; align-items: left;'><div class='tag tag-claude'>Claude</div>", unsafe_allow_html=True)
-                    st.write("")
+                        st.write("")
                     if users[key]["allow_chatgpt"]:
                         if share_data[key]['openai']['type'] == "Free":
                             st.markdown("""
@@ -374,6 +378,7 @@ if web_setting["web"]["share"]:
                             <div class='tag tag-gpt-3-5'>GPT-3.5</div>
                             <div class='tag tag-gpt-4-0'>GPT-4o*</div>
                             </div>""", unsafe_allow_html=True)
+                            st.write("")
                         elif share_data[key]['openai']['type'] == "Plus":
                             st.markdown("""
                             <div style='display: flex; justify-content: left; align-items: left;'>
@@ -381,6 +386,7 @@ if web_setting["web"]["share"]:
                             <div class='tag tag-gpt-4'>GPT - 4 </div>
                             <div class='tag tag-gpt-4-0'>GPT-4o</div>
                             </div>""", unsafe_allow_html=True)
+                            st.write("")
                     st.write("")
 
         if i % 2 == 0:
@@ -388,23 +394,17 @@ if web_setting["web"]["share"]:
                 with st.expander("**共享账户** " + str(i), expanded=True, icon=":material/apps:"):
                     st.write("")
                     st.markdown(
-                        "<div style='display: flex; justify-content: left; align-items: left;'><b>账户名称：" + key + "</b></div>",
+                        "<div style='display: flex; justify-content: left; align-items: left;'><b>账户：" + key + "</b></div>",
                         unsafe_allow_html=True)
                     st.write("")
                     if share_data[key]['openai']['expires_in'] == "0" or share_data[key]['openai']['expires_in'] == 0:
-                        st.markdown(
-                            "<div style='display: flex; justify-content: left; align-items: left;'><b>过期时间：永不过期</b></div>",
-                            unsafe_allow_html=True)
+                        st.markdown("<div style='display: flex; justify-content: left; align-items: left;'><b>过期时间：永不过期</b></div>", unsafe_allow_html=True)
                     else:
-                        st.markdown(
-                            "<div style='display: flex; justify-content: left; align-items: left;'><b>过期时间：" + str(
-                                share_data[key]['openai']['expires_in']) + " 秒</b></div>", unsafe_allow_html=True)
+                        st.markdown("<div style='display: flex; justify-content: left; align-items: left;'><b>过期时间：" + str(share_data[key]['openai']['expires_in']) + " 秒</b></div>", unsafe_allow_html=True)
                     st.divider()
                     if users[key]["allow_claude"]:
-                        st.markdown(
-                            f"<div style='display: flex; justify-content: left; align-items: left;'><div class='tag tag-claude'>Claude</div>",
-                            unsafe_allow_html=True)
-                    st.write("")
+                        st.markdown( f"<div style='display: flex; justify-content: left; align-items: left;'><div class='tag tag-claude'>Claude</div>", unsafe_allow_html=True)
+                        st.write("")
                     if users[key]["allow_chatgpt"]:
                         if share_data[key]['openai']['type'] == "Free":
                             st.markdown("""
@@ -412,6 +412,7 @@ if web_setting["web"]["share"]:
                             <div class='tag tag-gpt-3-5'>GPT-3.5</div>
                             <div class='tag tag-gpt-4-0'>GPT-4o*</div>
                             </div>""", unsafe_allow_html=True)
+                            st.write("")
                         elif share_data[key]['openai']['type'] == "Plus":
                             st.markdown("""
                             <div style='display: flex; justify-content: left; align-items: left;'>
@@ -419,6 +420,7 @@ if web_setting["web"]["share"]:
                             <div class='tag tag-gpt-4'>GPT - 4 </div>
                             <div class='tag tag-gpt-4-0'>GPT-4o</div>
                             </div>""", unsafe_allow_html=True)
+                            st.write("")
                     st.write("")
         i += 1
 

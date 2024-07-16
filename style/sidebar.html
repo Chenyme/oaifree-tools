@@ -1,12 +1,8 @@
 <style>
 @keyframes slideIn {
     0% {
-        margin-left: -300px;
+        margin-left: -400px;
         opacity: 0;
-    }
-    40% {
-        margin-left: -150px;
-        opacity: 0.5;
     }
     100% {
         margin-left: 0;
@@ -33,21 +29,32 @@
 .st-emotion-cache-6qob1r.eczjsme11 a, .st-emotion-cache-1gv3huu.eczjsme18 a {
     color: #1f77b4;
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color 2.0s ease;
 }
 .st-emotion-cache-6qob1r.eczjsme11 a:hover, .st-emotion-cache-1gv3huu.eczjsme18 a:hover {
     color: #ff5733;
 }
+.custom-element {
+    margin: -20px;
+    padding: 15px;
+    display: inline-block;
+}
 @media (max-width: 768px) {
     .st-emotion-cache-6qob1r.eczjsme11 {
-        animation: slideIn 1.5s ease-out;
+        animation: slideIn 2.0s ease-out;
         background-color: #ffffff;
         border-radius: 0px;
     }
     .st-emotion-cache-1gv3huu.eczjsme18 {
-        animation: slideIn 1.5s ease-out;
+        animation: slideIn 2.0s ease-out;
         background-color: #efede4;
     }
 }
-
+.st-emotion-cache-6qob1r.eczjsme11::-webkit-scrollbar {
+display: none;
+}
+.st-emotion-cache-6qob1r.eczjsme11 {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
 </style>

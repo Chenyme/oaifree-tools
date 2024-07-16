@@ -4,11 +4,17 @@ import logging
 import json
 import streamlit as st
 import secrets
+import time
 import streamlit_antd_components as sac
 from utils import get_sharetoken, get_accesstoken, get_oaifree_login_url, check_sharetoken, get_fucladue_login_url
 
-style_path = os.path.abspath('.') + '/style/'
-current_path = os.path.abspath('.') + '/config/'
+path = os.path.abspath('.')
+style_path = path + '/style/'
+current_path = path + '/config/'
+if not os.path.exists(path + '/.streamlit/secrets.toml'):  # 创建随机secret用于验证
+    secrets_data = {'secret_key': secrets.token_urlsafe(16)}
+    with open(path + '/.streamlit/secrets.toml', 'w', encoding='utf-8') as file:
+        toml.dump(secrets_data, file)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler(current_path + "app.log", encoding='utf-8'), logging.StreamHandler()])
 logger = logging.getLogger()
@@ -17,6 +23,8 @@ png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
+with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:  # 新增设置
+    secret_setting = toml.load(file)
 with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:  # web设置
     web_setting = toml.load(file)
 with open(current_path + '/users.json', 'r', encoding='utf-8') as file:  # 用户数据
@@ -33,12 +41,12 @@ with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:  # Open
     invite_config = json.load(file)
 with open(style_path + "//Simple_White.html", "r", encoding="utf-8") as file:  # 网页样式
     Simple_white_html = file.read()
-with open(style_path + "//Classic_Black.html", "r", encoding="utf-8") as file:
+with open(style_path + "//Classic_Black.html", "r", encoding="utf-8") as file:  # 网页样式
     Classic_Black_html = file.read()
-with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:
+with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:  # 网页样式
     Retro_Orange_html = file.read()
     Retro_Orange_html = Retro_Orange_html.replace("{{text}}", "Deepen understanding")
-with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:
+with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:  # 网页样式
     sidebar_html = file.read()
 
 
@@ -223,7 +231,10 @@ def select():
                 with open(current_path + 'invite.json', 'w', encoding='utf-8') as json_file:
                     json_file.write(invite_datas)
                 logger.info(f"【用户注册】 用户：{user_new_acc} 注册成功！")
-                st.success(f"**注册成功！请牢记您的 UID! (4+32位)**", icon=":material/check_circle:")
+                st.success("""
+                **注册成功，请刷新页面后登录！**
+                
+                **请牢记您的专属 UID (4+32位)：**""", icon=":material/check_circle:")
                 st.success(f"**{uid}**")
 
 
@@ -342,16 +353,29 @@ if "theme" not in st.session_state:
     st.session_state.theme = web_setting["web"]["login_theme"]
 
 
+with open(current_path + 'secret.toml', 'r') as f:
+    secret_setting = toml.load(f)
+    CLIENT_ID = secret_setting['linux_do']['CLIENT_ID']
+    CLIENT_SECRET = secret_setting['linux_do']['CLIENT_SECRET']
+    REDIRECT_URI = secret_setting['linux_do']['REDIRECT_URI']
+    AUTHORIZATION_ENDPOINT = secret_setting['linux_do']['AUTHORIZATION_ENDPOINT']
+    TOKEN_ENDPOINT = secret_setting['linux_do']['TOKEN_ENDPOINT']
+    USER_ENDPOINT = secret_setting['linux_do']['USER_ENDPOINT']
+
+
 # 侧边栏
 with st.sidebar:
     st.write("")
     st.write("**服务面板**")
-    st.page_link("pages/uid.py", label="UID 登录", use_container_width=True, icon=":material/badge:")
-    st.page_link("pages/change.py", label="密码变更", use_container_width=True, icon=":material/change_circle:")
-    st.page_link("pages/refresh.py", label="账户续费", use_container_width=True, icon=":material/history:")
-    st.page_link("pages/share.py", label="免费使用", use_container_width=True, icon=":material/supervisor_account:")
-    st.page_link("pages/admin.py", label="管理员登录", use_container_width=True, icon=":material/account_circle:")
 
+    @st.experimental_fragment
+    def sider():
+        st.page_link("pages/uid.py", label="UID 登录", use_container_width=True, icon=":material/badge:")
+        st.page_link("pages/change.py", label="密码变更", use_container_width=True, icon=":material/change_circle:")
+        st.page_link("pages/refresh.py", label="账户续费", use_container_width=True, icon=":material/history:")
+        st.page_link("pages/share.py", label="免费使用", use_container_width=True, icon=":material/supervisor_account:")
+        st.page_link("pages/admin.py", label="管理员登录", use_container_width=True, icon=":material/account_circle:")
+    sider()
     st.divider()
     st.write("**更换主题**")
     st.write("")
@@ -361,7 +385,6 @@ with st.sidebar:
         st.session_state.theme = "Classic Black"
     if st.button("Retro Orange"):
         st.session_state.theme = "Retro Orange"
-
     if st.session_state.theme == "Simple White":
         sidebar_html = sidebar_html.replace("#ffffff", "#f7f7f7")
         sidebar_html = sidebar_html.replace("#efede4", "#ffffff")
@@ -373,6 +396,7 @@ with st.sidebar:
         st.markdown(sidebar_html, unsafe_allow_html=True)
     elif st.session_state.theme == "Retro Orange":
         st.markdown(sidebar_html, unsafe_allow_html=True)
+
 
 if st.session_state.theme == "Simple White":
     title_html = f"""
@@ -397,11 +421,15 @@ if st.session_state.theme == "Simple White":
     st.markdown(title_html, unsafe_allow_html=True)
     st.markdown(subtitle_html, unsafe_allow_html=True)
     st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
     col4, col5, col6 = st.columns([0.15, 0.70, 0.15])
     with col5:
         account = st.text_input("**账户**", placeholder="your account")
         password = st.text_input("**密码**", type="password", placeholder="your password")
         st.divider()
+        st.write("")
         if st.button("**登录**", use_container_width=True):
             login_result = login(account, password)
             if login_result == 0:
@@ -449,147 +477,110 @@ elif st.session_state.theme == "Classic Black":
 
         st.write("")
         with st.container(border=True):
-            if "login" not in st.session_state:
-                sac.alert(label="**欢迎，请登录！**", color="dark", variant="transparent", size="lg", radius="sm")
-                user_account = st.text_input("ACCOUNT", label_visibility="collapsed", placeholder="您的账户/Enter your Account")
-
+            login_model = st.empty()
+            with login_model.container():
+                st.markdown("""<span style="color: black; font-size: 20px; font-weight: bold;">欢迎，请登录！</span>""", unsafe_allow_html=True)
+                user_account = st.text_input("ACCOUNT", label_visibility="collapsed", placeholder="用户账户 / 管理员账户")
                 if st.button("**验证账户**", use_container_width=True):
-                    if user_account == web_setting["web"]["super_user"]:
+                    if user_account in users.keys() or user_account == web_setting["web"]["super_user"]:
                         st.session_state.login = user_account
-                        st.rerun()
-                    if user_account in users.keys():
-                        st.session_state.login = user_account
-                        st.rerun()
+                        st.toast('**账户验证成功！请继续输入您的密码！**', icon=':material/check_circle:')
                     else:
-                        sac.alert(label="**此账户不存在！**", color="error", variant="filled", size="sm", radius="sm", icon=True)
+                        st.toast('**此账户不存在！**', icon=':material/error:')
 
-            else:
-                sac.alert(label=f"**你好，{st.session_state.login}！**", color="success", variant="transparent", size="lg", radius="sm", icon=True)
-                if st.session_state.login == web_setting["web"]["super_user"]:
-                    admin_password = st.text_input("PASSWORD", type="password", label_visibility="collapsed", placeholder="管理密钥/登录密码")
-                    st.write("")
-                    if st.button("**继续**", use_container_width=True):
-                        try:
-                            sure = users[st.session_state.login]["password"]
-                        except:
-                            sure = "Not Set"
-                        if admin_password == web_setting["web"]["super_key"]:
-                            st.session_state.role = "admin"
+            if "login" in st.session_state:
+                login_model.empty()
+                st.markdown(f"""<span style="color: green; font-size: 20px; font-weight: bold;">您好，{st.session_state.login}！</span>""", unsafe_allow_html=True)
+
+                password = st.text_input("PASSWORD", type="password", label_visibility="collapsed", placeholder="登录密码")
+                if st.button("**继续**", use_container_width=True):
+                    if st.session_state.login == web_setting["web"]["super_user"]:
+                        if password == web_setting["web"]["super_key"]:
                             del st.session_state["login"]
+                            st.session_state.role = "admin"
                             st.switch_page("pages/admin.py")
-                        elif sure == "Not Set":
-                            sac.alert(label="**密码错误！**", color="error", variant="filled", size="sm", radius="sm", icon=True)
-                        elif admin_password == users[st.session_state.login]["password"]:
+                        elif password == users[st.session_state.login]["password"]:
                             st.session_state.role = "role"
-                            login = st.session_state.login
-                            token = openai_data[login]["token"]
-                            group = openai_data[login]["group"]
+                            choose(st.session_state.login)
+                            del st.session_state["login"]
                         else:
-                            sac.alert(label="**密码错误！**", color="error", variant="filled", size="sm", radius="sm", icon=True)
-                else:
-                    user_password = st.text_input("PASSWORD", type="password", label_visibility="collapsed", placeholder="您的密码/Enter your Password！")
-                    if st.button("**继续**", use_container_width=True):
-                        if user_password == users[st.session_state.login]["password"]:
+                            st.toast('**密码错误！**', icon=':material/error:')
+                    else:
+                        if password == users[st.session_state.login]["password"]:
                             st.session_state.role = "role"
+                            choose(st.session_state.login)
+                            del st.session_state["login"]
                         else:
-                            sac.alert(label="**密码错误！**", color="error", variant="filled", size="sm", radius="sm", icon=True)
+                            st.toast('**密码错误！**', icon=':material/error:')
 
-            st.write("")
-            sac.divider("**OR**", align="center", key="divider", color="gray")
-            st.write("")
+            st.markdown("""<div class="divider">OR</div>""", unsafe_allow_html=True)
             if st.button("**UID登录**", use_container_width=True):
                 st.switch_page("pages/uid.py")
             if st.button("**加入我们**", use_container_width=True, key="select"):
                 select()
             st.page_link("pages/share.py", label="**:blue[免费试用?]**")
 
-    try:
-        if st.session_state.role == "role":
-            choose(st.session_state.login)
-            del st.session_state["login"]
-    except:
-        pass
-
 elif st.session_state.theme == "Retro Orange":
     st.markdown(Retro_Orange_html, unsafe_allow_html=True)
     st.write("")
-    with st.container(border=True):
-        st.markdown("""
-            <div style="text-align: center; font-family: 'Times New Roman', '宋体'; font-size: 20px;">
-                <p style="font-size: 20px;">Start Using ChatGPT/Claude For Free!</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        if st.button("Continue With UID / UID 登录", use_container_width=True, type="secondary"):
-            st.switch_page("pages/uid.py")
-
-        st.markdown("""
-            <div style="text-align: center; font-family: 'Times New Roman', '宋体'; font-size: 20px;">
-                <p style="font-size: 20px;">OR</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        if "login" not in st.session_state:
-            user_account = st.text_input("ACCOUNT", label_visibility="collapsed", placeholder="name@yourcompany.com / 您的账户")
-            st.write("")
-            if st.button("Login In / 登录", use_container_width=True):
-                if user_account == web_setting["web"]["super_user"]:
-                    st.session_state.login = user_account
-                    st.rerun()
-                if user_account in users.keys():
-                    st.session_state.login = user_account
-                    st.rerun()
-                else:
-                    st.toast('**This account does not exist!**\n\n**此账户不存在！**', icon=':material/error:')
-
-        else:
-            if st.session_state.login == web_setting["web"]["super_user"]:
-                if "note_success" not in st.session_state:
-                    st.toast('**Success! Please enter your password!**\n\n**成功！请继续输入您的密码！**', icon=':material/error:')
-                st.session_state.note_success = True
-                admin_password = st.text_input("PASSWORD", type="password", label_visibility="collapsed", placeholder="Enter your Password / 填写您的密码")
-                st.write("")
-                if st.button("Continues / 继续", use_container_width=True):
-                    try:
-                        sure = users[st.session_state.login]["password"]
-                    except:
-                        sure = "Not Set"
-                    if admin_password == web_setting["web"]["super_key"]:
-                        st.session_state.role = "admin"
-                        del st.session_state["login"]
-                        st.switch_page("pages/admin.py")
-                    elif sure == "Not Set":
-                        st.toast('**Password error!**\n\n**密码错误！**', icon=':material/error:')
-                    elif admin_password == users[st.session_state.login]["password"]:
-                        st.session_state.role = "role"
-                        login = st.session_state.login
-                        token = openai_data[login]["token"]
-                        group = openai_data[login]["group"]
-                    else:
-                        st.toast('**Password error!**\n\n**密码错误！**', icon=':material/error:')
+    col1, col2, col3 = st.columns([0.12, 0.76, 0.12])
+    with col2:
+        with st.container(border=True):
+            st.markdown("""<div style="text-align: center; font-family: 'Times New Roman', '宋体'; font-size: 20px;"><p style="font-size: 20px;">Start Using ChatGPT/Claude For Free!</p></div>""", unsafe_allow_html=True)
+            if secret_setting["linux_do"]["OPENED"]:
+                CLIENT_ID = secret_setting['linux_do']['CLIENT_ID']
+                CLIENT_SECRET = secret_setting['linux_do']['CLIENT_SECRET']
+                REDIRECT_URI = secret_setting['linux_do']['REDIRECT_URI']
+                AUTHORIZATION_ENDPOINT = secret_setting['linux_do']['AUTHORIZATION_ENDPOINT']
+                TOKEN_ENDPOINT = secret_setting['linux_do']['TOKEN_ENDPOINT']
+                USER_ENDPOINT = secret_setting['linux_do']['USER_ENDPOINT']
+                oauth_state = st.secrets["secret_key"]
+                authorization_url = f"{AUTHORIZATION_ENDPOINT}?client_id={CLIENT_ID}&response_type=code&redirect_uri={REDIRECT_URI}&state={oauth_state}"
+                st.link_button("Continue With LinuxDo / LinuxDo 登录", authorization_url, use_container_width=True)
             else:
-                if "note_success" not in st.session_state:
-                    st.toast('**Success! Please enter your password!**\n\n**成功！请继续输入您的密码！**', icon=':material/error:')
-                st.session_state.note_success = True
-                user_password = st.text_input("PASSWORD", type="password", label_visibility="collapsed", placeholder="Enter your Password / 填写您的密码")
+                if st.button("Continue With UID / UID 登录", use_container_width=True, type="secondary"):
+                    st.switch_page("pages/uid.py")
+
+            st.markdown("""<div style="text-align: center; font-family: 'Times New Roman', '宋体'; font-size: 20px;"><p style="font-size: 20px;">OR</p></div>""", unsafe_allow_html=True)
+
+            login_model = st.empty()
+            with login_model.container():
+                user_account = st.text_input("ACCOUNT", label_visibility="collapsed", placeholder="name@yourcompany.com / 您的账户")
+                st.write("")
+                if st.button("Login In / 登录", use_container_width=True):
+                    if user_account in users.keys() or user_account == web_setting["web"]["super_user"]:
+                        st.session_state.login = user_account
+                        st.toast('**Success! Please enter your password!**\n\n**验证成功！请继续输入您的密码！**', icon=':material/check_circle:')
+                    else:
+                        st.toast('**This account does not exist!**\n\n**此账户不存在！**', icon=':material/error:')
+
+            if "login" in st.session_state:
+                login_model.empty()
+                password = st.text_input("PASSWORD", type="password", label_visibility="collapsed", placeholder="Enter your Password / 填写您的密码")
                 st.write("")
                 if st.button("Continues / 继续", use_container_width=True):
-                    if user_password == users[st.session_state.login]["password"]:
-                        st.session_state.role = "role"
+                    if st.session_state.login == web_setting["web"]["super_user"]:
+                        if password == web_setting["web"]["super_key"]:
+                            st.session_state.role = "admin"
+                            del st.session_state["login"]
+                            st.switch_page("pages/admin.py")
+                        elif password == users[st.session_state.login]["password"]:
+                            st.session_state.role = "role"
+                            choose(st.session_state.login)
+                            del st.session_state["login"]
+                        else:
+                            st.toast('**Password error!**\n\n**密码错误！**', icon=':material/error:')
                     else:
-                        st.toast('**Password error!**\n\n**密码错误！**', icon=':material/error:')
-
-        if st.button("Join Us / 注册", use_container_width=True, key="select"):
-            select()
-        st.write("")
-
-    try:
-        if st.session_state.role == "role":
-            choose(st.session_state.login)
-            del st.session_state["login"]
-            del st.session_state["note_success"]
-    except:
-        pass
+                        if password == users[st.session_state.login]["password"]:
+                            st.session_state.role = "role"
+                            choose(st.session_state.login)
+                            del st.session_state["login"]
+                        else:
+                            st.toast('**Password error!**\n\n**密码错误！**', icon=':material/error:')
+            if st.button("Join Us / 注册", use_container_width=True, key="select"):
+                time.sleep(0.05)
+                select()
+            st.write("")
 
     st.write("")
     st.write("")
@@ -597,7 +588,7 @@ elif st.session_state.theme == "Retro Orange":
     st.markdown(f"{web_setting['web']['Retro_Orange_notice']}", unsafe_allow_html=True)  # 通知/页面
 
 # 页脚
-with open(style_path + "//footer.html", "r", encoding="utf-8") as file:
+with open(style_path + "/footer.html", "r", encoding="utf-8") as file:
     footer_html = file.read()
     color = "white"
     if st.session_state.theme == "Retro Orange":

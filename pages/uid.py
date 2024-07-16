@@ -35,13 +35,13 @@ with open(style_path + "//Classic_Black.html", "r", encoding="utf-8") as file:
     Classic_Black_html = file.read()
 with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:
     Retro_Orange_htm = file.read()
-    Retro_Orange_htm = Retro_Orange_htm.replace("{{text}}", "Brainstorm ideas")
+    Retro_Orange_htm = Retro_Orange_htm.replace("{{text}}", "Brainstorm your ideas")
 with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:
     sidebar_html = file.read()
 with open("LOGO.png", "rb") as image_file:
     encoded_image = base64.b64encode(image_file.read()).decode()
 
-version = "v1.2.0"
+version = "v1.2.1"
 
 
 @st.experimental_dialog("什么是UID？")
@@ -181,7 +181,6 @@ def find_user_details_by_uid(uid):
 
 
 def check_openai(token_result, user_name, group_result):
-
     error_status = False
     with st.status("**正在验证您的环境...**") as status:
         if check_sharetoken(token_result):
@@ -360,11 +359,15 @@ st.set_page_config(page_icon="LOGO.png",
 with st.sidebar:
     st.write("")
     st.write("**服务面板**")
-    st.page_link("pages/uid.py", label="UID 登录", use_container_width=True, icon=":material/badge:")
-    st.page_link("pages/change.py", label="密码变更", use_container_width=True, icon=":material/change_circle:")
-    st.page_link("pages/refresh.py", label="账户续费", use_container_width=True, icon=":material/history:")
-    st.page_link("pages/share.py", label="免费使用", use_container_width=True, icon=":material/supervisor_account:")
-    st.page_link("pages/admin.py", label="管理员登录", use_container_width=True, icon=":material/account_circle:")
+
+    @st.experimental_fragment
+    def sider():
+        st.page_link("pages/uid.py", label="UID 登录", use_container_width=True, icon=":material/badge:")
+        st.page_link("pages/change.py", label="密码变更", use_container_width=True, icon=":material/change_circle:")
+        st.page_link("pages/refresh.py", label="账户续费", use_container_width=True, icon=":material/history:")
+        st.page_link("pages/share.py", label="免费使用", use_container_width=True, icon=":material/supervisor_account:")
+        st.page_link("pages/admin.py", label="管理员登录", use_container_width=True, icon=":material/account_circle:")
+    sider()
 
     st.divider()
     st.write("**更换主题**")
@@ -375,7 +378,6 @@ with st.sidebar:
         st.session_state.theme = "Classic Black"
     if st.button("Retro Orange"):
         st.session_state.theme = "Retro Orange"
-
     if st.session_state.theme == "Simple White":
         sidebar_html = sidebar_html.replace("#ffffff", "#f7f7f7")
         sidebar_html = sidebar_html.replace("#efede4", "#ffffff")
@@ -391,23 +393,12 @@ with st.sidebar:
 if "theme" not in st.session_state:
     st.session_state.theme = web_setting["web"]["login_theme"]
 
+
 if st.session_state.theme == "Simple White":
     st.markdown(Simple_white_html, unsafe_allow_html=True)
     st.markdown(f"<div class='centered-title'><h1>" + web_setting["web"]["title"] + "</h1></div><div class='centered-subtitle'><div>" + web_setting["web"]["subtitle"] + "</div></div>", unsafe_allow_html=True)
     st.write("")
     st.write("")
-
-elif st.session_state.theme == "Classic Black":
-    st.markdown(Classic_Black_html, unsafe_allow_html=True)
-    st.markdown(f"<div class='centered-title'><h1>" + web_setting["web"]["title"] + "</h1></div><div class='centered-subtitle'><div>" + web_setting["web"]["subtitle"] + "</div></div>", unsafe_allow_html=True)
-    st.write("")
-    st.write("")
-
-elif st.session_state.theme == "Retro Orange":
-    st.markdown(Retro_Orange_htm, unsafe_allow_html=True)
-
-
-if st.session_state.theme == "Simple White":
     col4, col5, col6 = st.columns([0.15, 0.7, 0.15])
     with col5:
         st.write("")
@@ -437,7 +428,10 @@ if st.session_state.theme == "Simple White":
         pass
 
 elif st.session_state.theme == "Classic Black":
-
+    st.markdown(Classic_Black_html, unsafe_allow_html=True)
+    st.markdown(f"<div class='centered-title'><h1>" + web_setting["web"]["title"] + "</h1></div><div class='centered-subtitle'><div>" + web_setting["web"]["subtitle"] + "</div></div>", unsafe_allow_html=True)
+    st.write("")
+    st.write("")
     st.write("")
     col4, col5, col6 = st.columns([0.15, 0.7, 0.15])
     with col5:
@@ -478,42 +472,34 @@ elif st.session_state.theme == "Classic Black":
         pass
 
 elif st.session_state.theme == "Retro Orange":
+    st.markdown(Retro_Orange_htm, unsafe_allow_html=True)
     st.write("")
-    with st.container(border=True):
-        st.markdown("""
-            <div style="text-align: center; font-family: 'Times New Roman', '宋体'; font-size: 20px;">
-                <p style="font-size: 20px;">Start Using ChatGPT/Claude For Free!</p>
-            </div>
-            """, unsafe_allow_html=True)
-        st.write("")
-        if st.button("Continue With Account / 用账户登录", use_container_width=True):
-            st.switch_page("home.py")
-
-        st.markdown("""
-            <div style="text-align: center; font-family: 'Times New Roman', '宋体'; font-size: 20px;">
-                <p style="font-size: 20px;">OR</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        uid = st.text_input("请输入UID", key="uid", placeholder="Enter your UID / 填写您的UID", type="password", label_visibility="collapsed")
-        if st.button("Verify Your UID / 验证", use_container_width=True):
-            if uid:
-                user_name = find_user_details_by_uid(uid)
-                if user_name is not None:
-                    st.session_state.role = "role"
+    col1, col2, col3 = st.columns([0.12, 0.76, 0.12])
+    with col2:
+        with st.container(border=True):
+            st.markdown("""<div style="text-align: center; font-family: 'Times New Roman', '宋体'; font-size: 20px;"><p style="font-size: 20px;">Start Using ChatGPT/Claude For Free!</p></div>""", unsafe_allow_html=True)
+            if st.button("Continue With Account / 用账户登录", use_container_width=True):
+                st.switch_page("home.py")
+            st.markdown("""<div style="text-align: center; font-family: 'Times New Roman', '宋体'; font-size: 20px;"><p style="font-size: 20px;">OR</p></div>""", unsafe_allow_html=True)
+            uid = st.text_input("请输入UID", key="uid", placeholder="Enter your UID / 填写您的UID", type="password", label_visibility="collapsed")
+            st.write("")
+            if st.button("Verify Your UID / 验证", use_container_width=True):
+                if uid:
+                    user_name = find_user_details_by_uid(uid)
+                    if user_name is not None:
+                        st.session_state.role = "role"
+                        choose(user_name)
+                    else:
+                        st.toast("**Invalid UID!** \n\n **无效的UID，请重新填写！**", icon=":material/error:")
                 else:
-                    st.toast("**UID Not Found !** \n\n **此UID无效！**", icon=":material/error:")
-            else:
-                st.toast("**UID Must Not Be Empty !** \n\n **UID不能为空！**", icon=":material/error:")
-        if st.button("I Don't Have UID? / 我没有 UID ？", use_container_width=True):
-            read()
-        st.write("")
-
-    try:
-        if st.session_state.role == "role":
-            choose(user_name)
-    except:
-        pass
+                    st.toast("**UID must not be empty！** \n\n **UID不能为空，请填写再尝试！**", icon=":material/error:")
+            if st.button("I Don't Have UID? / 我没有 UID ？", use_container_width=True):
+                read()
+            st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.markdown(f"{web_setting['web']['Retro_Orange_notice']}", unsafe_allow_html=True)  # 通知/页面
 
 with open(style_path + "//footer.html", "r", encoding="utf-8") as file:
     footer_html = file.read()

@@ -128,6 +128,7 @@ header, .st-emotion-cache-12fmjuu {
     color: dark;
     font-size: 50px;
     font-weight: normal;
+    margin-top: -50px;
 }
 .typewriter h1:nth-child(1) {
     animation: typing1 5s steps(40, end) infinite, blink-caret .75s step-end infinite;
@@ -167,3 +168,116 @@ header, .st-emotion-cache-12fmjuu {
         <p>with <strong>OiaT</strong></p>
     </div>
 </body>
+<style>
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px #6a4dad;
+    }
+    50% {
+        box-shadow: 0 0 20px #6a4dad;
+    }
+    100% {
+        box-shadow: 0 0 5px #6a4dad;
+    }
+}
+body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100vh;
+    margin: 0;
+    background-color: #f7f7f7;
+}
+.notification-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: -12px;
+}
+.notification {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f7f7f7;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    padding: 10px 15px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+    animation: fadeIn 1s ease-in-out;
+}
+.new-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #6a4dad;
+    color: #fff;
+    border-radius: 12px;
+    padding: 5px 10px;
+    font-weight: bold;
+    margin-right: 10px;
+    animation: glow 2s infinite ease-in-out;
+}
+.learn-more {
+    color: #555;
+    text-decoration: none;
+    margin-left: 5px;
+    transition: transform 0.3s ease-in-out;
+}
+.learn-more:hover {
+    transform: scale(1.05);
+}
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    font-family: 'Times New Roman', '宋体';
+    font-size: 20px;
+}
+details {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: padding 0.5s ease-out;
+}
+summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.2rem 0.6rem;
+    cursor: pointer;
+    list-style: none;
+    font-family: 'Times New Roman', '宋体';
+    font-size: 20px;
+}
+summary h3 {
+    margin: 0;
+    font-family: 'Times New Roman', '宋体';
+    font-size: 24px;
+}
+summary svg {
+    transition: transform 0.5s;
+}
+details[open] summary svg {
+    transform: rotate(135deg);
+}
+.AccordionContent {
+    padding: 0 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, padding 0.3s ease-out;
+}
+details[open] .AccordionContent {
+    max-height: 1000px;
+    padding: 1rem;
+}
+</style>

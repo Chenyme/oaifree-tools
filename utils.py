@@ -100,7 +100,7 @@ def get_size(size_bytes):
     return size
 
 
-def df_to_json1(df):
+def df_to_json_account(df):
     json_data = df.to_dict('records')
     json_data = {str(record['用户组']): {
         'service_provider': record['服务商'],
@@ -159,6 +159,16 @@ def df_to_json4(df):
         'show_conversations': record['会话无需隔离'],
         'note': record['备注'],
         'used': record['是否使用']
+    } for record in json_data}
+    return json.dumps(json_data, indent=2)
+
+
+def df_to_json_domain(df):
+    json_data = df.to_dict('records')
+    json_data = {str(record['服务域名']): {
+        'name': record['名称'],
+        'speed': record['延迟'],
+        'type': record['类型']
     } for record in json_data}
     return json.dumps(json_data, indent=2)
 

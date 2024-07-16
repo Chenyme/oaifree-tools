@@ -1,4 +1,18 @@
 <style>
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+.divider::before,
+.divider::after {
+    content: '';
+    flex-grow: 1;
+    border-bottom: 1px solid #000;
+    border-bottom: 1px solid #ccc;
+    margin: 0 10px;
+}
 .centered-title {
     position: relative;
     top: -45px;
@@ -6,19 +20,19 @@
     margin-bottom: 0;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: 650;
-    font-size: 2.8em;
+    font-size: 2.5em;
 }
 .centered-subtitle {
     text-align: center;
     margin-top: -35px;
-    font-size: 1.1em;
+    font-size: 0.95em;
 }
 @media screen and (max-width: 768px) {
     .centered-title {
         font-size: 2em;
     }
     .centered-subtitle {
-        font-size: 1em;
+        font-size: 0.9em;
     }
 }
 .st-emotion-cache-4uzi61.e1f1d6gn0{
