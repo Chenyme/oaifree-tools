@@ -34,6 +34,7 @@
 
 
 ## 项目功能
+  - **新增支持**：支持接入 linux.do 认证！
   - **服务总览**：服务统计/图表数据/站点迁移/运行日志
   - **域名管理**：域名列表/服务切换/延迟测速/自定义域名
   - **主题样式**：管理信息/网站设置/主题切换/公告设置
@@ -45,8 +46,8 @@
 
 #### docker
 ```shell
-docker pull chenyme/oait:v1.2.0
-docker run -d -p 8501:8501 chenyme/oait:v1.2.0
+docker pull chenyme/oait:v1.2.1
+docker run -d -p 8501:8501 chenyme/oait:v1.2.1
 
 # docker pull ghcr.io/chenyme/oait:latest
 # docker run -d -p 8501:8501 ghcr.io/chenyme/oait:latest
@@ -55,8 +56,8 @@ docker run -d -p 8501:8501 chenyme/oait:v1.2.0
 #### Git
 ```shell
 git clone https://github.com/Chenyme/oaifree-tools
-docker build -t chenyme/oait:v1.2.0 .
-docker run -d -p 8501:8501 chenyme/oait:v1.2.0
+docker build -t chenyme/oait:v1.2.1 .
+docker run -d -p 8501:8501 chenyme/oait:v1.2.1
 ```
 
 #### Python
