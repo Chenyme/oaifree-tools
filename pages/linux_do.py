@@ -130,7 +130,7 @@ def check_anthropic(token_result, user_name):  # 看看始皇后续有没有大�
     return False, False
 
 
-st.set_page_config(page_title=web_setting["web"]["title"], page_icon=style_path + "Linux_do.webp")
+st.set_page_config(page_title=web_setting["web"]["title"], page_icon=style_path + "logo.png")
 
 if "theme" not in st.session_state:
     st.session_state.theme = web_setting["web"]["login_theme"]
