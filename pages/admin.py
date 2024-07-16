@@ -1955,8 +1955,10 @@ if st.session_state.role == "admin":
         with st.container(border=True):
             st.write("")
             st.write("##### LINUX.DO 用户登录接入 ")
-            st.info("**请先前往 [LINUX.DO Connect](https://connect.linux.do/) 申请应用接入，再开启此服务！**", icon=':material/double_arrow:')
-
+            st.info("""
+            **请先前往 [LINUX.DO Connect](https://connect.linux.do/) 申请应用接入，再开启此服务！**
+            
+            **Connect 中的接入信息格式为：应用主页填写 `https://您的域名` ；回调地址填写 `https://您的域名/linux_do`**""", icon=':material/double_arrow:')
             @st.experimental_fragment
             def linux_do_area():
                 OPENED = st.checkbox("**开启Linux.DO登录功能**", value=secret_data["linux_do"]["OPENED"], help="**开启后，用户可使用Linux.DO账号登录，将替换在原 `UID登录` 位置**")
