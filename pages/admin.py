@@ -285,7 +285,10 @@ if st.session_state.role == "admin":
                 zip_buffer = BytesIO(uploaded_file.getvalue())
                 with zipfile.ZipFile(zip_buffer, "r") as zip_ref:
                     zip_file_list = zip_ref.namelist()
+                    success_files = [file for file in required_files if file in zip_file_list]
                     error_files = [file for file in zip_file_list if file not in required_files]
+                    for file in success_files:
+                        zip_ref.extract(file, current_path)
                     st.success("**数据迁移成功！请及时刷新页面！**", icon=":material/check_circle:")
                     error = False
                     for file in error_files:
