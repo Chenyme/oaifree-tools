@@ -517,8 +517,19 @@ elif st.session_state.theme == "Classic Black":
                             st.toast('**密码错误！**', icon=':material/error:')
 
             st.markdown("""<div class="divider">OR</div>""", unsafe_allow_html=True)
-            if st.button("**UID登录**", use_container_width=True):
-                st.switch_page("pages/uid.py")
+            if secret_setting["linux_do"]["OPENED"]:
+                CLIENT_ID = secret_setting['linux_do']['CLIENT_ID']
+                CLIENT_SECRET = secret_setting['linux_do']['CLIENT_SECRET']
+                REDIRECT_URI = secret_setting['linux_do']['REDIRECT_URI']
+                AUTHORIZATION_ENDPOINT = secret_setting['linux_do']['AUTHORIZATION_ENDPOINT']
+                TOKEN_ENDPOINT = secret_setting['linux_do']['TOKEN_ENDPOINT']
+                USER_ENDPOINT = secret_setting['linux_do']['USER_ENDPOINT']
+                oauth_state = st.secrets["secret_key"]
+                authorization_url = f"{AUTHORIZATION_ENDPOINT}?client_id={CLIENT_ID}&response_type=code&redirect_uri={REDIRECT_URI}&state={oauth_state}"
+                st.link_button("**LinuxDo 登录**", authorization_url, use_container_width=True)
+            else:
+                if st.button("**UID登录**", use_container_width=True):
+                    st.switch_page("pages/uid.py")
             if st.button("**加入我们**", use_container_width=True, key="select"):
                 select()
             st.page_link("pages/share.py", label="**:blue[免费试用?]**")

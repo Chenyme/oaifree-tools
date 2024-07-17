@@ -2001,13 +2001,13 @@ if st.session_state.role == "admin":
                             with col3:
                                 allow_chatgpt = st.checkbox("**允许使用 ChatGPT**", secret_data["linux_do_1"]["chatgpt"], key=f"gpt{gen}")
                                 try:
-                                    chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, secret_data["linux_do_1"]["chatgpt_group"], key=f"group1{gen}")
+                                    chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, index=openai_list.index(secret_data["linux_do_1"]["chatgpt_group"]), key=f"group1{gen}")
                                 except:
                                     chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, key=f"group1{gen}")
                             with col4:
                                 allow_claude = st.checkbox("**允许使用 Claude**", secret_data["linux_do_1"]["claude"], key=f"cd{gen}")
                                 try:
-                                    claude_group = st.selectbox("**Claude 组别**", anthropic_list, secret_data["linux_do_1"]["claude_group"], key=f"group2{gen}")
+                                    claude_group = st.selectbox("**Claude 组别**", anthropic_list, index=anthropic_list.index(secret_data["linux_do_1"]["claude_group"]), key=f"group2{gen}")
                                 except:
                                     claude_group = st.selectbox("**Claude 组别**", anthropic_list, key=f"group2{gen}")
                             st.write("")
@@ -2043,13 +2043,13 @@ if st.session_state.role == "admin":
                             with col3:
                                 allow_chatgpt = st.checkbox("**允许使用 ChatGPT**", secret_data["linux_do_2"]["chatgpt"], key=f"gpt{gen}")
                                 try:
-                                    chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, secret_data["linux_do_2"]["chatgpt_group"], key=f"group1{gen}")
+                                    chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, index=openai_list.index(secret_data["linux_do_2"]["chatgpt_group"]), key=f"group1{gen}")
                                 except:
                                     chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, key=f"group1{gen}")
                             with col4:
                                 allow_claude = st.checkbox("**允许使用 Claude**", secret_data["linux_do_2"]["claude"], key=f"cd{gen}")
                                 try:
-                                    claude_group = st.selectbox("**Claude 组别**", anthropic_list, secret_data["linux_do_2"]["claude_group"], key=f"group2{gen}")
+                                    claude_group = st.selectbox("**Claude 组别**", anthropic_list, index=anthropic_list.index(secret_data["linux_do_2"]["claude_group"]), key=f"group2{gen}")
                                 except:
                                     claude_group = st.selectbox("**Claude 组别**", anthropic_list, key=f"group2{gen}")
                             st.write("")
@@ -2085,13 +2085,13 @@ if st.session_state.role == "admin":
                             with col3:
                                 allow_chatgpt = st.checkbox("**允许使用 ChatGPT**", secret_data["linux_do_3"]["chatgpt"], key=f"gpt{gen}")
                                 try:
-                                    chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, secret_data["linux_do_3"]["chatgpt_group"], key=f"group1{gen}")
+                                    chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, index=openai_list.index(secret_data["linux_do_3"]["chatgpt_group"]), key=f"group1{gen}")
                                 except:
                                     chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, key=f"group1{gen}")
                             with col4:
                                 allow_claude = st.checkbox("**允许使用 Claude**", secret_data["linux_do_3"]["claude"], key=f"cd{gen}")
                                 try:
-                                    claude_group = st.selectbox("**Claude 组别**", anthropic_list, secret_data["linux_do_3"]["claude_group"], key=f"group2{gen}")
+                                    claude_group = st.selectbox("**Claude 组别**", anthropic_list, index=anthropic_list.index(secret_data["linux_do_3"]["claude_group"]), key=f"group2{gen}")
                                 except:
                                     claude_group = st.selectbox("**Claude 组别**", anthropic_list, key=f"group2{gen}")
                             st.write("")
@@ -2129,13 +2129,13 @@ if st.session_state.role == "admin":
                                 with col3:
                                     allow_chatgpt = st.checkbox("**允许使用 ChatGPT**", secret_data["linux_do_4"]["chatgpt"], key=f"gpt{gen}")
                                     try:
-                                        chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, secret_data["linux_do_4"]["chatgpt_group"], key=f"group1{gen}")
+                                        chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, index=openai_list.index(secret_data["linux_do_4"]["chatgpt_group"]), key=f"group1{gen}")
                                     except:
                                         chatgpt_group = st.selectbox("**ChatGPT 组别**", openai_list, key=f"group1{gen}")
                                 with col4:
                                     allow_claude = st.checkbox("**允许使用 Claude**", secret_data["linux_do_4"]["claude"], key=f"cd{gen}")
                                     try:
-                                        claude_group = st.selectbox("**Claude 组别**", anthropic_list, secret_data["linux_do_4"]["claude_group"], key=f"group2{gen}")
+                                        claude_group = st.selectbox("**Claude 组别**", anthropic_list, index=anthropic_list.index(secret_data["linux_do_4"]["claude_group"]), key=f"group2{gen}")
                                     except:
                                         claude_group = st.selectbox("**Claude 组别**", anthropic_list, key=f"group2{gen}")
 

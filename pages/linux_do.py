@@ -518,4 +518,5 @@ except:
 st.write("")
 st.write("")
 st.write("")
-st.markdown(f"{web_setting['web']['Retro_Orange_notice']}", unsafe_allow_html=True)  # 通知/页面
+test = web_setting['web']['Retro_Orange_notice'].replace("点击<strong>左上角箭头</strong>可获取更多服务内容", "")
+st.markdown(f"{test}", unsafe_allow_html=True)  # 通知/页面
