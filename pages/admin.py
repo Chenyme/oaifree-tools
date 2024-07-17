@@ -2204,6 +2204,7 @@ if st.session_state.role == "admin":
             with col5:
                 st.link_button("**视频翻译**", "https://github.com/Chenyme/Chenyme-AAVT", use_container_width=True, type=button_type)
             st.write("")
+    footer_html = footer_html.replace("{{color}}", "white")
     st.markdown(footer_html, unsafe_allow_html=True)
 else:
     with st.sidebar:
