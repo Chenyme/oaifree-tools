@@ -16,8 +16,7 @@ import pandas as pd
 import altair as alt
 import streamlit as st
 import streamlit_antd_components as sac
-from utils import get_accesstoken, get_sharetoken, df_to_json_account, df_to_json_oaifree, df_to_json_invite, df_to_json4, \
-    df_to_json_fuclaude, df_to_json_user_data, check_sharetoken, get_size, df_to_json_domain
+from utils import get_accesstoken, get_sharetoken, df_to_json_account, df_to_json_oaifree, df_to_json_invite, df_to_json4, df_to_json_fuclaude, df_to_json_user_data, check_sharetoken, get_size, df_to_json_domain
 
 version = "v1.2.1"
 
@@ -31,35 +30,71 @@ png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
+
 # 读取配置文件
-with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:
-    secret_data = toml.load(file)
-with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
-    web_setting = toml.load(file)
-with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
-    accounts = json.load(file)
-with open(current_path + '/users.json', 'r', encoding='utf-8') as file:
-    user_data = json.load(file)
-with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:
-    domain_data = json.load(file)
-with open(current_path + '/openai.json', 'r', encoding='utf-8') as file:
-    openai_data = json.load(file)
-with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
-    invite_config = json.load(file)
-with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:
-    anthropic_data = json.load(file)
-with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
-    share_data = json.load(file)
-with open(current_path + '/refresh.json', 'r', encoding='utf-8') as file:
-    refresh_data = json.load(file)
-with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:
-    sidebar_html = file.read()
-with open(style_path + "/Retro_Orange.html", "r", encoding="utf-8") as file:
-    Retro_Orange_html = file.read()
-with open(style_path + "//footer.html", "r", encoding="utf-8") as file:
-    footer_html = file.read()
-with open("LOGO.png", "rb") as image_file:
-    encoded_image = base64.b64encode(image_file.read()).decode()
+def read_config():
+    with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:
+        secret_data = toml.load(file)
+    with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
+        web_setting = toml.load(file)
+    with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
+        accounts = json.load(file)
+    with open(current_path + '/users.json', 'r', encoding='utf-8') as file:
+        user_data = json.load(file)
+    with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:
+        domain_data = json.load(file)
+    with open(current_path + '/openai.json', 'r', encoding='utf-8') as file:
+        openai_data = json.load(file)
+    with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
+        invite_config = json.load(file)
+    with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:
+        anthropic_data = json.load(file)
+    with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
+        share_data = json.load(file)
+    with open(current_path + '/refresh.json', 'r', encoding='utf-8') as file:
+        refresh_data = json.load(file)
+    with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:
+        sidebar_html = file.read()
+    with open(style_path + "/Retro_Orange.html", "r", encoding="utf-8") as file:
+        Retro_Orange_html = file.read()
+    with open(style_path + "//footer.html", "r", encoding="utf-8") as file:
+        footer_html = file.read()
+    with open("LOGO.png", "rb") as image_file:
+        encoded_image = base64.b64encode(image_file.read()).decode()
+
+    st.session_state.secret_data = secret_data
+    st.session_state.web_setting = web_setting
+    st.session_state.accounts = accounts
+    st.session_state.user_data = user_data
+    st.session_state.domain_data = domain_data
+    st.session_state.openai_data = openai_data
+    st.session_state.invite_config = invite_config
+    st.session_state.anthropic_data = anthropic_data
+    st.session_state.share_data = share_data
+    st.session_state.refresh_data = refresh_data
+    st.session_state.sidebar_html = sidebar_html
+    st.session_state.Retro_Orange_html = Retro_Orange_html
+    st.session_state.footer_html = footer_html
+    st.session_state.encoded_image = encoded_image
+
+
+if "secret_data" not in st.session_state:
+    read_config()
+
+secret_data = st.session_state.secret_data
+web_setting = st.session_state.web_setting
+accounts = st.session_state.accounts
+user_data = st.session_state.user_data
+domain_data = st.session_state.domain_data
+openai_data = st.session_state.openai_data
+invite_config = st.session_state.invite_config
+anthropic_data = st.session_state.anthropic_data
+share_data = st.session_state.share_data
+refresh_data = st.session_state.refresh_data
+sidebar_html = st.session_state.sidebar_html
+Retro_Orange_html = st.session_state.Retro_Orange_html
+footer_html = st.session_state.footer_html
+encoded_image = st.session_state.encoded_image
 
 openai_list = []
 anthropic_list = []
@@ -102,18 +137,22 @@ if "theme" not in st.session_state:
 if "success" in st.session_state:
     st.toast("**更改成功！**", icon=":material/check_circle:")
     del st.session_state.success
+    read_config()
 
 if "test" in st.session_state:
     st.toast("**测试成功！**", icon=":material/check_circle:")
     del st.session_state.test
+    read_config()
 
 if "add" in st.session_state:
     st.toast("**新增成功！**", icon=":material/check_circle:")
     del st.session_state.add
+    read_config()
 
 if "delete" in st.session_state:
     st.toast("**删除成功！**", icon=":material/check_circle:")
     del st.session_state.delete
+    read_config()
 
 
 if st.session_state.role == "admin":
@@ -303,6 +342,7 @@ if st.session_state.role == "admin":
                             time.sleep(1)
                             status.update(label="**即 将 自 动 刷 新 ... 1**", state="complete", expanded=False)
                             time.sleep(1)
+                            st.session_state.success = True
                             st.rerun()
             else:
                 st.error("**请先上传数据文件！**", icon=":material/error:")
@@ -525,7 +565,10 @@ if st.session_state.role == "admin":
                         with open(current_path + '/openai.json', 'w', encoding='utf-8') as file:
                             json.dump(openai_data, file, indent=2)
                         logger.info(f"【管理员】 {name} 的 SA 刷新成功！")
+                        st.session_state.success = True
                         st.success(f"**{user} 刷新成功！**", icon=":material/check_circle:")
+                        time.sleep(0.05)
+                        st.rerun()
                     else:
                         logger.error(f"【管理员】 {name} 的 SA 刷新失败，请检查 AC 是否失效！")
                         st.error(f"**{user} 刷新失败！**", icon=":material/error:")
@@ -700,15 +743,18 @@ if st.session_state.role == "admin":
                 logs = file.read()
 
             pattern_user = re.compile(
-                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【用户登录】 用户：(\w+) 登录成功！')
+                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【用户登录】 用户：([^\s]+) 登录成功！')
             pattern_share = re.compile(
-                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【Share登录】 共享账户：(\w+) 登录成功！')
-            pattern_sign = re.compile(
-                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【用户注册】 新用户：(\w+) 注册成功！')
+                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【Share登录】 共享账户：([^\s]+) 登录成功！')
+            pattern_sign1 = re.compile(
+                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【用户注册】 新用户：([^\s]+) 注册成功！')
+            pattern_sign2 = re.compile(
+                r'(\d{4}-\d{2}-\d{2} \d{2}):\d{2}:\d{2},\d{3} - INFO - 【LinuxDo】 LinuxDo用户创建成功：([^\s]+)')
 
             matches_user = pattern_user.findall(logs)
             matches_share = pattern_share.findall(logs)
-            matches_sign = pattern_sign.findall(logs)
+            matches_sign = pattern_sign1.findall(logs)
+            matches_sign += pattern_sign2.findall(logs)
 
             all_dates = [datetime.strptime(date, '%Y-%m-%d %H').date() for date, _ in matches_user + matches_share + matches_sign]
             min_date = min(all_dates) if all_dates else datetime.today().date()
@@ -740,6 +786,7 @@ if st.session_state.role == "admin":
                         web_setting["chart"]["horizontal"] = horizontal
                         with open(current_path + "/setting.toml", "w", encoding="utf-8") as f:
                             toml.dump(web_setting, f)
+                        read_config()
                         st.toast("**更改设置成功！**", icon=":material/check_circle:")
 
                 plot_choose = sac.segmented(
@@ -1003,11 +1050,9 @@ if st.session_state.role == "admin":
                             domain_default_openai = st.selectbox("**默认 OpenAI 服务域名**", openai_domain, key="domain_default_openai")
                             if "change_domain" in st.session_state:
                                 st.write("")
-                                st.error("**警告：由于您修改了域名信息导致设置冲突！请尽快重新设置默认服务设置！**",
-                                         icon=':material/error:')
+                                st.error("**警告：由于您修改了域名信息导致设置冲突！请尽快重新设置默认服务设置！**", icon=':material/error:')
                                 st.write("")
-                                st.toast("**警告：由于您修改了域名信息导致设置冲突！请重新设置默认服务设置！**",
-                                         icon=':material/error:')
+                                st.toast("**警告：由于您修改了域名信息导致设置冲突！请重新设置默认服务设置！**", icon=':material/error:')
                     with col2:
                         try:
                             domain_default_anthropic = st.selectbox("**默认 Anthropic 服务域名**", anthropic_domain, index=anthropic_domain.index(web_setting["domain"]["domain_default_anthropic"]))
@@ -1945,9 +1990,11 @@ if st.session_state.role == "admin":
                             }
                             with open(current_path + "share.json", "w") as share_file:
                                 json.dump(share_data, share_file, indent=2)
-                            st.toast("保存成功！", icon=":material/check_circle:")
                     with open(current_path + "setting.toml", "w", encoding="utf-8") as f:
                         toml.dump(web_setting, f)
+                    st.session_state.success = True
+                    time.sleep(0.05)
+                    st.rerun()
             with col2:
                 if st.button("**前往共享站**", use_container_width=True, type=button_type):
                     st.switch_page("pages/share.py")

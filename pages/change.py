@@ -18,29 +18,67 @@ png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
-with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
-    invite_config = json.load(file)
-with open(current_path + '/users.json', 'r', encoding='utf-8') as file:
-    users = json.load(file)
-with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
-    accounts = json.load(file)
-with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
-    web_setting = toml.load(file)
-with open(current_path + '/refresh.json', 'r', encoding='utf-8') as file:
-    refresh_data = json.load(file)
-with open("LOGO.png", "rb") as image_file:
-    encoded_image = base64.b64encode(image_file.read()).decode()
-with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:
-    anthropic_data = json.load(file)
-with open(style_path + "//Simple_White.html", "r", encoding="utf-8") as file:
-    Simple_white_html = file.read()
-with open(style_path + "//Classic_Black.html", "r", encoding="utf-8") as file:
-    Classic_Black_html = file.read()
-with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:
-    Retro_Orange_htm = file.read()
-    Retro_Orange_htm = Retro_Orange_htm.replace("{{text}}", "Analyze complex data")
-with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:
-    sidebar_html = file.read()
+def read_config():
+    with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:  # 新增设置
+        secret_setting = toml.load(file)
+    with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:  # web设置
+        web_setting = toml.load(file)
+    with open(current_path + '/users.json', 'r', encoding='utf-8') as file:  # 用户数据
+        users = json.load(file)
+    with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:  # 账户数据
+        accounts = json.load(file)
+    with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:  # 域名数据
+        domains = json.load(file)
+    with open(current_path + '/openai.json', 'r', encoding='utf-8') as file:  # OpenAI数据
+        openai_data = json.load(file)
+    with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:  # Anthropic数据
+        anthropic_data = json.load(file)
+    with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:  # OpenAI邀请数据
+        invite_config = json.load(file)
+    with open(style_path + "//Simple_White.html", "r", encoding="utf-8") as file:  # 网页样式
+        Simple_white_html = file.read()
+    with open(style_path + "//Classic_Black.html", "r", encoding="utf-8") as file:  # 网页样式
+        Classic_Black_html = file.read()
+    with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:  # 网页样式
+        Retro_Orange_html = file.read()
+    with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:  # 网页样式
+        sidebar_html = file.read()
+    with open("LOGO.png", "rb") as image_file:
+        encoded_image = base64.b64encode(image_file.read()).decode()
+
+    st.session_state.web_setting = web_setting
+    st.session_state.secret_setting = secret_setting
+    st.session_state.users = users
+    st.session_state.accounts = accounts
+    st.session_state.domains = domains
+    st.session_state.openai_data = openai_data
+    st.session_state.anthropic_data = anthropic_data
+    st.session_state.invite_config = invite_config
+    st.session_state.Simple_white_html = Simple_white_html
+    st.session_state.Classic_Black_html = Classic_Black_html
+    st.session_state.Retro_Orange_html = Retro_Orange_html
+    st.session_state.sidebar_html = sidebar_html
+    st.session_state.encoded_image = encoded_image
+
+
+if "web_setting" not in st.session_state:
+    read_config()
+
+web_setting = st.session_state.web_setting
+secret_setting = st.session_state.secret_setting
+users = st.session_state.users
+accounts = st.session_state.accounts
+domains = st.session_state.domains
+openai_data = st.session_state.openai_data
+anthropic_data = st.session_state.anthropic_data
+invite_config = st.session_state.invite_config
+Simple_white_html = st.session_state.Simple_white_html
+Classic_Black_html = st.session_state.Classic_Black_html
+Retro_Orange_html = st.session_state.Retro_Orange_html
+sidebar_html = st.session_state.sidebar_html
+encoded_image = st.session_state.encoded_image
+Retro_Orange_html = Retro_Orange_html.replace("{{text}}", "Analyze complex data")
+
 
 if "theme" not in st.session_state:
     st.session_state.theme = web_setting["web"]["login_theme"]
@@ -112,7 +150,7 @@ elif st.session_state.theme == "Classic Black":
     st.write("")
 
 elif st.session_state.theme == "Retro Orange":
-    st.markdown(Retro_Orange_htm, unsafe_allow_html=True)
+    st.markdown(Retro_Orange_html, unsafe_allow_html=True)
 
 if "change" not in st.session_state:
     st.session_state.change = "password"
@@ -148,6 +186,7 @@ if st.session_state.theme == "Retro Orange":
                                                     users[user_account]['password'] = user_password_new
                                                     with open(current_path + '/users.json', 'w', encoding='utf-8') as file:
                                                         json.dump(users, file, indent=2)
+                                                    read_config()
                                                     st.toast('**密码已成功更改！**', icon=':material/check_circle:')
                                                 else:
                                                     st.toast('**密码长度不足，请填写8位及以上的密码！**', icon=':material/error:')
@@ -194,6 +233,7 @@ if st.session_state.theme == "Retro Orange":
                                                     users[user_account]['password'] = user_password
                                                     with open(current_path + '/users.json', 'w', encoding='utf-8') as file:
                                                         json.dump(users, file, indent=2)
+                                                    read_config()
                                                     st.toast('**密码已成功更改！**', icon=':material/check_circle:')
                                                 else:
                                                     st.toast('**错误的UID，UID是您注册时和登陆时显示的令牌！**', icon=':material/error:')
@@ -248,6 +288,7 @@ else:
                                                     users[user_account]['password'] = user_password_new
                                                     with open(current_path + '/users.json', 'w', encoding='utf-8') as file:
                                                         json.dump(users, file, indent=2)
+                                                    read_config()
                                                     st.toast('**密码已成功更改！**', icon=':material/check_circle:')
                                                 else:
                                                     st.toast('**密码长度不足，请填写8位及以上的密码！**', icon=':material/error:')
@@ -294,6 +335,7 @@ else:
                                                     users[user_account]['password'] = user_password
                                                     with open(current_path + '/users.json', 'w', encoding='utf-8') as file:
                                                         json.dump(users, file, indent=2)
+                                                    read_config()
                                                     st.toast('**密码已成功更改！**', icon=':material/check_circle:')
                                                 else:
                                                     st.toast('**错误的UID，UID是您注册时和登陆时显示的令牌！**', icon=':material/error:')
@@ -317,3 +359,12 @@ else:
                 st.page_link("home.py", label="**返回首页**")
                 st.write("")
         change_area_old()
+
+with open(style_path + "//footer.html", "r", encoding="utf-8") as file:
+    footer_html = file.read()
+    color = "white"
+    if st.session_state.theme == "Retro Orange":
+        color = "#efede4"
+    footer_html = footer_html.replace("{{color}}", color)
+st.markdown(footer_html, unsafe_allow_html=True)
+st.logo("LOGO.png", link="https://github.com/Chenyme/oaifree-tools")

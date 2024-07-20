@@ -11,9 +11,7 @@ import base64
 path = os.path.abspath('.')
 style_path = path + '/style/'
 current_path = path + '/config/'
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler(current_path + "/app.log", encoding='utf-8'),
-                              logging.StreamHandler()])
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler(current_path + "/app.log", encoding='utf-8'), logging.StreamHandler()])
 logger = logging.getLogger()
 png_logger = logging.getLogger("PIL.PngImagePlugin")
 png_logger.setLevel(logging.WARNING)
@@ -52,6 +50,7 @@ with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:  #
     </div>
 </body>
 <style>""", "")
+
 with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:  # 网页样式
     sidebar_html = file.read()
 with open(current_path + 'secret.toml', 'r') as f:
@@ -187,7 +186,7 @@ try:
         encoded_image = base64.b64encode(image_file.read()).decode()
     if str(user_linux_do_data["username"]) + "@linux.do" not in users.keys():
         name = str(user_linux_do_data["username"]) + "@linux.do"
-        password = str(user_linux_do_data["username"])
+        password = str(user_linux_do_data["username"]) + '-' + secrets.token_urlsafe(5)
         uid = "UID-" + secrets.token_urlsafe(32)
         note = f"LinuxDo {user_linux_do_data['trust_level']}级用户"
         with st.container(border=True):
@@ -337,7 +336,7 @@ try:
                         st.stop()
                 st.markdown(f"""
                 <div class="uid-message">账户：{user_linux_do_data["username"] + '@linux.do'}</div>
-                <div class="uid-message">密码：{user_linux_do_data["username"] + '-' + secrets.token_urlsafe(5)}</div>
+                <div class="uid-message">密码：{password}</div>
                 <div class="uid-message">{uid}</div>
                 """, unsafe_allow_html=True)
                 st.toast("**请及时前往首页修改您的密码！**", icon=":material/check_circle:")
@@ -511,9 +510,9 @@ try:
                 st.write("")
 except:
     st.error("""
-    **401：Unauthorized!**
+    **401：Unauthorized access or an unknown error occurred during access! **
     
-    **未授权访问！**
+    **未授权访问或访问过程中出现未知错误！**
     """, icon=":material/error:")
 st.write("")
 st.write("")
