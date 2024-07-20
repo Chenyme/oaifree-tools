@@ -30,71 +30,35 @@ png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
-
 # 读取配置文件
-def read_config():
-    with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:
-        secret_data = toml.load(file)
-    with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
-        web_setting = toml.load(file)
-    with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
-        accounts = json.load(file)
-    with open(current_path + '/users.json', 'r', encoding='utf-8') as file:
-        user_data = json.load(file)
-    with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:
-        domain_data = json.load(file)
-    with open(current_path + '/openai.json', 'r', encoding='utf-8') as file:
-        openai_data = json.load(file)
-    with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
-        invite_config = json.load(file)
-    with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:
-        anthropic_data = json.load(file)
-    with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
-        share_data = json.load(file)
-    with open(current_path + '/refresh.json', 'r', encoding='utf-8') as file:
-        refresh_data = json.load(file)
-    with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:
-        sidebar_html = file.read()
-    with open(style_path + "/Retro_Orange.html", "r", encoding="utf-8") as file:
-        Retro_Orange_html = file.read()
-    with open(style_path + "//footer.html", "r", encoding="utf-8") as file:
-        footer_html = file.read()
-    with open("LOGO.png", "rb") as image_file:
-        encoded_image = base64.b64encode(image_file.read()).decode()
-
-    st.session_state.secret_data = secret_data
-    st.session_state.web_setting = web_setting
-    st.session_state.accounts = accounts
-    st.session_state.user_data = user_data
-    st.session_state.domain_data = domain_data
-    st.session_state.openai_data = openai_data
-    st.session_state.invite_config = invite_config
-    st.session_state.anthropic_data = anthropic_data
-    st.session_state.share_data = share_data
-    st.session_state.refresh_data = refresh_data
-    st.session_state.sidebar_html = sidebar_html
-    st.session_state.Retro_Orange_html = Retro_Orange_html
-    st.session_state.footer_html = footer_html
-    st.session_state.encoded_image = encoded_image
-
-
-if "secret_data" not in st.session_state:
-    read_config()
-
-secret_data = st.session_state.secret_data
-web_setting = st.session_state.web_setting
-accounts = st.session_state.accounts
-user_data = st.session_state.user_data
-domain_data = st.session_state.domain_data
-openai_data = st.session_state.openai_data
-invite_config = st.session_state.invite_config
-anthropic_data = st.session_state.anthropic_data
-share_data = st.session_state.share_data
-refresh_data = st.session_state.refresh_data
-sidebar_html = st.session_state.sidebar_html
-Retro_Orange_html = st.session_state.Retro_Orange_html
-footer_html = st.session_state.footer_html
-encoded_image = st.session_state.encoded_image
+with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:
+    secret_data = toml.load(file)
+with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:
+    web_setting = toml.load(file)
+with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:
+    accounts = json.load(file)
+with open(current_path + '/users.json', 'r', encoding='utf-8') as file:
+    user_data = json.load(file)
+with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:
+    domain_data = json.load(file)
+with open(current_path + '/openai.json', 'r', encoding='utf-8') as file:
+    openai_data = json.load(file)
+with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:
+    invite_config = json.load(file)
+with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:
+    anthropic_data = json.load(file)
+with open(current_path + '/share.json', 'r', encoding='utf-8') as file:
+    share_data = json.load(file)
+with open(current_path + '/refresh.json', 'r', encoding='utf-8') as file:
+    refresh_data = json.load(file)
+with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:
+    sidebar_html = file.read()
+with open(style_path + "/Retro_Orange.html", "r", encoding="utf-8") as file:
+    Retro_Orange_html = file.read()
+with open(style_path + "//footer.html", "r", encoding="utf-8") as file:
+    footer_html = file.read()
+with open("LOGO.png", "rb") as image_file:
+    encoded_image = base64.b64encode(image_file.read()).decode()
 
 openai_list = []
 anthropic_list = []
@@ -137,22 +101,18 @@ if "theme" not in st.session_state:
 if "success" in st.session_state:
     st.toast("**更改成功！**", icon=":material/check_circle:")
     del st.session_state.success
-    read_config()
 
 if "test" in st.session_state:
     st.toast("**测试成功！**", icon=":material/check_circle:")
     del st.session_state.test
-    read_config()
 
 if "add" in st.session_state:
     st.toast("**新增成功！**", icon=":material/check_circle:")
     del st.session_state.add
-    read_config()
 
 if "delete" in st.session_state:
     st.toast("**删除成功！**", icon=":material/check_circle:")
     del st.session_state.delete
-    read_config()
 
 
 if st.session_state.role == "admin":
@@ -786,7 +746,6 @@ if st.session_state.role == "admin":
                         web_setting["chart"]["horizontal"] = horizontal
                         with open(current_path + "/setting.toml", "w", encoding="utf-8") as f:
                             toml.dump(web_setting, f)
-                        read_config()
                         st.toast("**更改设置成功！**", icon=":material/check_circle:")
 
                 plot_choose = sac.segmented(

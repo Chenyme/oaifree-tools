@@ -20,70 +20,37 @@ urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
 
-def read_config():
-    with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:  # 新增设置
-        secret_setting = toml.load(file)
-    with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:  # web设置
-        web_setting = toml.load(file)
-    with open(current_path + '/users.json', 'r', encoding='utf-8') as file:  # 用户数据
-        users = json.load(file)
-    with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:  # 账户数据
-        accounts = json.load(file)
-    with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:  # 域名数据
-        domains = json.load(file)
-    with open(current_path + '/openai.json', 'r', encoding='utf-8') as file:  # OpenAI数据
-        openai_data = json.load(file)
-    with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:  # Anthropic数据
-        anthropic_data = json.load(file)
-    with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:  # OpenAI邀请数据
-        invite_config = json.load(file)
-    with open(current_path + '/refresh.json', 'r', encoding='utf-8') as file:  # 刷新数据
-        refresh_data = json.load(file)
-    with open(style_path + "//Simple_White.html", "r", encoding="utf-8") as file:  # 网页样式
-        Simple_white_html = file.read()
-    with open(style_path + "//Classic_Black.html", "r", encoding="utf-8") as file:  # 网页样式
-        Classic_Black_html = file.read()
-    with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:  # 网页样式
-        Retro_Orange_html = file.read()
-        Retro_Orange_html = Retro_Orange_html.replace("{{text}}", "Deepen understanding")
-    with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:  # 网页样式
-        sidebar_html = file.read()
-    with open("LOGO.png", "rb") as image_file:
-        encoded_image = base64.b64encode(image_file.read()).decode()
 
-    st.session_state.web_setting = web_setting
-    st.session_state.secret_setting = secret_setting
-    st.session_state.users = users
-    st.session_state.accounts = accounts
-    st.session_state.domains = domains
-    st.session_state.openai_data = openai_data
-    st.session_state.anthropic_data = anthropic_data
-    st.session_state.invite_config = invite_config
-    st.session_state.refresh_data = refresh_data
-    st.session_state.Simple_white_html = Simple_white_html
-    st.session_state.Classic_Black_html = Classic_Black_html
-    st.session_state.Retro_Orange_html = Retro_Orange_html
-    st.session_state.sidebar_html = sidebar_html
-    st.session_state.encoded_image = encoded_image
+with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:  # 新增设置
+    secret_setting = toml.load(file)
+with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:  # web设置
+    web_setting = toml.load(file)
+with open(current_path + '/users.json', 'r', encoding='utf-8') as file:  # 用户数据
+    users = json.load(file)
+with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:  # 账户数据
+    accounts = json.load(file)
+with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:  # 域名数据
+    domains = json.load(file)
+with open(current_path + '/openai.json', 'r', encoding='utf-8') as file:  # OpenAI数据
+    openai_data = json.load(file)
+with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:  # Anthropic数据
+    anthropic_data = json.load(file)
+with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:  # OpenAI邀请数据
+    invite_config = json.load(file)
+with open(current_path + '/refresh.json', 'r', encoding='utf-8') as file:  # 刷新数据
+    refresh_data = json.load(file)
+with open(style_path + "//Simple_White.html", "r", encoding="utf-8") as file:  # 网页样式
+    Simple_white_html = file.read()
+with open(style_path + "//Classic_Black.html", "r", encoding="utf-8") as file:  # 网页样式
+    Classic_Black_html = file.read()
+with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:  # 网页样式
+    Retro_Orange_html = file.read()
+    Retro_Orange_html = Retro_Orange_html.replace("{{text}}", "Deepen understanding")
+with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:  # 网页样式
+    sidebar_html = file.read()
+with open("LOGO.png", "rb") as image_file:
+    encoded_image = base64.b64encode(image_file.read()).decode()
 
-
-if "refresh_data" not in st.session_state:
-    read_config()
-
-web_setting = st.session_state.web_setting
-secret_setting = st.session_state.secret_setting
-users = st.session_state.users
-accounts = st.session_state.accounts
-domains = st.session_state.domains
-openai_data = st.session_state.openai_data
-anthropic_data = st.session_state.anthropic_data
-invite_config = st.session_state.invite_config
-refresh_data = st.session_state.refresh_data
-Simple_white_html = st.session_state.Simple_white_html
-Classic_Black_html = st.session_state.Classic_Black_html
-Retro_Orange_html = st.session_state.Retro_Orange_html
-sidebar_html = st.session_state.sidebar_html
-encoded_image = st.session_state.encoded_image
 Retro_Orange_html = Retro_Orange_html.replace("{{text}}", "Discover opportunities")
 
 if "theme" not in st.session_state:
@@ -229,7 +196,6 @@ if st.session_state.theme == "Retro Orange":
                                                 refresh_data[refresh]['used'] = True
                                                 with open(current_path + '/refresh.json', 'w', encoding='utf-8') as file:
                                                     json.dump(refresh_data, file, indent=2)
-                                                read_config()
                                                 if str(refresh_data[refresh]['expires_in']) == "0":
                                                     logger.info(f"【账户续费】 账户：{user_account} 续费成功！续费:永久！")
                                                     st.toast('续费成功！', icon=':material/check_circle:')
@@ -328,7 +294,6 @@ else:
                                                 refresh_data[refresh]['used'] = True
                                                 with open(current_path + '/refresh.json', 'w', encoding='utf-8') as file:
                                                     json.dump(refresh_data, file, indent=2)
-                                                read_config()
 
                                                 if str(refresh_data[refresh]['expires_in']) == "0":
                                                     logger.info(f"【账户续费】 账户：{user_account} 续费成功！续费:永久！")

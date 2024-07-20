@@ -18,69 +18,34 @@ png_logger.setLevel(logging.WARNING)
 urllib3_logger = logging.getLogger("urllib3.connectionpool")
 urllib3_logger.setLevel(logging.WARNING)
 
-def read_config():
-    with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:  # 新增设置
-        secret_setting = toml.load(file)
-    with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:  # web设置
-        web_setting = toml.load(file)
-    with open(current_path + '/users.json', 'r', encoding='utf-8') as file:  # 用户数据
-        users = json.load(file)
-    with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:  # 账户数据
-        accounts = json.load(file)
-    with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:  # 域名数据
-        domains = json.load(file)
-    with open(current_path + '/openai.json', 'r', encoding='utf-8') as file:  # OpenAI数据
-        openai_data = json.load(file)
-    with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:  # Anthropic数据
-        anthropic_data = json.load(file)
-    with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:  # OpenAI邀请数据
-        invite_config = json.load(file)
-    with open(current_path + '/share.json', 'r', encoding='utf-8') as file:  # 共享数据
-        share_data = json.load(file)
-    with open(style_path + "//Simple_White.html", "r", encoding="utf-8") as file:  # 网页样式
-        Simple_white_html = file.read()
-    with open(style_path + "//Classic_Black.html", "r", encoding="utf-8") as file:  # 网页样式
-        Classic_Black_html = file.read()
-    with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:  # 网页样式
-        Retro_Orange_html = file.read()
-    with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:  # 网页样式
-        sidebar_html = file.read()
-    with open("LOGO.png", "rb") as image_file:
-        encoded_image = base64.b64encode(image_file.read()).decode()
-
-    st.session_state.web_setting = web_setting
-    st.session_state.secret_setting = secret_setting
-    st.session_state.users = users
-    st.session_state.accounts = accounts
-    st.session_state.domains = domains
-    st.session_state.openai_data = openai_data
-    st.session_state.anthropic_data = anthropic_data
-    st.session_state.invite_config = invite_config
-    st.session_state.share_data = share_data
-    st.session_state.Simple_white_html = Simple_white_html
-    st.session_state.Classic_Black_html = Classic_Black_html
-    st.session_state.Retro_Orange_html = Retro_Orange_html
-    st.session_state.sidebar_html = sidebar_html
-    st.session_state.encoded_image = encoded_image
-
-
-if "share_data" not in st.session_state:
-    read_config()
-
-web_setting = st.session_state.web_setting
-secret_setting = st.session_state.secret_setting
-users = st.session_state.users
-accounts = st.session_state.accounts
-domains = st.session_state.domains
-openai_data = st.session_state.openai_data
-anthropic_data = st.session_state.anthropic_data
-invite_config = st.session_state.invite_config
-share_data = st.session_state.share_data
-Simple_white_html = st.session_state.Simple_white_html
-Classic_Black_html = st.session_state.Classic_Black_html
-Retro_Orange_html = st.session_state.Retro_Orange_html
-sidebar_html = st.session_state.sidebar_html
-encoded_image = st.session_state.encoded_image
+with open(current_path + '/secret.toml', 'r', encoding='utf-8') as file:  # 新增设置
+    secret_setting = toml.load(file)
+with open(current_path + '/setting.toml', 'r', encoding='utf-8') as file:  # web设置
+    web_setting = toml.load(file)
+with open(current_path + '/users.json', 'r', encoding='utf-8') as file:  # 用户数据
+    users = json.load(file)
+with open(current_path + '/accounts.json', 'r', encoding='utf-8') as file:  # 账户数据
+    accounts = json.load(file)
+with open(current_path + '/domain.json', 'r', encoding='utf-8') as file:  # 域名数据
+    domains = json.load(file)
+with open(current_path + '/openai.json', 'r', encoding='utf-8') as file:  # OpenAI数据
+    openai_data = json.load(file)
+with open(current_path + '/anthropic.json', 'r', encoding='utf-8') as file:  # Anthropic数据
+    anthropic_data = json.load(file)
+with open(current_path + '/invite.json', 'r', encoding='utf-8') as file:  # OpenAI邀请数据
+    invite_config = json.load(file)
+with open(current_path + '/share.json', 'r', encoding='utf-8') as file:  # 共享数据
+    share_data = json.load(file)
+with open(style_path + "//Simple_White.html", "r", encoding="utf-8") as file:  # 网页样式
+    Simple_white_html = file.read()
+with open(style_path + "//Classic_Black.html", "r", encoding="utf-8") as file:  # 网页样式
+    Classic_Black_html = file.read()
+with open(style_path + "//Retro_Orange.html", "r", encoding="utf-8") as file:  # 网页样式
+    Retro_Orange_html = file.read()
+with open(style_path + "//sidebar.html", "r", encoding="utf-8") as file:  # 网页样式
+    sidebar_html = file.read()
+with open("LOGO.png", "rb") as image_file:
+    encoded_image = base64.b64encode(image_file.read()).decode()
 Retro_Orange_html = Retro_Orange_html.replace("{{text}}", "Spark your creativity")
 
 if "theme" not in st.session_state:
