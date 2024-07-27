@@ -1,4 +1,4 @@
-streamlit
+streamlit==1.36.0
 streamlit_antd_components
 openpyxl
 pandas
